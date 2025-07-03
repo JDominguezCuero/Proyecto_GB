@@ -1,0 +1,97 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f2f2f2;
+    padding: 30px;
+}
+
+#title{
+    color:#f89b0f;
+    text-align: center;
+}
+
+
+form, #resultado, #tabla-amortizacion {
+    background: white;
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+
+   
+    border: 3px solid transparent;
+    border-image: linear-gradient(to right, #f89b0f, #0ae20a); 
+    border-image-slice: 1; 
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc; 
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #f89b0f;
+    color: white;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #e08b0c;
+}
+
+.output {
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 8px;
+    text-align: right;
+    font-size: 0.9em;
+}
+
+th {
+    background-color: #0ae20a;
+    color: white;
+    border: 1px solid #f89b0f; /
+}
+
+td {
+    border: 1px solid #0ae20a; 
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #e6ffe6;
+}
+
+#tabla-amortizacion h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #f77104;
+}

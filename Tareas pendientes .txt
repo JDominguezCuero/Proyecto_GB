@@ -1,0 +1,23 @@
+Cambios realizados 
+
+creacion css productosyservicios.css
+
+creacion html
+-chatbot.html
+
+creacion PHP---->view
+
+-productosyservicios.php
+-Productos.php
+
+
+cambios en el barra nav asesor y barra nav cliente
+
+-Cambiar los titulos de las paginas (view)
+
+Integrar tabla amortizacion ya esta creada solo es agregar codigo, dentro de esta misma crear el siulacro de capacidad de endeudamiento separadas por un div o un seccion 
+
+habilitar boton simulacro en asesorGerente  
+
+-ajustar cambios en el formulario crearcliente ----------> ya esta ajustado se debe cambiar el css CrearAsesor 
+

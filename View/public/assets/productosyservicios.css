@@ -1,0 +1,216 @@
+/* === Estilos Generales === */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fdf5ed;
+}
+
+header {
+    background-color: #ff6f00;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+footer {
+    background-color: #fff3e0;
+    color: #8d6e63;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.option-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s ease;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+}
+
+.option-card .icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+
+/* === FAB Flotante === */
+.fab-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.fab-button {
+    background-color: #ff6f00;
+    color: white;
+    padding: 15px 22px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: none;
+}
+
+.fab-options {
+    display: none;
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.fab-container.active .fab-options {
+    display: block;
+}
+
+.fab-options li {
+    list-style: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #444;
+}
+
+.fab-options li:hover {
+    background-color: #ffe0b2;
+}
+
+
+/* === Modal Común === */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+/* === Botón de cierre de modal === */
+.modal-close-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* === Formulario de turnos === */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+button[type="submit"] {
+    background-color: #fb8c00;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button[type="submit"]:hover {
+    background-color: #ef6c00;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+/* === Resultado de turno generado === */
+#turno-display {
+    display: none;
+    margin-top: 20px;
+}
+
+
+/* === Modal Chatbot === */
+.chatbot-container {
+    width: 95%;
+    max-width: 700px;
+    height: 85vh;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.chatbot-header {
+    background-color: #ff6f00;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.chatbot-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
