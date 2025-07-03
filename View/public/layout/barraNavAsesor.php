@@ -23,6 +23,7 @@
     ?>
     <li><a href="<?= BASE_URL ?>/View/asesor/RegistroAsesor.php">Crear Asesor</a></li>
     <li><a href="<?= BASE_URL ?>/View/asesor/Bitacora.php">Bitacora</a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/cajero.php">Cajero</a></li>
   </ul>
 </nav>
 
