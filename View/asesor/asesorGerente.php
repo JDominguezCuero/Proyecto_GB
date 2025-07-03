@@ -1,173 +1,128 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simulador de Cajero Financiero</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f2f4f8;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #1d3557;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 5px;
-    }
-    input[type="text"] {
-      padding: 10px;
-      width: 100%;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #457b9d;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #1d3557;
-    }
-    .info-box {
-      background-color: #e0f0ff;
-      border-left: 6px solid #2196F3;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 8px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ccc;
-    }
-    th {
-      background-color: #1d3557;
-      color: white;
-    }
-    tr.cancelada {
-      background-color: #d4edda !important;
-    }
-    .select-cuota {
-      padding: 5px 10px;
-      background-color: #2a9d8f;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .select-cuota:hover {
-      background-color: #21867a;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Panel del Cajero</h1>
-  </header>
-
-  <div class="container">
-    <div class="form-group">
-      <label for="documento">Buscar cliente por Documento</label>
-      <input type="text" id="documento" placeholder="Ingrese número de documento" />
-      <button onclick="consultarCliente()">Consultar</button>
-    </div>
-
-    <div id="cliente-info" style="display:none;">
-      <div class="info-box">
-        <strong>Cliente:</strong> <span id="nombre-cliente"></span><br>
-        <strong>Producto:</strong> <span id="producto-cliente"></span><br>
-        <strong>Monto:</strong> <span id="monto-cliente"></span>
-      </div>
-
-      <h3>Tabla de Amortización</h3>
-      <table id="tabla-cuotas">
-        <thead>
-          <tr>
-            <th># Cuota</th>
-            <th>Fecha</th>
-            <th>Monto</th>
-            <th>Estado</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- JS rellenará filas aquí -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <script>
-    const cuotas = [
-      { numero: 1, fecha: '2025-07-15', monto: 200000, estado: 'Pendiente' },
-      { numero: 2, fecha: '2025-08-15', monto: 200000, estado: 'Pendiente' },
-      { numero: 3, fecha: '2025-09-15', monto: 200000, estado: 'Pendiente' }
-    ];
-
-    function consultarCliente() {
-      const documento = document.getElementById('documento').value.trim();
-      if (documento === '') {
-        alert('Por favor ingrese un documento.');
-        return;
-      }
-
-      // Simulación de datos del cliente
-      document.getElementById('nombre-cliente').textContent = 'Juan Pérez';
-      document.getElementById('producto-cliente').textContent = 'Crédito de Libre Inversión';
-      document.getElementById('monto-cliente').textContent = '$600,000';
-      document.getElementById('cliente-info').style.display = 'block';
-
-      const tbody = document.querySelector('#tabla-cuotas tbody');
-      tbody.innerHTML = '';
-      cuotas.forEach(cuota => {
-        const fila = document.createElement('tr');
-        fila.id = 'cuota-' + cuota.numero;
-        fila.innerHTML = `
-          <td>${cuota.numero}</td>
-          <td>${cuota.fecha}</td>
-          <td>$${cuota.monto.toLocaleString()}</td>
-          <td id="estado-${cuota.numero}">${cuota.estado}</td>
-          <td><button class="select-cuota" onclick="abonarCuota(${cuota.numero})">Abonar</button></td>
-        `;
-        tbody.appendChild(fila);
+<?php
+session_start();
+  require_once(__DIR__ . '../../../Config/config.php');
+  
+  if (isset($_GET['login']) && $_GET['login'] == 'success') {
+    $user = htmlspecialchars($_SESSION['nombre'] ?? 'Asesor');
+    echo "<script>
+      document.addEventListener('DOMContentLoaded', function() {
+          showModal('✅ Operación Exitosa', 'Bienvenido @$user.', 'success');
       });
-    }
+      </script>";
 
-    function abonarCuota(numero) {
-      const confirmacion = confirm(`¿Deseas marcar la cuota ${numero} como cancelada?`);
-      if (!confirmacion) return;
+  } else if (isset($_GET['login']) && $_GET['login'] == 'error') {
+    $mensaje = htmlspecialchars($_GET['error']);
+    echo "<script>
+      document.addEventListener('DOMContentLoaded', function() {
+          showModal('❌ Error al registrar', '$mensaje', 'error');
+      });
+      </script>";
+  }
 
-      document.getElementById('estado-' + numero).textContent = 'Cancelada';
-      document.getElementById('cuota-' + numero).classList.add('cancelada');
-    }
-  </script>
+?>
+
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco finan_cias</title>    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
+  </head>
+  <body>
+    <!-- barra de navegacion en todas las paginas :) -->
+   <?php include '../public/layout/barraNavAsesor.php'; ?>
+
+ <!-- Carrusel -->
+  <section class="carrusel">
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A1.png" alt="Imagen 1"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A2.png" alt="Imagen 2"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A3.png" alt="Imagen 3"></div>
+   <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A4.png" alt="Imagen 4"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A5.png" alt="Imagen 5"></div>
+   <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A6.png" alt="Imagen 6"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A7.png" alt="Imagen 7"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A8.png" alt="Imagen 8"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A9.png" alt="Imagen 9"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A10.png" alt="Imagen 10"></div>
+   <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A11.png" alt="Imagen 11"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A12.png" alt="Imagen 12"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A13.png" alt="Imagen 13"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A14.png" alt="Imagen 14"></div>
+    <div class="slide"><img src="<?= BASE_URL ?>/View/public/assets/Img/carrusel/A15.png" alt="Imagen 15"></div>
+    
+
+    <!-- Flechas -->
+  <button class="flecha izq"><i class="fas fa-chevron-left"></i></button>
+  <button class="flecha der"><i class="fas fa-chevron-right"></i></button>
+
+
+  </section>
+
+  <!-- Texto debajo del carrusel -->
+  <section class="texto-dinamico">
+    <p>
+      BANCO Finan-CIAS, una institución financiera autónoma, moderna y confiable, creada con visión y compromiso desde la academia, pero pensada para el mundo real.
+      Nacimos como un proyecto de los estudiantes del programa Tecnólogo en Gestión Bancaria del SENA, con el propósito de construir una banca accesible, humana y eficiente, que responda a los desafíos actuales de las personas, las familias, los emprendedores y las comunidades.
+    </p>
+  </section>
+
+    <!-- Footer -->
+
+  <?php include '../public/layout/frontendBackend.php'; ?>
+  <?php include '../public/layout/layoutfooter.php'; ?>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <?php include __DIR__ . '../../../View/public/layout/mensajesModal.php'; ?>
+   
+  <script>
+  let indiceActual = 0;
+  let intervalo;
+
+  const slides = document.querySelectorAll('.slide');
+
+  function mostrarSlide(n) {
+    slides.forEach(slide => slide.classList.remove('active'));
+    slides[n].classList.add('active');
+  }
+
+  function cambiarSlide(direccion) {
+    indiceActual += direccion;
+    if (indiceActual < 0) indiceActual = slides.length - 1;
+    if (indiceActual >= slides.length) indiceActual = 0;
+    mostrarSlide(indiceActual);
+  }
+
+  function iniciarCarruselAutomatico() {
+    intervalo = setInterval(() => cambiarSlide(1), 4000);
+  }
+
+  function reiniciarCarrusel() {
+    clearInterval(intervalo);
+    iniciarCarruselAutomatico();
+  }
+
+  // Eventos de botones (mejor para evitar conflictos en HTML inline)
+  document.addEventListener("DOMContentLoaded", () => {
+    mostrarSlide(indiceActual);
+    iniciarCarruselAutomatico();
+
+    document.querySelector('.flecha.izq').addEventListener('click', () => {
+      cambiarSlide(-1);
+      reiniciarCarrusel();
+    });
+
+    document.querySelector('.flecha.der').addEventListener('click', () => {
+      cambiarSlide(1);
+      reiniciarCarrusel();
+    });
+  });
+</script>
 </body>
 </html>

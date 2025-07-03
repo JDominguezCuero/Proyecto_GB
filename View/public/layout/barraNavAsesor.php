@@ -1,6 +1,6 @@
 <header class="header">
   <div class="logo-nombre">
-    <img src="../public/assets/Img/logos/logo2.png" alt="Logo Banco" class="logo">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/logos/logo2.png" alt="Logo Banco" class="logo">
     <div class="titulo">
       <h1>Banco Finan-CIAS</h1>
       <h6>¡La Banca que te ayuda a crecer!</h6>
@@ -12,17 +12,17 @@
 
 <nav class="nav">
   <ul>
-    <li><a href="../asesor/asesorGerente.php">inicio</a></li>
-    <li><a href="../asesor/productosyservicios.php">Productos y Servicios </a></li>
-    <li><a href="../asesor/Tab_Amortizacion.php">Solicitud credito</a></li>
-    <li><a href="../asesor/CrearCliente.php">Crear cliente</a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/asesorGerente.php">inicio</a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/productosyservicios.php">Productos y Servicios </a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/Tab_Amortizacion.php">Solicitud credito</a></li>
+    <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=listarCliente">Crear cliente</a></li>
     <?php 
       if($_SESSION['rol'] == 3){
         echo '<li><a href="../asesor/RegistroAsesor.php">Crear Asesor</a></li>';
       }
     ?>
-    <li><a href="../asesor/RegistroAsesor.php">Crear Asesor</a></li>
-    <li><a href="../asesor/Bitacora.php">Bitacora</a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/RegistroAsesor.php">Crear Asesor</a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/Bitacora.php">Bitacora</a></li>
   </ul>
 </nav>
 
@@ -39,7 +39,7 @@
 
         if (confirmacion) {
           // Si el usuario confirma, redirige a inicio.php con un parámetro 'logout'
-          window.location.href = '../public/inicio.php?logout=true'; 
+          window.location.href = '<?= BASE_URL ?>/View/public/inicio.php?logout=true'; 
         }
       });
     }

@@ -22,23 +22,9 @@ try {
             header("Location: /Proyecto_GB/View/asesor/asesorGerente.php?login=success");
         break;
 
-        case 'consultar':
-            $id = $_GET['id'] ?? null;
-            if ($id) {
-                $item = obtenerPersonalPorId($conexion, $id);
-                if (!$item) {
-                    $mensajeError = "Usuario no encontrado.";
-                }
-            } else {
-                $mensajeError = "ID no proporcionado.";
-            }
-
-            if (!empty($mensajeError)) {
-                header("Location: controller.php?accion=listar&error=" . urlencode($mensajeError));
-                exit;
-            }
-
-            include __DIR__ . '/views/personal.php';
+        case 'listarCliente':
+            $productos = obtenerProductos($conexion);
+            include __DIR__ . '/../View/asesor/CrearCliente.php';
         break;
 
         case 'agregarAsesor':
@@ -130,64 +116,6 @@ try {
             } catch (Exception $e) {
                 $mensajeError = "Error inesperado: " . urlencode($e->getMessage());
                 header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?error=error&msg=" . urlencode($mensajeError));
-                exit;
-            }
-            break;
-
-
-        case 'editar':
-            $id = $_POST['id'] ?? $_GET['id'] ?? null;
-
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
-                $nombre     = $_POST['nombre'] ?? '';
-                $apellido   = $_POST['apellido'] ?? '';
-                $correo     = $_POST['correo'] ?? '';
-                $contrasena = $_POST['contrasena'] ?? '';
-                $idRol      = $_POST['id_rol'] ?? 3;
-                $direccion  = $_POST['direccion'] ?? '';
-                $celular    = $_POST['celular'] ?? '';
-                $activo     = $_POST['activo'] ?? 1;
-
-                if ($nombre && $apellido && $correo && $idRol !== '') {
-                    $resultado = actualizarPersonal($conexion, $id, $nombre, $apellido, $correo, $contrasena, $idRol, $direccion, $celular, $activo);
-                    if ($resultado) {
-                        header("Location: controller.php?accion=listar&msg=" . urlencode("Usuario actualizado correctamente."));
-                        exit;
-                    } else {
-                        $mensajeError = "Error al actualizar el usuario.";
-                    }
-                } else {
-                    $mensajeError = "Faltan campos obligatorios para actualizar.";
-                }
-            } elseif ($id) {
-                $item = obtenerPersonalPorId($conexion, $id);
-                include __DIR__ . '/views/personal.php';
-            } else {
-                $mensajeError = "ID de usuario no proporcionado para editar.";
-            }
-
-            if (!empty($mensajeError)) {
-                header("Location: controller.php?accion=listar&error=" . urlencode($mensajeError));
-                exit;
-            }
-            break;
-
-        case 'eliminar':
-            $id = $_GET['id'] ?? null;
-            if ($id) {
-                $resultado = eliminarPersonal($conexion, $id);
-                if ($resultado) {
-                    header("Location: controller.php?accion=listar&msg=" . urlencode("Usuario eliminado correctamente."));
-                    exit;
-                } else {
-                    $mensajeError = "No se pudo eliminar el usuario.";
-                }
-            } else {
-                $mensajeError = "ID no proporcionado para eliminar.";
-            }
-
-            if (!empty($mensajeError)) {
-                header("Location: controller.php?accion=listar&error=" . urlencode($mensajeError));
                 exit;
             }
             break;
