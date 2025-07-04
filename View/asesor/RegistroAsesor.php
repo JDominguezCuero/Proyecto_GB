@@ -11,7 +11,7 @@ session_start();
       </script>";
 
   }else if (isset($_GET['success']) && $_GET['success'] == 'success' && isset($_GET['msg'])) {
-    $mensaje = htmlspecialchars($_GET['msg']) ?? 'Error inesperado.';
+    $mensaje = htmlspecialchars($_GET['msg']) ?? 'Proceso Exitoso.';
     echo "<script>
       document.addEventListener('DOMContentLoaded', function() {
           showModal('✅ Operación Exitosa', '$mensaje', 'success');

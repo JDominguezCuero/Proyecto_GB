@@ -2,11 +2,19 @@
 session_start();
   require_once(__DIR__ . '../../../Config/config.php');
   
-  if (isset($_GET['login']) && $_GET['login'] == 'success') {
-    $user = htmlspecialchars($_SESSION['nombre'] ?? 'Asesor');
+  if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
+    $mensaje = htmlspecialchars($_GET['msg']) ?? 'Error inesperado.';
     echo "<script>
       document.addEventListener('DOMContentLoaded', function() {
-          showModal('✅ Operación Exitosa', 'Bienvenido @$user.', 'success');
+          showModal('❌ Error al registrar', '$mensaje', 'error');
+      });
+      </script>";
+
+  }else if (isset($_GET['success']) && $_GET['success'] == 'success' && isset($_GET['msg'])) {
+    $mensaje = htmlspecialchars($_GET['msg']) ?? 'Proceso Exitoso.';
+    echo "<script>
+      document.addEventListener('DOMContentLoaded', function() {
+          showModal('✅ Operación Exitosa', '$mensaje', 'success');
       });
       </script>";
   }
@@ -56,19 +64,23 @@ session_start();
     <div class="modal-container turno-container">
       <button class="modal-close-button" id="closeTurno">&times;</button>
       <h1>Generador de Turnos</h1>
-      <form id="turnoForm">
+      <form id="turnoForm" action="<?= BASE_URL ?>/Controlador/asesorController.php?accion=registrarTurno" method="POST">
         <div class="form-group">
           <label for="nombre">Nombre Completo:</label>
-          <input type="text" id="nombre" name="nombre" required placeholder="Ej: Juan Pérez">
+          <input type="text" id="nombre" name="nombre_completo_solicitante" required placeholder="Ej: Juan Pérez">
           <p class="error-message" id="error-nombre">Por favor, ingresa tu nombre completo.</p>
         </div>
         <div class="form-group">
           <label for="cedula">Número de Cédula:</label>
-          <input type="number" id="cedula" name="cedula" required placeholder="Ej: 123456789">
+          <input type="number" id="cedula" name="n_documento_solicitante" required placeholder="Ej: 123456789">
           <p class="error-message" id="error-cedula">Por favor, ingresa tu número de cédula.</p>
         </div>
+        <input type="hidden" id="n_turno_hidden" name="n_Turno">
+        <input type="hidden" id="fecha_solicitud_hidden" name="fechaSolicitud">
+
         <button type="submit">Generar Turno</button>
       </form>
+
       <div id="turno-display">
         <p>Su turno ha sido generado:</p>
         <p><strong>Turno No.:</strong> <span id="numeroTurno"></span></p>
@@ -163,8 +175,6 @@ session_start();
     closeChatbotButton.addEventListener('click', () => hideOverlay(chatbotOverlay));
 
     turnoForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-
       errorNombre.style.display = 'none';
       errorCedula.style.display = 'none';
 
@@ -174,21 +184,15 @@ session_start();
 
       if (valid) {
         contadorTurnos++;
-        const horaActual = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const numeroTurnoGenerado = `T${contadorTurnos.toString().padStart(3, '0')}`;
+        const fechaHoraActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        numeroTurnoSpan.textContent = `T${contadorTurnos.toString().padStart(3, '0')}`;
-        nombreClienteSpan.textContent = nombreInput.value;
-        cedulaClienteSpan.textContent = cedulaInput.value;
-        horaGeneracionSpan.textContent = horaActual;
-
-        turnoDisplay.style.display = 'block';
-        turnoForm.style.display = 'none';
-
-        setTimeout(() => {
-          hideOverlay(turnoOverlay);
-          turnoForm.style.display = 'block';
-        }, 5000);
-      }
+        document.getElementById('n_turno_hidden').value = numeroTurnoGenerado;
+        document.getElementById('fecha_solicitud_hidden').value = fechaHoraActual;
+              
+      }else {
+            event.preventDefault();
+        }
     });
 
     window.addEventListener('message', function(event) {

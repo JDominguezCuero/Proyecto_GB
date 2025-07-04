@@ -12,7 +12,8 @@
 
 <nav class="nav">
   <ul>
-    <li><a href="<?= BASE_URL ?>/View/asesor/asesorGerente.php">inicio</a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/asesorGerente.php">Inicio</a></li>
+    <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=listarTurnos">Turnos</a></li>
     <li><a href="<?= BASE_URL ?>/View/asesor/productosyservicios.php">Productos y Servicios </a></li>
     <li><a href="<?= BASE_URL ?>/View/asesor/Tab_Amortizacion.php">Solicitud credito</a></li>
     <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=listarCliente">Crear cliente</a></li>

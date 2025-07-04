@@ -18,7 +18,7 @@ session_start();
 <head>
   <meta charset="UTF-8">
   <title>Vista de Turnos</title>
-  <link rel="stylesheet" href="estilos.css">
+  <!-- <link rel="stylesheet" href="estilos.css"> -->
   <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
   <style>
     .tabla-contenedor {

@@ -2,34 +2,6 @@
 // usuarios/model.php
 require_once __DIR__ . '/../../Proyecto_GB/Config/config.php';
 
-function obtenerProductos($conexion) {
-    $sql = "SELECT * FROM producto";
-    $stmt = $conexion->query($sql);
-    if (!$stmt) {
-        throw new Exception("Error al obtener inventario de alimentos: " . implode(":", $conexion->errorInfo()));
-    }
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-/**
- * Obtiene un registro de personal por su ID.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param int $idPersonal ID del personal.
- * @return array|false Array asociativo del personal o false si no se encuentra.
- */
-function obtenerPersonalPorId(PDO $conexion, int $idPersonal) {
-    $sql = "SELECT p.*, r.Rol AS Nombre_Rol, td.Tipo_Documento AS Nombre_Tipo_Documento, g.Genero AS Nombre_Genero
-            FROM personal p
-            LEFT JOIN rol r ON p.ID_Rol = r.ID_Rol
-            LEFT JOIN tipo_documento td ON p.ID_TD = td.ID_TD
-            LEFT JOIN genero g ON p.ID_Genero = g.ID_Genero
-            WHERE p.ID_Personal = :idPersonal";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bindParam(':idPersonal', $idPersonal, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
 /**
  * Registra nuevo personal.
  * @param PDO $conexion Objeto de conexión PDO.
@@ -58,6 +30,62 @@ function registrarPersonal(PDO $conexion, array $datosPersonal): bool {
         ':fotoPerfil' => $datosPersonal['Foto_Perfil_Personal'] ?? null
     ]);
 }
+
+/**
+* Registra un nuevo turno con datos básicos.
+* Genera el Numero_Turno y establece el estado inicial 'En Espera'.
+* @param PDO $conexion Objeto de conexión PDO.
+* @param string $nombreCompleto Nombre completo del solicitante.
+* @param string $nDocumento Número de documento del solicitante.
+* @return bool True si se registra correctamente, false en caso contrario.
+*/
+function registrarTurno(PDO $conexion, string $nombreCompleto, string $nDocumento, string $numeroTurno, string $fechaSolicitud, int $idEstadoTurno = 1): bool {
+    $sql = "INSERT INTO turno (Nombre_Completo_Solicitante, N_Documento_Solicitante, Numero_Turno, Fecha_Hora_Solicitud, ID_Estado_Turno)
+            VALUES (:nombreCompleto, :nDocumento, :numeroTurno, :fechaSolicitud, :idEstadoTurno)";
+    $stmt = $conexion->prepare($sql);
+    return $stmt->execute([
+        ':nombreCompleto' => $nombreCompleto,
+        ':nDocumento' => $nDocumento,
+        ':numeroTurno' => $numeroTurno,
+        ':fechaSolicitud' => $fechaSolicitud,
+        ':idEstadoTurno' => $idEstadoTurno
+    ]);
+}
+
+
+
+
+
+
+function obtenerProductos($conexion) {
+    $sql = "SELECT * FROM producto";
+    $stmt = $conexion->query($sql);
+    if (!$stmt) {
+        throw new Exception("Error al obtener inventario de alimentos: " . implode(":", $conexion->errorInfo()));
+    }
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Obtiene un registro de personal por su ID.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idPersonal ID del personal.
+ * @return array|false Array asociativo del personal o false si no se encuentra.
+ */
+function obtenerPersonalPorId(PDO $conexion, int $idPersonal) {
+    $sql = "SELECT p.*, r.Rol AS Nombre_Rol, td.Tipo_Documento AS Nombre_Tipo_Documento, g.Genero AS Nombre_Genero
+            FROM personal p
+            LEFT JOIN rol r ON p.ID_Rol = r.ID_Rol
+            LEFT JOIN tipo_documento td ON p.ID_TD = td.ID_TD
+            LEFT JOIN genero g ON p.ID_Genero = g.ID_Genero
+            WHERE p.ID_Personal = :idPersonal";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':idPersonal', $idPersonal, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+
 
 /**
  * Actualiza un registro de personal existente.
@@ -176,7 +204,8 @@ function registrarCliente(PDO $conexion, array $datosCliente): bool {
     $stmt = $conexion->prepare($sql);
 
     // Hashear la contraseña antes de guardar
-    $datosCliente['Contraseña'] = password_hash($datosCliente['Contraseña'], PASSWORD_DEFAULT);
+    // Asegúrate de que $datosCliente['Contraseña'] siempre exista aquí.
+    $hashedPassword = password_hash($datosCliente['Contraseña'], PASSWORD_DEFAULT);
 
     return $stmt->execute([
         ':nombre' => $datosCliente['Nombre_Cliente'],
@@ -190,8 +219,102 @@ function registrarCliente(PDO $conexion, array $datosCliente): bool {
         ':ciudad' => $datosCliente['Ciudad_Cliente'],
         ':fechaNacimiento' => $datosCliente['Fecha_Nacimiento_Cliente'],
         ':idPersonalCreador' => $datosCliente['ID_Personal_Creador'] ?? null,
-        ':contrasena' => $datosCliente['Contraseña'],
+        ':contrasena' => $hashedPassword, // Usar la contraseña hasheada
         ':estado' => $datosCliente['Estado_Cliente'] ?? 1
+    ]);
+}
+
+/**
+ * Registra un nuevo crédito para un cliente.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param array $datosCredito Array asociativo con los datos del crédito.
+ * @return bool True si se registra correctamente, false en caso contrario.
+ */
+function registrarCredito(PDO $conexion, array $datosCredito): bool {
+    $sql = "INSERT INTO credito (
+                ID_Cliente,
+                Monto_Total_Credito,
+                Monto_Pendiente_Credito,
+                Fecha_Vencimiento_Credito,
+                ID_Producto,
+                ID_Estado,
+                Tasa_Interes_Anual,
+                Tasa_Interes_Periodica,
+                Numero_Cuotas,
+                Valor_Cuota_Calculado,
+                Periodicidad,
+                Fecha_Creacion_Credito
+            ) VALUES (
+                :idCliente,
+                :montoTotal,
+                :montoPendiente,
+                :fechaVencimiento,
+                :idProducto,
+                :idEstado,
+                :tasaAnual,
+                :tasaPeriodica,
+                :numeroCuotas,
+                :valorCuotaCalculado,
+                :periodicidad,
+                NOW() -- Fecha y hora actual de creación
+            )";
+    $stmt = $conexion->prepare($sql);
+
+    return $stmt->execute([
+        ':idCliente' => $datosCredito['ID_Cliente'],
+        ':montoTotal' => $datosCredito['Monto_Total_Credito'],
+        ':montoPendiente' => $datosCredito['Monto_Pendiente_Credito'],
+        ':fechaVencimiento' => $datosCredito['Fecha_Vencimiento_Credito'],
+        ':idProducto' => $datosCredito['ID_Producto'],
+        ':idEstado' => $datosCredito['ID_Estado'],
+        ':tasaAnual' => $datosCredito['Tasa_Interes_Anual'],
+        ':tasaPeriodica' => $datosCredito['Tasa_Interes_Periodica'],
+        ':numeroCuotas' => $datosCredito['Numero_Cuotas'],
+        ':valorCuotaCalculado' => $datosCredito['Valor_Cuota_Calculado'],
+        ':periodicidad' => $datosCredito['Periodicidad']
+    ]);
+}
+
+/**
+ * Registra una cuota específica de un crédito.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param array $datosCuota Array asociativo con los datos de la cuota.
+ * @return bool True si se registra correctamente, false en caso contrario.
+ */
+function registrarCuotaCredito(PDO $conexion, array $datosCuota): bool {
+    $sql = "INSERT INTO cuotacredito (
+                ID_Credito,
+                Numero_Cuota,
+                Monto_Capital,
+                Monto_Interes,
+                Monto_Total_Cuota,
+                Fecha_Vencimiento,
+                ID_Estado_Cuota,
+                Fecha_Pago, -- Puede ser null si aún no se ha pagado
+                Monto_Pagado -- Puede ser null si aún no se ha pagado
+            ) VALUES (
+                :idCredito,
+                :numeroCuota,
+                :montoCapital,
+                :montoInteres,
+                :montoTotalCuota,
+                :fechaVencimiento,
+                :idEstadoCuota,
+                :fechaPago,
+                :montoPagado
+            )";
+    $stmt = $conexion->prepare($sql);
+
+    return $stmt->execute([
+        ':idCredito' => $datosCuota['ID_Credito'],
+        ':numeroCuota' => $datosCuota['Numero_Cuota'],
+        ':montoCapital' => $datosCuota['Monto_Capital'],
+        ':montoInteres' => $datosCuota['Monto_Interes'],
+        ':montoTotalCuota' => $datosCuota['Monto_Total_Cuota'],
+        ':fechaVencimiento' => $datosCuota['Fecha_Vencimiento'],
+        ':idEstadoCuota' => $datosCuota['ID_Estado_Cuota'],
+        ':fechaPago' => $datosCuota['Fecha_Pago'] ?? null,   // Permitir NULL si no hay fecha de pago
+        ':montoPagado' => $datosCuota['Monto_Pagado'] ?? null // Permitir NULL si no hay monto pagado
     ]);
 }
 
@@ -291,26 +414,6 @@ function obtenerCreditoPorId(PDO $conexion, int $idCredito) {
 }
 
 /**
- * Registra un nuevo crédito.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $datosCredito Array asociativo con los datos del crédito.
- * @return bool True si se registra correctamente, false en caso contrario.
- */
-function registrarCredito(PDO $conexion, array $datosCredito): bool {
-    $sql = "INSERT INTO credito (ID_Cliente, Monto_Total_Credito, Monto_Pendiente_Credito, Fecha_Vencimiento_Credito, ID_Producto, ID_Estado)
-            VALUES (:idCliente, :montoTotal, :montoPendiente, :fechaVencimiento, :idProducto, :idEstado)";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':idCliente' => $datosCredito['ID_Cliente'],
-        ':montoTotal' => $datosCredito['Monto_Total_Credito'],
-        ':montoPendiente' => $datosCredito['Monto_Pendiente_Credito'],
-        ':fechaVencimiento' => $datosCredito['Fecha_Vencimiento_Credito'],
-        ':idProducto' => $datosCredito['ID_Producto'],
-        ':idEstado' => $datosCredito['ID_Estado']
-    ]);
-}
-
-/**
  * Actualiza un registro de crédito existente.
  * @param PDO $conexion Objeto de conexión PDO.
  * @param int $idCredito ID del crédito a actualizar.
@@ -371,26 +474,6 @@ function obtenerCuotaPorId(PDO $conexion, int $idCuotaCredito) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-/**
- * Registra una nueva cuota para un crédito.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $datosCuota Array asociativo con los datos de la cuota.
- * @return bool True si se registra correctamente, false en caso contrario.
- */
-function registrarCuotaCredito(PDO $conexion, array $datosCuota): bool {
-    $sql = "INSERT INTO CuotaCredito (ID_Credito, Numero_Cuota, Monto_Capital, Monto_Interes, Monto_Total_Cuota, Fecha_Vencimiento, ID_Estado_Cuota)
-            VALUES (:idCredito, :numeroCuota, :montoCapital, :montoInteres, :montoTotalCuota, :fechaVencimiento, :idEstadoCuota)";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':idCredito' => $datosCuota['ID_Credito'],
-        ':numeroCuota' => $datosCuota['Numero_Cuota'],
-        ':montoCapital' => $datosCuota['Monto_Capital'],
-        ':montoInteres' => $datosCuota['Monto_Interes'],
-        ':montoTotalCuota' => $datosCuota['Monto_Total_Cuota'],
-        ':fechaVencimiento' => $datosCuota['Fecha_Vencimiento'],
-        ':idEstadoCuota' => $datosCuota['ID_Estado_Cuota']
-    ]);
-}
 
 /**
  * Actualiza el estado de una cuota (ej. cuando es pagada).
@@ -401,6 +484,7 @@ function registrarCuotaCredito(PDO $conexion, array $datosCuota): bool {
  */
 function actualizarCuotaCredito(PDO $conexion, int $idCuotaCredito, array $datosCuota): bool {
     $campos = [];
+    
     $valores = [':idCuotaCredito' => $idCuotaCredito];
 
     if (isset($datosCuota['Fecha_Pago'])) { $campos[] = 'Fecha_Pago = :fechaPago'; $valores[':fechaPago'] = $datosCuota['Fecha_Pago']; }
@@ -591,7 +675,7 @@ function asignarAsesorProducto(PDO $conexion, array $datosAsesorProducto): bool 
  * @return array Array asociativo de productos asignados.
  */
 function obtenerProductosPorAsesor(PDO $conexion, int $idPersonal, bool $incluirInactivos = false): array {
-    $sql = "SELECT ap.*, p.Nombre_Producto
+    $sql = "SELECT ap.*, p.Nombre_Producto, p.Descripcion_Producto, p.Monto_Minimo, p.Monto_Maximo, p.Plazo_Minimo, p.Plazo_Maximo 
             FROM asesor_producto ap
             JOIN producto p ON ap.ID_Producto = p.ID_Producto
             WHERE ap.ID_Personal = :idPersonal";
@@ -688,31 +772,11 @@ function obtenerEventosBitacora(PDO $conexion, array $filtros = []): array {
 
 // --- Funciones para la tabla 'turno' ---
 
-/**
- * Registra un nuevo turno.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $datosTurno Array asociativo con los datos del turno.
- * @return bool True si se registra correctamente, false en caso contrario.
- */
-function registrarTurno(PDO $conexion, array $datosTurno): bool {
-    $sql = "INSERT INTO turno (ID_Cliente, Nombre_Completo_Solicitante, N_Documento_Solicitante, Numero_Turno, ID_Producto_Interes, ID_Estado_Turno, Motivo_Turno)
-            VALUES (:idCliente, :nombreCompleto, :nDocumento, :numeroTurno, :idProductoInteres, :idEstadoTurno, :motivoTurno)";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':idCliente' => $datosTurno['ID_Cliente'] ?? null,
-        ':nombreCompleto' => $datosTurno['Nombre_Completo_Solicitante'] ?? null,
-        ':nDocumento' => $datosTurno['N_Documento_Solicitante'] ?? null,
-        ':numeroTurno' => $datosTurno['Numero_Turno'],
-        ':idProductoInteres' => $datosTurno['ID_Producto_Interes'] ?? null,
-        ':idEstadoTurno' => $datosTurno['ID_Estado_Turno'] ?? 1, // Por defecto 'En Espera'
-        ':motivoTurno' => $datosTurno['Motivo_Turno'] ?? null
-    ]);
-}
 
 /**
  * Obtiene todos los turnos, con filtros opcionales.
  * @param PDO $conexion Objeto de conexión PDO.
- * @param array $filtros Array asociativo de filtros (ej. 'ID_Cliente', 'ID_Estado_Turno').
+ * @param array $filtros Array asociativo de filtros (ej. 'ID_Cliente', 'ID_Estado_Turno', 'ID_Turno').
  * @return array Array asociativo de turnos.
  */
 function obtenerTurnos(PDO $conexion, array $filtros = []): array {
@@ -721,25 +785,35 @@ function obtenerTurnos(PDO $conexion, array $filtros = []): array {
             LEFT JOIN cliente c ON t.ID_Cliente = c.ID_Cliente
             LEFT JOIN producto p ON t.ID_Producto_Interes = p.ID_Producto
             JOIN estado e ON t.ID_Estado_Turno = e.ID_Estado
-            WHERE e.Tipo_Estado = 'Turno'";
+            WHERE e.Tipo_Estado = 'Turno'"; // Asegura que solo se traigan turnos y no otros tipos de estado.
+
     $condiciones = [];
     $valores = [];
 
+    // Filtro por ID de Cliente
     if (isset($filtros['ID_Cliente'])) {
         $condiciones[] = "t.ID_Cliente = :idCliente";
         $valores[':idCliente'] = $filtros['ID_Cliente'];
     }
+    // Filtro por ID de Estado de Turno
     if (isset($filtros['ID_Estado_Turno'])) {
         $condiciones[] = "t.ID_Estado_Turno = :idEstadoTurno";
         $valores[':idEstadoTurno'] = $filtros['ID_Estado_Turno'];
     }
+    // Filtro por Fecha de Inicio de Solicitud
     if (isset($filtros['Fecha_Inicio_Solicitud'])) {
         $condiciones[] = "t.Fecha_Hora_Solicitud >= :fechaInicio";
         $valores[':fechaInicio'] = $filtros['Fecha_Inicio_Solicitud'];
     }
+    // Filtro por Fecha de Fin de Solicitud
     if (isset($filtros['Fecha_Fin_Solicitud'])) {
         $condiciones[] = "t.Fecha_Hora_Solicitud <= :fechaFin";
         $valores[':fechaFin'] = $filtros['Fecha_Fin_Solicitud'];
+    }
+    // Nuevo filtro por ID de Turno
+    if (isset($filtros['ID_Turno'])) {
+        $condiciones[] = "t.ID_Turno = :idTurno";
+        $valores[':idTurno'] = $filtros['ID_Turno'];
     }
 
     if (!empty($condiciones)) {

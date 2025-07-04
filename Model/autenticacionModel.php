@@ -22,7 +22,7 @@ function loginCliente($conexion, $usuario, $clave) {
  * Autenticación de personal por correo y contraseña.
  */
 function loginPersonal($conexion, $correo, $clave) {
-    $sql = "SELECT * FROM personal WHERE Correo_Personal = :correo AND Activo = 1";
+    $sql = "SELECT * FROM personal WHERE Correo_Personal = :correo AND Activo_Personal = 1";
     $stmt = $conexion->prepare($sql);
     $stmt->bindParam(':correo', $correo);
     $stmt->execute();

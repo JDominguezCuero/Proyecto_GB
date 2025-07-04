@@ -51,7 +51,7 @@ try {
                 $resultado = loginPersonal($conexion, $usuario, $clave);
 
                 if ($resultado) {
-                    if ($resultado['Activo'] == 1) {
+                    if ($resultado['Activo_Personal'] == 1) {
                     
                         $_SESSION['idPersonal'] = $resultado['ID_Personal'];
                         $_SESSION['nombre'] = $resultado['Nombre_Personal'];
