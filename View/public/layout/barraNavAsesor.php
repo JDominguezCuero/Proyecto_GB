@@ -48,13 +48,13 @@
 
 <!-- Para Cajeros -->
 <?php 
-      if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 3 || $_SESSION['rol'] == 5)){
+      if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 4 || $_SESSION['rol'] == 5)){
         echo '<li><a href="' . BASE_URL . '/View/asesor/cajero.php">Gestionar Cajero</a></li>';
       }
       ?>
 
 <?php 
-      if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 3 || $_SESSION['rol'] == 5)){
+      if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 1 || $_SESSION['rol'] == 5)){
         echo '<li><a href="' . BASE_URL . '/View/asesor/RegistroAsesor.php">Crear Asesor</a></li>';
         echo '<li><a href="' . BASE_URL . '/View/asesor/Bitacora.php">Bitacora</a></li>';
       }

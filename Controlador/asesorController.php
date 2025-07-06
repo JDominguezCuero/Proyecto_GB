@@ -9,35 +9,34 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$accionesPublicas = ['crearTurnoPublico', 'verTurnos', 'listarTurnosPublicos']; 
+$accionesPublicas = $_GET['crearTurnoPublico'] ?? ''; 
 
 // Si la acción actual está en la lista pública, no validamos sesión
-$accion = $_GET['accion'] ?? '';
 
-if (!in_array($accion, $accionesPublicas)) {
+if ($accionesPublicas) {
     if (!isset($_SESSION['usuario'])) {
         if (
             isset($_SERVER['HTTP_ACCEPT']) &&
             strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
-        ) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
-        } else {
-            $mensajeError = "Usuario no logueado.";
-            header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
+            ) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
+            } else {
+                $mensajeError = "Usuario no logueado.";
+                header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
+            }
+            exit;
         }
-        exit;
     }
-}
-
+    
 $accion = $_GET['accion'] ?? 'listar';
 $error = "";
 
 try {
     switch ($accion) {
         case 'listar':
-            // $personal = obtenerTodoElPersonal($conexion);
-            // header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
+            $personal = obtenerTodoElPersonal($conexion);
+            header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
         break;
 
         case 'Credito_Cliente':
@@ -56,6 +55,19 @@ try {
                 }
 
                 if ($turnoAtender['ID_Producto_Interes']) {
+
+                    $nuevoEstadoTurno = 2; 
+
+                    // Actualizar estado del turno
+                    $datosParaActualizarTurno = [
+                        'ID_Estado_Turno' => $nuevoEstadoTurno
+                    ];
+
+                    $resultadoUpdateTurno = actualizarTurno($conexion, (int)$idTurno, $datosParaActualizarTurno);
+
+                    // Registrar Bitacora
+                    // registrarEventoBitacora($conexion, );
+
                     $productoInteres = obtenerProductoPorId($conexion, $turnoAtender['ID_Producto_Interes']);
                 }
             }
@@ -337,11 +349,11 @@ try {
                         }
                     }
 
-                    // --- 4. Actualizar el estado del turno a 10 ---
+                    // --- 4. Actualizar el estado del turno a 3 ---
                     $idTurnoActual = $_GET['idTurno'] ?? null;
 
                     if ($idTurnoActual !== null && $idTurnoActual !== '') {
-                        $nuevoEstadoTurno = 10; 
+                        $nuevoEstadoTurno = 3; 
 
                         $datosParaActualizarTurno = [
                             'ID_Estado_Turno' => $nuevoEstadoTurno,

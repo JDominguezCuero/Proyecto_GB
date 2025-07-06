@@ -113,7 +113,7 @@ function obtenerProductoPorId(PDO $conexion, int $idProducto) {
  * @return array Array asociativo de turnos.
  */
 function obtenerTurnos(PDO $conexion, array $filtros = []): array {
-    $sql = "SELECT t.*, c.Nombre_Cliente, c.Apellido_Cliente, p.Nombre_Producto, p.Descripcion_Producto, e.Estado AS Estado_Turno
+    $sql = "SELECT t.*, c.Nombre_Cliente, c.Apellido_Cliente, p.Nombre_Producto, p.Descripcion_Producto, t.ID_Estado_Turno AS Estado_Turno
             FROM turno t
             LEFT JOIN cliente c ON t.ID_Cliente = c.ID_Cliente
             LEFT JOIN producto p ON t.ID_Producto_Interes = p.ID_Producto
@@ -188,6 +188,56 @@ function actualizarTurno(PDO $conexion, int $idTurno, array $datosTurno): bool {
     $stmt = $conexion->prepare($sql);
     return $stmt->execute($valores);
 }
+
+/**
+ * Registra un evento en la bitácora.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param array $datosBitacora Array asociativo con los datos del evento.
+ * @return bool True si se registra correctamente, false en caso contrario.
+ */
+function registrarEventoBitacora(PDO $conexion, array $datosBitacora): bool {
+    $sql = "INSERT INTO bitacora (ID_Cliente, ID_Personal, ID_RegistroAsesoramiento, Tipo_Evento, Descripcion_Evento)
+            VALUES (:idCliente, :idPersonal, :idRegistroAsesoramiento, :tipoEvento, :descripcionEvento)";
+    $stmt = $conexion->prepare($sql);
+    return $stmt->execute([
+        ':idCliente' => $datosBitacora['ID_Cliente'] ?? null,
+        ':idPersonal' => $datosBitacora['ID_Personal'] ?? null,
+        ':idRegistroAsesoramiento' => $datosBitacora['ID_RegistroAsesoramiento'] ?? null,
+        ':tipoEvento' => $datosBitacora['Tipo_Evento'],
+        ':descripcionEvento' => $datosBitacora['Descripcion_Evento'] ?? null
+    ]);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -864,24 +914,7 @@ function actualizarEstadoAsesorProducto(PDO $conexion, int $idAsesorProducto, st
 
 // --- Funciones para la tabla 'bitacora' ---
 
-/**
- * Registra un evento en la bitácora.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $datosBitacora Array asociativo con los datos del evento.
- * @return bool True si se registra correctamente, false en caso contrario.
- */
-function registrarEventoBitacora(PDO $conexion, array $datosBitacora): bool {
-    $sql = "INSERT INTO bitacora (ID_Cliente, ID_Personal, ID_RegistroAsesoramiento, Tipo_Evento, Descripcion_Evento)
-            VALUES (:idCliente, :idPersonal, :idRegistroAsesoramiento, :tipoEvento, :descripcionEvento)";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':idCliente' => $datosBitacora['ID_Cliente'] ?? null,
-        ':idPersonal' => $datosBitacora['ID_Personal'] ?? null,
-        ':idRegistroAsesoramiento' => $datosBitacora['ID_RegistroAsesoramiento'] ?? null,
-        ':tipoEvento' => $datosBitacora['Tipo_Evento'],
-        ':descripcionEvento' => $datosBitacora['Descripcion_Evento'] ?? null
-    ]);
-}
+
 
 /**
  * Obtiene registros de la bitácora, con filtros opcionales.
