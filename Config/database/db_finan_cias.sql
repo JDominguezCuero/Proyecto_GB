@@ -47,7 +47,63 @@ CREATE TABLE `asesor_producto` (
 --
 
 INSERT INTO `asesor_producto` (`ID_Asesor_Producto`, `ID_Personal`, `ID_Producto`, `Descripcion_AP`, `Fecha_Asignacion`, `Estado_AsesorProducto`) VALUES
-(2, 1, 1, NULL, '2025-07-05 18:12:35', 'Activo');
+(2, 1, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+(3, 6, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(4, 6, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(5, 6, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(6, 6, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+(7, 6, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+(8, 7, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(9, 7, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(10, 7, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(11, 7, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+(12, 7, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+(13, 8, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+(14, 8, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(15, 8, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(16, 8, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+(17, 9, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(18, 9, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(19, 9, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(20, 9, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+(21, 10, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(22, 10, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(23, 10, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(24, 10, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+(25, 10, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+(26, 11, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+(27, 11, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+(28, 11, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(29, 11, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(30, 11, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+(31, 12, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(32, 12, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(33, 12, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(34, 12, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+(35, 12, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+(36, 13, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(37, 13, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(38, 13, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(39, 13, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+(40, 13, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+(41, 14, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+(42, 14, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(43, 14, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(44, 14, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+(45, 15, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(46, 15, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(47, 15, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(48, 15, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+(49, 16, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(50, 16, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(51, 16, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(52, 16, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+(53, 16, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+(54, 17, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+(55, 17, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(56, 17, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(57, 17, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+(58, 17, 1, NULL, '2025-07-05 18:12:35', 'Activo');
 
 -- --------------------------------------------------------
 
@@ -518,10 +574,12 @@ CREATE TABLE `turno` (
 INSERT INTO `turno` (`ID_Turno`, `ID_Cliente`, `Nombre_Completo_Solicitante`, `N_Documento_Solicitante`, `Numero_Turno`, `ID_Producto_Interes`, `Fecha_Hora_Solicitud`, `Fecha_Hora_Finalizacion`, `ID_Estado_Turno`, `Tiempo_Espera_Minutos`, `Motivo_Turno`) VALUES
 (1, 1, 'Laura Camila Ríos Martínez', '1032456789', 'T-000', NULL, '2025-07-04 13:30:00', '2025-07-04 14:00:00', 1, 15, 'Solicitud de asesoría para inversión en CDT'),
 (37, NULL, 'Jose Dominguez Cuero', '3233', 'T037', NULL, '2025-07-06 02:13:29', NULL, 1, NULL, NULL),
-(38, NULL, 'asd', '232', 'T038', 17, '2025-07-06 02:17:02', '2025-07-06 18:23:57', 10, NULL, NULL),
+(38, NULL, 'asd', '232', 'T038', 17, '2025-07-06 02:17:02', '2025-07-06 18:23:57', 3, NULL, NULL),
 (39, NULL, 'Prueba turno', '2324234', 'T039', 37, '2025-07-06 02:24:54', NULL, 1, NULL, NULL),
 (40, NULL, 'Jose Dominguez Cuero', '122552522', 'T040', 11, '2025-07-06 03:30:58', NULL, 1, NULL, NULL),
-(41, NULL, 'Jose Dominguez Cuero', '67', 'T041', 38, '2025-07-06 04:27:31', NULL, 1, NULL, NULL);
+(41, NULL, 'Jose Dominguez Cuero', '67', 'T041', 38, '2025-07-06 04:27:31', NULL, 1, NULL, NULL),
+(42, NULL, 'sdsd', '3223', 'T042', 15, '2025-07-06 21:21:32', NULL, 2, NULL, NULL),
+(43, NULL, 'Prueba Turno PUBLICO', '025245255', 'T043', 1, '2025-07-06 21:22:16', NULL, 2, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -661,7 +719,7 @@ ALTER TABLE `turno`
 -- AUTO_INCREMENT de la tabla `asesor_producto`
 --
 ALTER TABLE `asesor_producto`
-  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT de la tabla `bitacora`
@@ -751,7 +809,7 @@ ALTER TABLE `tipo_documento`
 -- AUTO_INCREMENT de la tabla `turno`
 --
 ALTER TABLE `turno`
-  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- Restricciones para tablas volcadas
