@@ -11,7 +11,6 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -278,7 +277,7 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
                 </div>
 
                 <div class="flex justify-end mt-6 space-x-3">
-                    <button type="submit" class="bg-lime-500 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded">
+                    <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
                         Registrar Cliente
                     </button>
                     <button type="button" onclick="closeModal('clienteModal')" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">

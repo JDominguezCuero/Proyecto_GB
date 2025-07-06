@@ -5,10 +5,22 @@ session_start();
 require_once __DIR__ . '/../../Proyecto_GB/Config/config.php';
 require_once __DIR__ . '/../../Proyecto_GB/Model/asesorModel.php';
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// Verifica si hay sesión iniciada
 if (!isset($_SESSION['usuario'])) {
-    header("Location: /Proyecto_GB/View/public/inicio.php?login=error&reason=nologin");
+    if (
+        isset($_SERVER['HTTP_ACCEPT']) && 
+        strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
+    ) {
+        // Si la petición espera JSON, devolvemos error JSON
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
+    } else {
+        // Si es una petición normal (navegador), redireccionamos
+        header("Location: /Proyecto_GB/View/public/inicio.php?login=error&reason=nologin");
+    }
     exit;
 }
 
@@ -20,27 +32,6 @@ try {
         case 'listar':
             // $personal = obtenerTodoElPersonal($conexion);
             header("Location: /Proyecto_GB/View/asesor/asesorGerente.php?login=success");
-        break;
-
-        //Eliminar
-        case 'listarCliente':
-            $idPersonal = $_SESSION['idPersonal'];
-            $idTurno = $_GET['idTurno'] ?? '';
-
-            $turnoAtender = null; // Inicializa la variable
-
-            if ($idTurno) {
-                // Consulta la base de datos para obtener el turno específico por su ID
-                $turnosEncontrados = obtenerTurnos($conexion, ['ID_Turno' => $idTurno]);
-                
-                // Si se encontró un turno, tómalo (asumiendo que el ID es único)
-                if (!empty($turnosEncontrados)) {
-                    $turnoAtender = $turnosEncontrados[0]; // Se toma el primer y único resultado
-                }
-            }
-
-            $productos = obtenerProductosPorAsesor($conexion, $idPersonal);
-            include __DIR__ . '/../View/asesor/CrearCliente.php';
         break;
 
         case 'Credito_Cliente':
@@ -86,12 +77,7 @@ try {
             include __DIR__ . '/../View/asesor/turnos.php';
         break;
 
-        // case 'listarProductos_Servicios':
-
-        //     $listProductos = obtenerProductos($conexion);
-        //     include __DIR__ . '/../View/asesor/productosyservicios.php';
-        // break;
-
+        //Modificar
         case 'agregarAsesor':
             try{
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -126,64 +112,6 @@ try {
                 exit;    
             }
             break;
-
-        // case 'agregarCliente':
-        //     try {
-        //         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        //             // Captura de datos desde el formulario
-        //             $nombre = $_POST['nombre'] ?? '';
-        //             $apellido = $_POST['apellido'] ?? '';
-        //             $idGenero = $_POST['genero'] ?? '';
-        //             $idTipoDocumento = $_POST['tipo_documento'] ?? '';
-        //             $documento = $_POST['documento'] ?? '';
-        //             $celular = $_POST['celular'] ?? '';
-        //             $correo = $_POST['correo'] ?? '';
-        //             $direccion = $_POST['direccion'] ?? '';
-        //             $ciudad = $_POST['ciudad'] ?? '';
-        //             $fechaNacimiento = $_POST['fecha_nacimiento'] ?? '';
-        //             $contrasena = $_POST['contrasena'] ?? '';
-
-        //             // IDs quemados (modifica según tu lógica de negocio)
-        //             $idAsesorAsignado = $_SESSION['usuario'] ?? 1; // Asignado por defecto
-        //             $idPersonalModificador = 1; // Personal que realiza el registro
-
-        //             if ($nombre && $apellido && $idGenero && $idTipoDocumento && $documento && $correo && $contrasena) {
-        //                 $resultado = registrarCliente(
-        //                     $conexion,
-        //                     $nombre,
-        //                     $apellido,
-        //                     $idGenero,
-        //                     $idTipoDocumento,
-        //                     $documento,
-        //                     $celular,
-        //                     $correo,
-        //                     $direccion,
-        //                     $ciudad,
-        //                     $fechaNacimiento,
-        //                     $idAsesorAsignado,
-        //                     $idPersonalModificador,
-        //                     $contrasena
-        //                 );
-
-        //                 if ($resultado) {
-        //                     $mensaje = "Cliente registrado correctamente.";
-        //                     header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?success=success&msg=" . urlencode($mensaje));
-        //                     exit;
-        //                 } else {
-        //                     $mensajeError = "Error al registrar el cliente.";
-        //                     header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?error=error&msg=" . urlencode($mensajeError));
-        //                 }
-        //             } else {
-        //                 $mensajeError = "Faltan campos obligatorios.";
-        //                 header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?error=error&msg=" . urlencode($mensajeError));
-        //             }
-        //         }
-        //     } catch (Exception $e) {
-        //         $mensajeError = "Error inesperado: " . urlencode($e->getMessage());
-        //         header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?error=error&msg=" . urlencode($mensajeError));
-        //         exit;
-        //     }
-        //     break;
 
         case 'registrarTurno':
             try {
@@ -239,195 +167,225 @@ try {
             }
         break;
 
-        case 'agregarCliente':
+        case 'consolidadoCliente':
             try {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    // 1. Captura de datos del Cliente
-                    $datosCliente = [
-                        'Nombre_Cliente' => $_POST['nombre'] ?? '',
-                        'Apellido_Cliente' => $_POST['apellido'] ?? '',
-                        'ID_Genero' => $_POST['genero'] ?? '',
-                        'ID_TD' => $_POST['tipo_documento'] ?? '',
-                        'N_Documento_Cliente' => $_POST['documento'] ?? '',
-                        'Celular_Cliente' => $_POST['celular'] ?? '',
-                        'Correo_Cliente' => $_POST['correo'] ?? '',
-                        'Direccion_Cliente' => $_POST['direccion'] ?? '',
-                        'Ciudad_Cliente' => $_POST['ciudad'] ?? '',
-                        'Fecha_Nacimiento_Cliente' => $_POST['fecha_nacimiento'] ?? '',
-                        'Contraseña' => $_POST['contrasena'] ?? '',
-                        'ID_Personal_Creador' => $_SESSION['idPersonal'] ?? null,
-                    ];
+                    
+                    // Leer el cuerpo de la solicitud JSON
+                    $input = file_get_contents('php://input');
+                    file_put_contents("debug_json.txt", $input);
+                    $data = json_decode($input, true); // Decodificar a un array asociativo
 
-                    // Validación básica de campos obligatorios del cliente
-                    if (empty($datosCliente['Nombre_Cliente']) || empty($datosCliente['Apellido_Cliente']) ||
-                        empty($datosCliente['ID_Genero']) || empty($datosCliente['ID_TD']) ||
-                        empty($datosCliente['N_Documento_Cliente']) || empty($datosCliente['Correo_Cliente']) ||
-                        empty($datosCliente['Contraseña'])) {
-                        $mensajeError = "Faltan campos obligatorios para registrar el cliente.";
-                        header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?error=error&msg=" . urlencode($mensajeError));
-                        exit;
+                    // Validar que el JSON se decodificó correctamente y que los datos esperados existen
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        throw new Exception("Error al decodificar JSON: " . json_last_error_msg());
+                    }
+                    if (!isset($data['cliente']) || !isset($data['simulacion']) || !isset($data['producto'])) {
+                        throw new Exception("Datos de cliente, simulación o producto incompletos en la solicitud.");
                     }
 
-                    // Iniciar una transacción para asegurar la atomicidad de las operaciones
+                    // Extraer los datos de cada sección del JSON
+                    $datosClienteJSON = $data['cliente'];
+                    $datosSimulacionJSON = $data['simulacion'];
+                    $datosProductoJSON = $data['producto'];
+
+                    // Iniciar una transacción para asegurar la atomicidad
                     $conexion->beginTransaction();
 
-                    // 1. Registrar Cliente
-                    $resultadoCliente = registrarCliente($conexion, $datosCliente);
+                    // --- 1. Registrar Cliente ---
+                    // Mapear los datos del JSON a los campos de la tabla 'Cliente'
+                    $datosClienteParaDB = [
+                        'Nombre_Cliente' => $datosClienteJSON['nombre'] ?? '',
+                        'Apellido_Cliente' => $datosClienteJSON['apellido'] ?? '',
+                        // Aquí debes asegurarte de que 'genero' y 'tipo_documento' sean los IDs correctos para tu DB.
+                        // Si el JS envía el texto (ej. "Cédula de Ciudadanía"), necesitarás funciones como getGeneroId/getTipoDocumentoId.
+                        // Si el JS ya envía el ID numérico, usa $datosClienteJSON['genero'] y $datosClienteJSON['tipoDocumento'].
+                        'ID_Genero' => $datosClienteJSON['genero'] ?? '', // <--- Implementa esta función si 'genero' es texto
+                        'ID_TD' => $datosClienteJSON['tipo_documento'] ?? '', // <--- Implementa esta función si 'tipo_documento' es texto
+                        'N_Documento_Cliente' => $datosClienteJSON['documento'] ?? '',
+                        'Celular_Cliente' => $datosClienteJSON['celular'] ?? '',
+                        'Correo_Cliente' => $datosClienteJSON['correo'] ?? '',
+                        'Direccion_Cliente' => $datosClienteJSON['direccion'] ?? '',
+                        'Ciudad_Cliente' => $datosClienteJSON['ciudad'] ?? '',
+                        'Fecha_Nacimiento_Cliente' => $datosClienteJSON['fecha_nacimiento'] ?? '', // Coincide con 'fechaNacimiento' del JS
+                        'ID_Personal_Creador' => $_SESSION['idPersonal'] ?? null,
+                        'Fecha_Creacion_Cliente' => date('Y-m-d H:i:s'), // Fecha actual de creación
+                        'Estado_Cliente' => 1, // Asume un ID de estado inicial para el cliente (ej. Activo)
+                        'Contraseña' => password_hash($datosClienteJSON['contrasena'] ?? 'default_pass_hash', PASSWORD_DEFAULT), // Siempre hashear
+                    ];
+
+                    // Validación básica de campos obligatorios para Cliente
+                    if (empty($datosClienteParaDB['Nombre_Cliente']) || empty($datosClienteParaDB['Apellido_Cliente']) ||
+                        empty($datosClienteParaDB['ID_TD']) || empty($datosClienteParaDB['N_Documento_Cliente']) ||
+                        empty($datosClienteParaDB['Correo_Cliente']) || empty($datosClienteJSON['contrasena'])) {
+                        throw new Exception("Faltan campos obligatorios para registrar el cliente.");
+                    }
+
+                    // Llamar a tu función para registrar el cliente
+                    $resultadoCliente = registrarCliente($conexion, $datosClienteParaDB);
                     if (!$resultadoCliente) {
                         throw new Exception("Error al registrar el cliente.");
                     }
                     $idCliente = $conexion->lastInsertId(); // Obtener el ID del cliente recién insertado
 
-                    // 2. Captura de datos del Crédito desde el formulario
-                    $idProducto = $_POST['id_producto'] ?? null; // ID del producto de crédito seleccionado
-                    $montoPrestamo = floatval($_POST['monto'] ?? 0);
-                    $numeroCuotas = intval($_POST['num_cuotas'] ?? 0);
-                    $tasaInteresAnual = floatval(str_replace(',', '.', $_POST['tasa_interes_anual'] ?? '0')); // Tasa anual en %
-                    $periodicidadTexto = $_POST['periodicidad'] ?? ''; // 'Mensual', 'Diaria', etc.
-                    $tasaInteresPeriodica = floatval(str_replace(',', '.', $_POST['tasa_interes_periodica'] ?? '0')) / 100; // Convertir a decimal
-                    $valorCuota = floatval($_POST['valor_cuota'] ?? 0);
+                    // --- 2. Registrar Crédito ---
+                    // Mapear los datos del JSON a los campos de la tabla 'Credito'
+                    $idProducto = $datosProductoJSON['id_producto'] ?? null;
+                    $montoPrestamo = floatval($datosSimulacionJSON['monto'] ?? 0);
+                    $numeroCuotas = intval($datosSimulacionJSON['cuotas'] ?? 0);
+                    $periodicidadTexto = $datosSimulacionJSON['periodicidad'] ?? '';
+                    $tasaInteresAnual = floatval($datosSimulacionJSON['tasaAnual'] ?? 0); // Viene en decimal del JS
+                    $tasaInteresPeriodica = floatval($datosSimulacionJSON['tasaPeriodica'] ?? 0); // Viene en decimal del JS
+                    $valorCuota = floatval($datosSimulacionJSON['valorCuota'] ?? 0); // Viene ya calculado del JS
 
-                    // Validación básica de campos obligatorios del crédito
-                    if (empty($idProducto) || $montoPrestamo <= 0 || $numeroCuotas <= 0 || $tasaInteresAnual <= 0 || empty($periodicidadTexto) || $tasaInteresPeriodica <= 0 || $valorCuota <= 0) {
-                        throw new Exception("Faltan campos obligatorios o valores inválidos para registrar el crédito.");
-                    }
-
-                    // Calcular fecha de vencimiento del crédito general (aproximado)
+                    // Calcular la fecha de vencimiento del crédito general (tu lógica existente)
                     $periodoMesesParaVencimiento = 0;
                     switch ($periodicidadTexto) {
-                        case "Diaria":
-                            $periodoMesesParaVencimiento = ceil($numeroCuotas / 30);
-                            break;
-                        case "Mensual":
-                            $periodoMesesParaVencimiento = $numeroCuotas;
-                            break;
-                        case "Bimensual":
-                            $periodoMesesParaVencimiento = $numeroCuotas * 2;
-                            break;
-                        case "Trimestral":
-                            $periodoMesesParaVencimiento = $numeroCuotas * 3;
-                            break;
-                        case "Semestral":
-                            $periodoMesesParaVencimiento = $numeroCuotas * 6;
-                            break;
-                        case "Anual":
-                            $periodoMesesParaVencimiento = $numeroCuotas * 12;
-                            break;
-                        default:
-                            $periodoMesesParaVencimiento = $numeroCuotas; // Por si acaso
-                            break;
+                        case "Diaria": $periodoMesesParaVencimiento = ceil($numeroCuotas / 30); break;
+                        case "Mensual": $periodoMesesParaVencimiento = $numeroCuotas; break;
+                        case "Bimensual": $periodoMesesParaVencimiento = $numeroCuotas * 2; break;
+                        case "Trimestral": $periodoMesesParaVencimiento = $numeroCuotas * 3; break;
+                        case "Semestral": $periodoMesesParaVencimiento = $numeroCuotas * 6; break;
+                        case "Anual": $periodoMesesParaVencimiento = $numeroCuotas * 12; break;
+                        default: $periodoMesesParaVencimiento = $numeroCuotas; break;
                     }
                     $fechaVencimientoCredito = date('Y-m-d', strtotime("+$periodoMesesParaVencimiento months"));
-                    $idEstadoCreditoActivo = 7; // EJEMPLO: Reemplaza con el ID real de tu estado 'Activo' para créditos
+                    $idEstadoCreditoActivo = 7; // ID para 'Activo' (confirma tu valor)
 
-                    $datosCredito = [
+                    $datosCreditoParaDB = [
                         'ID_Cliente' => $idCliente,
                         'Monto_Total_Credito' => $montoPrestamo,
-                        'Monto_Pendiente_Credito' => $montoPrestamo, // Inicialmente el monto total
+                        'Monto_Pendiente_Credito' => $montoPrestamo, // Al inicio, el monto total
+                        'Fecha_Apertura_Credito' => date('Y-m-d H:i:s'), // Fecha actual de apertura
                         'Fecha_Vencimiento_Credito' => $fechaVencimientoCredito,
                         'ID_Producto' => $idProducto,
                         'ID_Estado' => $idEstadoCreditoActivo,
-                        'Tasa_Interes_Anual' => $tasaInteresAnual, // Ya viene en %
-                        'Tasa_Interes_Periodica' => $tasaInteresPeriodica * 100, // Guardar en %
+                        // Estos campos no estaban en tu JSON de 'Credito', pero son parte de la simulación.
+                        // Si tu tabla Credito los guarda, asegúrate de que los tipos de datos coincidan (ej. % vs decimal).
+                        'Tasa_Interes_Anual' => $tasaInteresAnual * 100, // Multiplicar por 100 si tu DB guarda el %
+                        'Tasa_Interes_Periodica' => $tasaInteresPeriodica * 100, // Multiplicar por 100 si tu DB guarda el %
                         'Numero_Cuotas' => $numeroCuotas,
-                        'Valor_Cuota_Calculado' => $valorCuota, // Ya viene calculado
+                        'Valor_Cuota_Calculado' => $valorCuota,
                         'Periodicidad' => $periodicidadTexto,
                     ];
 
-                    // 2. Registrar Crédito
-                    $resultadoCredito = registrarCredito($conexion, $datosCredito);
+                    // Validación básica de campos obligatorios para Crédito
+                    if (empty($idProducto) || $montoPrestamo <= 0 || $numeroCuotas <= 0 || $valorCuota <= 0) {
+                        throw new Exception("Faltan campos obligatorios o valores inválidos para registrar el crédito.");
+                    }
+
+                    // Llamar a tu función para registrar el crédito
+                    $resultadoCredito = registrarCredito($conexion, $datosCreditoParaDB);
                     if (!$resultadoCredito) {
                         throw new Exception("Error al registrar el crédito.");
                     }
-                    $idCredito = $conexion->lastInsertId(); // Obtener el ID del crédito recién insertado
+                    $idCredito = $conexion->lastInsertId(); // Obtener el ID del crédito
 
-                    // 3. Generar y Registrar Cuotas de Amortización (tabla cuotacredito)
-                    $idEstadoCuotaPendiente = 8; // EJEMPLO: Reemplaza con el ID real de tu estado 'Pendiente' para cuotas
+                    // --- 3. Generar y Registrar Cuotas de Amortización (tabla CuotaCliente) ---
+                    $idEstadoCuotaPendiente = 8; // ID para 'Pendiente' (confirma tu valor)
                     $saldoActual = $montoPrestamo;
-                    $fechaInicioCredito = date('Y-m-d'); // Fecha de inicio del crédito, usualmente la fecha de hoy
+                    $fechaInicioCredito = date('Y-m-d'); // Fecha de inicio para calcular vencimientos de cuotas
 
                     for ($i = 1; $i <= $numeroCuotas; $i++) {
                         $interesCuota = $saldoActual * $tasaInteresPeriodica;
                         $abonoCapitalCuota = $valorCuota - $interesCuota;
                         $saldoActual -= $abonoCapitalCuota;
 
-                        // Ajuste para la última cuota para evitar problemas de redondeo y asegurar que el saldo llegue a cero
-                        if ($i === $numeroCuotas) {
-                            $abonoCapitalCuota = $valorCuota - $interesCuota + $saldoActual; // Sumar el saldo restante
+                        // Ajuste para la última cuota para evitar errores de redondeo y asegurar saldo cero
+                        if ($i === $numeroCuotas && abs($saldoActual) < 0.01) { // Umbral para considerar "casi cero"
+                            $abonoCapitalCuota += $saldoActual;
                             $saldoActual = 0;
                         }
 
-                        // Calcular la fecha de vencimiento para esta cuota específica
+                        // Calcular la fecha de vencimiento para esta cuota específica (tu lógica existente)
                         $fechaVencimientoCuota = '';
                         switch ($periodicidadTexto) {
-                            case "Diaria":
-                                $fechaVencimientoCuota = date('Y-m-d', strtotime("+$i days", strtotime($fechaInicioCredito)));
-                                break;
-                            case "Mensual":
-                                $fechaVencimientoCuota = date('Y-m-d', strtotime("+$i months", strtotime($fechaInicioCredito)));
-                                break;
-                            case "Bimensual":
-                                $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 2) . " months", strtotime($fechaInicioCredito)));
-                                break;
-                            case "Trimestral":
-                                $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 3) . " months", strtotime($fechaInicioCredito)));
-                                break;
-                            case "Semestral":
-                                $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 6) . " months", strtotime($fechaInicioCredito)));
-                                break;
-                            case "Anual":
-                                $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 12) . " months", strtotime($fechaInicioCredito)));
-                                break;
-                            default:
-                                $fechaVencimientoCuota = date('Y-m-d', strtotime("+$i months", strtotime($fechaInicioCredito))); // Default a mensual si no se reconoce
-                                break;
+                            case "Diaria": $fechaVencimientoCuota = date('Y-m-d', strtotime("+$i days", strtotime($fechaInicioCredito))); break;
+                            case "Mensual": $fechaVencimientoCuota = date('Y-m-d', strtotime("+$i months", strtotime($fechaInicioCredito))); break;
+                            case "Bimensual": $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 2) . " months", strtotime($fechaInicioCredito))); break;
+                            case "Trimestral": $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 3) . " months", strtotime($fechaInicioCredito))); break;
+                            case "Semestral": $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 6) . " months", strtotime($fechaInicioCredito))); break;
+                            case "Anual": $fechaVencimientoCuota = date('Y-m-d', strtotime("+" . ($i * 12) . " months", strtotime($fechaInicioCredito))); break;
+                            default: $fechaVencimientoCuota = date('Y-m-d', strtotime("+$i months", strtotime($fechaInicioCredito))); break;
                         }
 
-                        $datosCuota = [
+                        // Mapear los datos calculados/recibidos a los campos de la tabla 'CuotaCliente'
+                        $datosCuotaParaDB = [
                             'ID_Credito' => $idCredito,
                             'Numero_Cuota' => $i,
                             'Monto_Capital' => round($abonoCapitalCuota, 2),
                             'Monto_Interes' => round($interesCuota, 2),
-                            'Monto_Total_Cuota' => round($valorCuota, 2), // El valor de la cuota es fijo
+                            'Monto_Total_Cuota' => round($valorCuota, 2),
                             'Fecha_Vencimiento' => $fechaVencimientoCuota,
+                            'Fecha_Pago' => null, // Nulo inicialmente, se llena al pagar
+                            'Monto_Pagado' => 0.00, // Cero inicialmente
+                            'Dias_Mora_Al_Pagar' => 0, // Cero inicialmente
+                            'Monto_Recargo_Mora' => 0.00, // Cero inicialmente
                             'ID_Estado_Cuota' => $idEstadoCuotaPendiente,
                         ];
 
-                        $resultadoCuota = registrarCuotaCredito($conexion, $datosCuota);
+                        // Llamar a tu función para registrar cada cuota
+                        $resultadoCuota = registrarCuotaCredito($conexion, $datosCuotaParaDB);
                         if (!$resultadoCuota) {
                             throw new Exception("Error al registrar la cuota " . $i . " del crédito.");
                         }
                     }
 
-                    // Si todo fue exitoso, confirmar la transacción
+                    // --- 4. Actualizar el estado del turno a 10 ---
+                    $idTurnoActual = $_GET['idTurno'] ?? null;
+
+                    if ($idTurnoActual !== null && $idTurnoActual !== '') {
+                        $nuevoEstadoTurno = 10; 
+
+                        $datosParaActualizarTurno = [
+                            'ID_Estado_Turno' => $nuevoEstadoTurno,
+                            'Fecha_Hora_Finalizacion' => date('Y-m-d H:i:s')
+                        ];
+
+                        $resultadoUpdateTurno = actualizarTurno($conexion, (int)$idTurnoActual, $datosParaActualizarTurno);
+
+                        if (!$resultadoUpdateTurno) {
+                            error_log("Advertencia: No se pudo actualizar el estado del turno ID: " . $idTurnoActual . ". El proceso de crédito continuó.");
+                        }
+                    } else {
+                        error_log("Advertencia: ID de turno no disponible para actualizar su estado.");
+                    }
+
+                    // Confirmar la transacción si todo fue exitoso
                     $conexion->commit();
-                    $mensaje = "Cliente y crédito registrados correctamente.";
-                    header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?success=success&msg=" . urlencode($mensaje));
+
+                    // Enviar respuesta JSON de éxito al frontend
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'message' => 'Proceso de consolidación completado exitosamente.']);
                     exit;
 
+                } else {
+                    throw new Exception("Método de solicitud no permitido.");
                 }
             } catch (PDOException $e) {
                 $conexion->rollBack(); // Revertir la transacción en caso de error de DB
-                if ($e->getCode() == '23000') {
-                    $mensajeError = "Error: El número de documento o correo electrónico del cliente ya está registrado.";
-                } else {
-                    $mensajeError = "Error de base de datos al registrar cliente/crédito: " . $e->getMessage();
+                $errorMessage = "Error de base de datos: " . $e->getMessage();
+                if ($e->getCode() == '23000') { // Violación de restricción de unicidad
+                    $errorMessage = "Error: El número de documento o correo electrónico del cliente ya está registrado.";
                 }
-                error_log("Error en agregarCliente (DB): " . $e->getMessage());
-                header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?error=error&msg=" . urlencode($mensajeError));
+                error_log("Error en 'consolidadoCliente' (DB): " . $e->getMessage());
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => $errorMessage]);
                 exit;
             } catch (Exception $e) {
                 $conexion->rollBack(); // Revertir la transacción en caso de error general
-                $mensajeError = "Error inesperado al registrar cliente/crédito: " . $e->getMessage();
-                error_log("Error en agregarCliente (general): " . $e->getMessage());
-                header("Location: /Proyecto_GB/View/asesor/CrearCliente.php?error=error&msg=" . urlencode($mensajeError));
+                $errorMessage = "Error inesperado: " . $e->getMessage();
+                error_log("Error en 'consolidadoCliente' (general): " . $e->getMessage());
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => $errorMessage]);
                 exit;
             }
-            break;
+        break;
 
         default:
             header("Location: controller.php?accion=listar");
             exit;
+        break;
     }
 } catch (Exception $e) {
     error_log("Error en Controller de Cliente: " . $e->getMessage());

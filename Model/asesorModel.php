@@ -372,6 +372,7 @@ function registrarCredito(PDO $conexion, array $datosCredito): bool {
                 ID_Cliente,
                 Monto_Total_Credito,
                 Monto_Pendiente_Credito,
+                Fecha_Apertura_Credito,
                 Fecha_Vencimiento_Credito,
                 ID_Producto,
                 ID_Estado,
@@ -379,12 +380,12 @@ function registrarCredito(PDO $conexion, array $datosCredito): bool {
                 Tasa_Interes_Periodica,
                 Numero_Cuotas,
                 Valor_Cuota_Calculado,
-                Periodicidad,
-                Fecha_Creacion_Credito
+                Periodicidad
             ) VALUES (
                 :idCliente,
                 :montoTotal,
                 :montoPendiente,
+                :fechaCreacion,
                 :fechaVencimiento,
                 :idProducto,
                 :idEstado,
@@ -392,8 +393,7 @@ function registrarCredito(PDO $conexion, array $datosCredito): bool {
                 :tasaPeriodica,
                 :numeroCuotas,
                 :valorCuotaCalculado,
-                :periodicidad,
-                NOW() -- Fecha y hora actual de creación
+                :periodicidad
             )";
     $stmt = $conexion->prepare($sql);
 
@@ -401,6 +401,7 @@ function registrarCredito(PDO $conexion, array $datosCredito): bool {
         ':idCliente' => $datosCredito['ID_Cliente'],
         ':montoTotal' => $datosCredito['Monto_Total_Credito'],
         ':montoPendiente' => $datosCredito['Monto_Pendiente_Credito'],
+        ':fechaCreacion'=> $datosCredito['Fecha_Apertura_Credito'],
         ':fechaVencimiento' => $datosCredito['Fecha_Vencimiento_Credito'],
         ':idProducto' => $datosCredito['ID_Producto'],
         ':idEstado' => $datosCredito['ID_Estado'],

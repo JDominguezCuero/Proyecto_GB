@@ -357,7 +357,7 @@ document.getElementById('formularioCliente').addEventListener('submit', function
     currentClientData = {
         nombre: document.getElementById('clientNombre').value,
         apellido: document.getElementById('clientApellido').value,
-        tipoDocumento: document.getElementById('clientTipoDocumento').options[document.getElementById('clientTipoDocumento').selectedIndex].text,
+        tipoDocumento: document.getElementById('clientTipoDocumento').value,
         documento: document.getElementById('clientDocumento').value,
         genero: document.getElementById('clientGenero').value,
         celular: document.getElementById('clientCelular').value,
@@ -431,8 +431,15 @@ document.getElementById('btnFinalizarProceso').addEventListener('click', functio
         }
     };
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const idTurno = urlParams.get('idTurno'); 
+
+    console.error('Id Turno:', idTurno);
+
+    const fetchUrl = `/Proyecto_GB/Controlador/asesorController.php?accion=consolidadoCliente&idTurno=${idTurno}`;
+
     // Aquí es donde enviarías finalDataToSave a tu backend vía AJAX (fetch).
-    fetch('<?= BASE_URL ?>/Controlador/tuControladorDeGuardado.php?accion=guardarTodo', {
+    fetch(fetchUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
