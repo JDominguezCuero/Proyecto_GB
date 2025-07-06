@@ -1,4 +1,5 @@
 <header class="header">
+
   <div class="logo-nombre">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/logos/logo2.png" alt="Logo Banco" class="logo">
     <div class="titulo">
@@ -6,24 +7,60 @@
       <h6>¡La Banca que te ayuda a crecer!</h6>
     </div>
   </div>
-  <p class="text-sm text-gray-300"><?php echo htmlspecialchars($_SESSION['nombre'] ?? ''); ?></p>
-  <a href="#" id="cerrarSesionBtn" class="btn-admin">Cerrar Sesion</a> 
+
+  <!-- Si NO hay una sesión activa -->
+  <?php if (!isset($_SESSION['usuario'])): ?>
+    <div class="dropdown">
+        <button class="btn-admin" onclick="toggleDropdown()">Iniciar Sesión ▾</button>
+        <div id="menuSesion" class="dropdown-content">
+          <a href="../autenticacion/Login_Cliente.php">Cliente</a>
+          <a href="../autenticacion/Login_Administracion.php">Administrativo</a>
+        </div>
+    </div>
+  <?php else: ?>
+    <!-- Si hay sesión activa -->
+    <p class="text-sm text-gray-300"><?php echo htmlspecialchars($_SESSION['nombre'] ?? ''); ?></p>
+    <a href="#" id="cerrarSesionBtn" class="btn-admin">Cerrar Sesión</a>
+  <?php endif; ?>
+
 </header>
 
 <nav class="nav">
   <ul>
-    <li><a href="<?= BASE_URL ?>/View/asesor/asesorGerente.php">Inicio</a></li>
-    <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=listarTurnos">Turnos</a></li>
+    <!-- Vista publica (PARA TODOS) -->
+    <li><a href="<?= BASE_URL ?>/View/public/inicio.php">Inicio</a></li>
+
+    <!-- Vista Publica No Logueado-->
+    <?php if (!isset($_SESSION['usuario'])): ?>
+      <li><a href="<?= BASE_URL ?>/View/public/visionMision.php">Visión y Misión</a></li>
+      <li><a href="<?= BASE_URL ?>/View/public/estructura.php">Estructura Organizacional</a></li>
+    <?php endif; ?>
+
     <li><a href="<?= BASE_URL ?>/View/asesor/productosyservicios.php">Productos y Servicios</a></li>
-    <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=Credito_Cliente">Solicitud credito</a></li>
+
+    <!-- Para asesores -->
     <?php 
-      if(isset($_SESSION['rol']) && $_SESSION['rol'] == 3){
-        echo '<li><a href="../asesor/RegistroAsesor.php">Crear Asesor</a></li>';
+      if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 3 || $_SESSION['rol'] == 5)){
+        echo '<li><a href="' . BASE_URL . '/Controlador/asesorController.php?accion=listarTurnos">Turnos</a></li>';
+        echo '<li><a href="' . BASE_URL . '/Controlador/asesorController.php?accion=Credito_Cliente">Solicitud credito</a></li>';
       }
     ?>
-    <li><a href="<?= BASE_URL ?>/View/asesor/RegistroAsesor.php">Crear Asesor</a></li>
-    <li><a href="<?= BASE_URL ?>/View/asesor/Bitacora.php">Bitacora</a></li>
-    <li><a href="<?= BASE_URL ?>/View/asesor/cajero.php">Cajero</a></li>
+
+<!-- Para Cajeros -->
+<?php 
+      if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 3 || $_SESSION['rol'] == 5)){
+        echo '<li><a href="' . BASE_URL . '/View/asesor/cajero.php">Gestionar Cajero</a></li>';
+      }
+      ?>
+
+<?php 
+      if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 3 || $_SESSION['rol'] == 5)){
+        echo '<li><a href="' . BASE_URL . '/View/asesor/RegistroAsesor.php">Crear Asesor</a></li>';
+        echo '<li><a href="' . BASE_URL . '/View/asesor/Bitacora.php">Bitacora</a></li>';
+      }
+    ?>   
+
+
   </ul>
 </nav>
 
@@ -45,4 +82,17 @@
       });
     }
   });
+
+  function toggleDropdown() {
+    document.getElementById("menuSesion").classList.toggle("show");
+  }
+
+  window.onclick = function (event) {
+    if (!event.target.matches('.btn-admin')) {
+      const dropdowns = document.getElementsByClassName("dropdown-content");
+      for (let i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].classList.remove("show");
+      }
+    }
+  };
 </script>

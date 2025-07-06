@@ -12,6 +12,7 @@ CREATE DATABASE db_finan_cias2;
 
 USE db_finan_cias2;
 
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -46,7 +47,7 @@ CREATE TABLE `asesor_producto` (
 --
 
 INSERT INTO `asesor_producto` (`ID_Asesor_Producto`, `ID_Personal`, `ID_Producto`, `Descripcion_AP`, `Fecha_Asignacion`, `Estado_AsesorProducto`) VALUES
-(1, 1, 4, 'Asignado como asesor para productos de inversión tipo CDT a corto plazo.', '2025-07-01 00:00:00', 'Activo');
+(2, 1, 1, NULL, '2025-07-05 18:12:35', 'Activo');
 
 -- --------------------------------------------------------
 
@@ -102,7 +103,13 @@ CREATE TABLE `cliente` (
 INSERT INTO `cliente` (`ID_Cliente`, `Nombre_Cliente`, `Apellido_Cliente`, `ID_Genero`, `ID_TD`, `N_Documento_Cliente`, `Celular_Cliente`, `Correo_Cliente`, `Direccion_Cliente`, `Ciudad_Cliente`, `Fecha_Nacimiento_Cliente`, `ID_Personal_Creador`, `Fecha_Creacion_Cliente`, `Estado_Cliente`, `Contraseña`) VALUES
 (1, 'SIN', 'CLIENTE', 3, 1, '0000000000', '000000000', 'SIN@gmail.com', 'DESCONOCIDAD', 'DESCONOCIDAD', '2000-01-01', NULL, '2025-06-29 15:27:36', 0, '741852963QAZWSXEDCRFVTGBYHNUJMIKOLPÑ'),
 (2, 'Cliente', 'prueba', 1, 3, '0000000005', '313000008', 'Cliente@gmail.com', 'el SENA', 'Puerto Boyaca', '2000-01-01', NULL, '2025-06-20 17:04:54', 1, '12345'),
-(3, 'Cliente2', 'Aprobado', 1, 1, '0000000006', '313000009', 'ClienteAprobado@gmail.com', 'SENA', 'PUERTO BOYACA', '2000-01-01', 1, '2025-06-29 16:25:07', 1, '12345');
+(3, 'Cliente2', 'Aprobado', 1, 1, '0000000006', '313000009', 'ClienteAprobado@gmail.com', 'SENA', 'PUERTO BOYACA', '2000-01-01', 1, '2025-06-29 16:25:07', 1, '12345'),
+(12, 'Prueba', 'turno', 1, 1, '2324234', '3206339397', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-18', 1, '2025-07-06 10:44:55', 1, '$2y$10$jcnGdr82SLX9BZDhwNXmd.H/D0lLHIwbjJW8Wnxj3SHnwM2zEwAEK'),
+(14, 'Prueba', 'turno', 1, 1, '213312233', '3223', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-21', 1, '2025-07-06 11:00:23', 1, '$2y$10$UBd7fos1UY9HzXdi5JB.ruK5BHlh4cBMustMqIIXU/2hKqmiGTJIi'),
+(15, 'Jose', 'Dominguez Cuero', 1, 1, '23223', '322332', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-30', 1, '2025-07-06 11:07:45', 1, '$2y$10$HSx9Pf8.CdZS8Z92RfZEhOZZb00hBBOnShs0/hUrOQmxmZ3oKKdjK'),
+(16, 'Prueba', 'turno', 1, 1, '23242342', '233232', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-30', 1, '2025-07-06 11:08:37', 1, '$2y$10$Qzw1RH2fFLAh3eWwHy595.m..BdkPC2.NQO2IAOojn/kiZP.3Alei'),
+(18, 'Prueba', 'turno', 2, 1, '2323323223', '3206339397', 'jose@gmail.com', 'Cra 11 # 39-4', 'dsdsd', '2025-07-23', 1, '2025-07-06 11:11:56', 1, '$2y$10$460pCjxt4Oz1CjEW37uBO.cyX9VHSqEjuw3af025KHoec6BM8.Dy6'),
+(21, 'asd', 'dsdsd', 1, 1, '223223', '22332', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-14', 1, '2025-07-06 11:23:57', 1, '$2y$10$HmGekjSAz65VRtA3mcBQpeLHpaYYI7rszB9Sb2KAXLA3DZt4z/Ps6');
 
 -- --------------------------------------------------------
 
@@ -118,8 +125,25 @@ CREATE TABLE `credito` (
   `Fecha_Apertura_Credito` datetime NOT NULL DEFAULT current_timestamp(),
   `Fecha_Vencimiento_Credito` date NOT NULL,
   `ID_Producto` int(11) NOT NULL DEFAULT 4,
-  `ID_Estado` int(11) NOT NULL
+  `ID_Estado` int(11) NOT NULL,
+  `Tasa_Interes_Anual` decimal(5,2) DEFAULT 0.00,
+  `Tasa_Interes_Periodica` decimal(7,5) DEFAULT 0.00000,
+  `Numero_Cuotas` int(11) DEFAULT 0,
+  `Valor_Cuota_Calculado` decimal(10,2) DEFAULT 0.00,
+  `Periodicidad` varchar(20) DEFAULT 'Mensual'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `credito`
+--
+
+INSERT INTO `credito` (`ID_Credito`, `ID_Cliente`, `Monto_Total_Credito`, `Monto_Pendiente_Credito`, `Fecha_Apertura_Credito`, `Fecha_Vencimiento_Credito`, `ID_Producto`, `ID_Estado`, `Tasa_Interes_Anual`, `Tasa_Interes_Periodica`, `Numero_Cuotas`, `Valor_Cuota_Calculado`, `Periodicidad`) VALUES
+(1, 12, 23232.00, 23232.00, '2025-07-06 17:44:55', '2025-09-06', 37, 7, 3.00, 0.25000, 2, 11659.58, 'Mensual'),
+(2, 14, 32233.00, 32233.00, '2025-07-06 18:00:23', '2025-09-06', 37, 7, 2.00, 0.16667, 2, 16156.80, 'Mensual'),
+(3, 15, 222332.00, 222332.00, '2025-07-06 18:07:45', '2025-09-06', 1, 7, 3.00, 0.25000, 2, 111583.05, 'Mensual'),
+(4, 16, 232323.00, 232323.00, '2025-07-06 18:08:37', '2025-09-06', 37, 7, 3.00, 0.25000, 2, 116597.29, 'Mensual'),
+(5, 18, 323.00, 323.00, '2025-07-06 18:11:56', '2025-08-06', 37, 7, 2.00, 0.16667, 1, 323.54, 'Mensual'),
+(8, 21, 232332.00, 232332.00, '2025-07-06 18:23:57', '2025-08-06', 17, 7, 3.00, 0.25000, 1, 232912.83, 'Mensual');
 
 -- --------------------------------------------------------
 
@@ -141,6 +165,22 @@ CREATE TABLE `cuotacredito` (
   `Monto_Recargo_Mora` decimal(15,2) DEFAULT 0.00,
   `ID_Estado_Cuota` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `cuotacredito`
+--
+
+INSERT INTO `cuotacredito` (`ID_CuotaCredito`, `ID_Credito`, `Numero_Cuota`, `Monto_Capital`, `Monto_Interes`, `Monto_Total_Cuota`, `Fecha_Vencimiento`, `Fecha_Pago`, `Monto_Pagado`, `Dias_Mora_Al_Pagar`, `Monto_Recargo_Mora`, `ID_Estado_Cuota`) VALUES
+(1, 1, 1, 11601.50, 58.08, 11659.58, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
+(2, 1, 2, 11630.50, 29.08, 11659.58, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
+(3, 2, 1, 16103.08, 53.72, 16156.80, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
+(4, 2, 2, 16129.92, 26.88, 16156.80, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
+(5, 3, 1, 111027.22, 555.83, 111583.05, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
+(6, 3, 2, 111304.78, 278.26, 111583.05, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
+(7, 4, 1, 116016.48, 580.81, 116597.29, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
+(8, 4, 2, 116306.52, 290.77, 116597.29, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
+(9, 5, 1, 323.00, 0.54, 323.54, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
+(14, 8, 1, 232332.00, 580.83, 232912.83, '2025-08-06', NULL, 0.00, 0, 0.00, 8);
 
 -- --------------------------------------------------------
 
@@ -262,8 +302,21 @@ CREATE TABLE `personal` (
 INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `ID_Rol`, `ID_Genero`, `ID_TD`, `N_Documento_Personal`, `Celular_Personal`, `Correo_Personal`, `Contraseña_Personal`, `Activo_Personal`, `Fecha_Creacion_Personal`, `Foto_Perfil_Personal`) VALUES
 (1, 'Gerente', 'Primero', 1, 1, 1, '0000000000', '3130000001', 'jsdmngzc@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:00:44', NULL),
 (2, 'SubGerente', 'Segundo', 2, 2, 2, '0000000002', '3130000002', 'SubGerente@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
-(3, 'Asesor', 'tercero', 3, 3, 3, '0000000003', '3130000003', 'Asesor@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
-(4, 'Cajero', 'Cuarto', 4, 1, 1, '0000000004', '3130000004', 'Cajero@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL);
+(3, 'Asesor', 'tercero', 3, 3, 3, '0000000003', '3130000003', 'jose@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
+(4, 'Cajero', 'Cuarto', 4, 1, 1, '0000000004', '3130000004', 'Cajero@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
+(5, 'ADMIN', 'SUPER', 5, 1, 1, '0000000001', '3206339397', 'admin1$#$@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-07-06 13:03:05', 'N/A'),
+(6, 'Nubia Lorena', 'Montoya Palomo', 3, 3, 3, '00000000000', '3130000001', 'montoyapalomo1997@gmail.com', 'Montoya1', 1, '2025-06-20 17:02:48', NULL),
+(7, 'Dina Mayerli', 'Muñoz Erazo', 3, 3, 3, '00000000002', '3130000001', 'izajhoss@gmail.com', 'Muñoz2', 1, '2025-06-20 17:02:48', NULL),
+(8, 'Luisa Fernanda', 'Cuesta Rivera', 3, 3, 3, '00000000003', '3130000002', 'luisacuesta180@gmail.com', 'Cuesta3', 1, '2025-06-20 17:02:48', NULL),
+(9, 'Angela Maria', 'Valencia Tabarez', 3, 3, 3, '00000000004', '3130000003', 'Angelavalenciatabarez09@gmail.com', 'Valencia4', 1, '2025-06-20 17:02:48', NULL),
+(10, 'Miguel Ángel', 'Hernández Cárdenas', 3, 3, 3, '00000000005', '3130000004', 'hernandezcardenas288@gmail.com', 'Hernández5', 1, '2025-06-20 17:02:48', NULL),
+(11, 'Lilian Yohana', 'Ocampo Henao', 3, 3, 3, '00000000006', '3130000005', 'yoanaocampohenao@gmail.com', 'Ocampo6', 1, '2025-06-20 17:02:48', NULL),
+(12, 'Naftali Estefani', 'Moreno Murcia', 3, 3, 3, '00000000007', '3130000006', 'morenonaftali@gmail.com', 'Moreno7', 1, '2025-06-20 17:02:48', NULL),
+(13, 'Siara Vanesa', 'Madero Ramirez', 3, 3, 3, '00000000008', '3130000007', 'saramadero96@gmail.com', 'Madero8', 1, '2025-06-20 17:02:48', NULL),
+(14, 'Ana Yulieth', 'Palacio Cuellar', 3, 3, 3, '00000000009', '3130000008', 'Anayuliethpalacio04@gmail.com', 'Palacio9', 1, '2025-06-20 17:02:48', NULL),
+(15, 'Nicoll Daniela', 'Flores Pacheco', 3, 3, 3, '00000000010', '3130000009', 'florezdaniela313@gmail.com', 'Flores10', 1, '2025-06-20 17:02:48', NULL),
+(16, 'Angie Lorena', 'Murcia', 3, 3, 3, '00000000011', '3130000010', 'lorenamurcia199905@gmail.com', 'Murcia11', 1, '2025-06-20 17:02:48', NULL),
+(17, 'Heilyn Stefany', 'Hernández Pérez', 3, 3, 3, '00000000012', '3130000011', 'heihernandez111@gmail.com', 'Hernández12', 1, '2025-06-20 17:02:48', NULL);
 
 -- --------------------------------------------------------
 
@@ -274,18 +327,19 @@ INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `
 CREATE TABLE `producto` (
   `ID_Producto` int(11) NOT NULL,
   `Nombre_Producto` varchar(100) NOT NULL,
-  `Categoria_Productos` varchar(100) NOT NULL,
+  `Categoria_Productos` varchar(100) DEFAULT NULL,
   `Descripcion_Producto` text DEFAULT NULL,
-  `ID_TI` int(11) NOT NULL,
-  `Monto_Minimo` decimal(12,2) NOT NULL,
-  `Monto_Maximo` decimal(12,2) NOT NULL,
-  `Plazo_Minimo` int(11) NOT NULL COMMENT 'En meses',
-  `Plazo_Maximo` int(11) NOT NULL COMMENT 'En meses',
+  `ID_TI` int(11) DEFAULT NULL,
+  `Monto_Minimo` decimal(12,2) DEFAULT NULL,
+  `Monto_Maximo` decimal(12,2) DEFAULT NULL,
+  `Plazo_Minimo` int(11) DEFAULT NULL COMMENT 'En meses',
+  `Plazo_Maximo` int(11) DEFAULT NULL COMMENT 'En meses',
   `Activo_Producto` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `producto`
+--
 
 INSERT INTO `producto` (`ID_Producto`, `Nombre_Producto`, `Categoria_Productos`, `Descripcion_Producto`, `ID_TI`, `Monto_Minimo`, `Monto_Maximo`, `Plazo_Minimo`, `Plazo_Maximo`, `Activo_Producto`) VALUES
 (1, 'Compra de cartera de crédito hipotecario', 'Compra de cartera', 'Permite trasladar tu crédito de vivienda actual desde otra entidad financiera para mejorar condiciones como tasa de interés, plazo o cuota mensual.', 1, 5000000.00, 500000000.00, 12, 84, 1),
@@ -371,7 +425,8 @@ INSERT INTO `rol` (`ID_Rol`, `Rol`, `Nivel_Acceso`, `Descripcion_Rol`, `Permisos
 (1, 'Gerente', 1, 'Gerente general con acceso completo al sistema', 'Todos los permisos'),
 (2, 'SubGerente', 2, 'Subgerente con acceso casi completo al sistema', 'Gestionar personal, productos, tasas, ver reportes'),
 (3, 'Asesor', 3, 'Asesor financiero que atiende clientes', 'Gestionar clientes, créditos, asesoramientos, turnos'),
-(4, 'Cajero', 4, 'Cajero que procesa pagos', 'Procesar pagos, ver información de créditos');
+(4, 'Cajero', 4, 'Cajero que procesa pagos', 'Procesar pagos, ver información de créditos'),
+(5, 'SUPER ADMIN', 5, 'ACCESO COMPLETO AL SISTEMA', 'FUNCIONALIDADES COMPLETAS DEL SISTEMA');
 
 -- --------------------------------------------------------
 
@@ -461,10 +516,12 @@ CREATE TABLE `turno` (
 --
 
 INSERT INTO `turno` (`ID_Turno`, `ID_Cliente`, `Nombre_Completo_Solicitante`, `N_Documento_Solicitante`, `Numero_Turno`, `ID_Producto_Interes`, `Fecha_Hora_Solicitud`, `Fecha_Hora_Finalizacion`, `ID_Estado_Turno`, `Tiempo_Espera_Minutos`, `Motivo_Turno`) VALUES
-(1, 1, 'Laura Camila Ríos Martínez', '1032456789', 'A-102', 4, '2025-07-04 13:30:00', '2025-07-04 14:00:00', 1, 15, 'Solicitud de asesoría para inversión en CDT'),
-(2, NULL, 'Jose Dominguez Cuero', '1032456789', 'A-102', 4, '2025-07-04 13:30:00', '2025-07-04 14:00:00', 2, 15, 'Solicitud de asesoría para inversión en CDT'),
-(3, NULL, 'Jose Dominguez Cuero', '1037665857', 'T001', NULL, '2025-07-04 05:25:59', NULL, 1, NULL, NULL),
-(4, NULL, 'Prueb Turno', '102626', 'T001', NULL, '2025-07-04 06:39:57', NULL, 1, NULL, NULL);
+(1, 1, 'Laura Camila Ríos Martínez', '1032456789', 'T-000', NULL, '2025-07-04 13:30:00', '2025-07-04 14:00:00', 1, 15, 'Solicitud de asesoría para inversión en CDT'),
+(37, NULL, 'Jose Dominguez Cuero', '3233', 'T037', NULL, '2025-07-06 02:13:29', NULL, 1, NULL, NULL),
+(38, NULL, 'asd', '232', 'T038', 17, '2025-07-06 02:17:02', '2025-07-06 18:23:57', 10, NULL, NULL),
+(39, NULL, 'Prueba turno', '2324234', 'T039', 37, '2025-07-06 02:24:54', NULL, 1, NULL, NULL),
+(40, NULL, 'Jose Dominguez Cuero', '122552522', 'T040', 11, '2025-07-06 03:30:58', NULL, 1, NULL, NULL),
+(41, NULL, 'Jose Dominguez Cuero', '67', 'T041', 38, '2025-07-06 04:27:31', NULL, 1, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -604,7 +661,7 @@ ALTER TABLE `turno`
 -- AUTO_INCREMENT de la tabla `asesor_producto`
 --
 ALTER TABLE `asesor_producto`
-  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `bitacora`
@@ -616,19 +673,19 @@ ALTER TABLE `bitacora`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `ID_Cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID_Cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `credito`
 --
 ALTER TABLE `credito`
-  MODIFY `ID_Credito` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Credito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `cuotacredito`
 --
 ALTER TABLE `cuotacredito`
-  MODIFY `ID_CuotaCredito` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_CuotaCredito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `estado`
@@ -658,13 +715,13 @@ ALTER TABLE `periodo`
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `ID_Personal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID_Personal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `ID_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `registroasesoramiento`
@@ -676,13 +733,13 @@ ALTER TABLE `registroasesoramiento`
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
-  MODIFY `ID_Rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID_Rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `tasa_interes`
 --
 ALTER TABLE `tasa_interes`
-  MODIFY `ID_TI` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `ID_TI` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_documento`
@@ -694,7 +751,7 @@ ALTER TABLE `tipo_documento`
 -- AUTO_INCREMENT de la tabla `turno`
 --
 ALTER TABLE `turno`
-  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- Restricciones para tablas volcadas
@@ -782,3 +839,7 @@ ALTER TABLE `turno`
   ADD CONSTRAINT `fk_turno_estado` FOREIGN KEY (`ID_Estado_Turno`) REFERENCES `estado` (`ID_Estado`),
   ADD CONSTRAINT `fk_turno_producto` FOREIGN KEY (`ID_Producto_Interes`) REFERENCES `producto` (`ID_Producto`);
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

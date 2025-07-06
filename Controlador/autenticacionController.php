@@ -58,7 +58,7 @@ try {
                         $_SESSION['usuario'] = $usuario;
                         $_SESSION['rol'] = $resultado['ID_Rol'];
 
-                        header("Location: /Proyecto_GB/Controlador/asesorController.php?accion=listar");
+                        header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
                         exit;
 
                     } else {

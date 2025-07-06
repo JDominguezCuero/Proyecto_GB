@@ -159,6 +159,35 @@ function obtenerTurnos(PDO $conexion, array $filtros = []): array {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Actualiza un registro de turno existente.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idTurno ID del turno a actualizar.
+ * @param array $datosTurno Array asociativo con los datos a actualizar.
+ * @return bool True si se actualiza correctamente, false en caso contrario.
+ */
+function actualizarTurno(PDO $conexion, int $idTurno, array $datosTurno): bool {
+    $campos = [];
+    $valores = [':idTurno' => $idTurno];
+
+    if (isset($datosTurno['ID_Cliente'])) { $campos[] = 'ID_Cliente = :idCliente'; $valores[':idCliente'] = $datosTurno['ID_Cliente']; }
+    if (isset($datosTurno['Nombre_Completo_Solicitante'])) { $campos[] = 'Nombre_Completo_Solicitante = :nombreCompleto'; $valores[':nombreCompleto'] = $datosTurno['Nombre_Completo_Solicitante']; }
+    if (isset($datosTurno['N_Documento_Solicitante'])) { $campos[] = 'N_Documento_Solicitante = :nDocumento'; $valores[':nDocumento'] = $datosTurno['N_Documento_Solicitante']; }
+    if (isset($datosTurno['Numero_Turno'])) { $campos[] = 'Numero_Turno = :numeroTurno'; $valores[':numeroTurno'] = $datosTurno['Numero_Turno']; }
+    if (isset($datosTurno['ID_Producto_Interes'])) { $campos[] = 'ID_Producto_Interes = :idProductoInteres'; $valores[':idProductoInteres'] = $datosTurno['ID_Producto_Interes']; }
+    if (isset($datosTurno['Fecha_Hora_Finalizacion'])) { $campos[] = 'Fecha_Hora_Finalizacion = :fechaFinalizacion'; $valores[':fechaFinalizacion'] = $datosTurno['Fecha_Hora_Finalizacion']; }
+    if (isset($datosTurno['ID_Estado_Turno'])) { $campos[] = 'ID_Estado_Turno = :idEstadoTurno'; $valores[':idEstadoTurno'] = $datosTurno['ID_Estado_Turno']; }
+    if (isset($datosTurno['Tiempo_Espera_Minutos'])) { $campos[] = 'Tiempo_Espera_Minutos = :tiempoEspera'; $valores[':tiempoEspera'] = $datosTurno['Tiempo_Espera_Minutos']; }
+    if (isset($datosTurno['Motivo_Turno'])) { $campos[] = 'Motivo_Turno = :motivoTurno'; $valores[':motivoTurno'] = $datosTurno['Motivo_Turno']; }
+
+    if (empty($campos)) {
+        return false;
+    }
+
+    $sql = "UPDATE turno SET " . implode(', ', $campos) . " WHERE ID_Turno = :idTurno";
+    $stmt = $conexion->prepare($sql);
+    return $stmt->execute($valores);
+}
 
 
 
@@ -183,16 +212,7 @@ function obtenerTurnos(PDO $conexion, array $filtros = []): array {
 
 
 
-
-
-
-
-
-
-
-
-
-
+// METODOS FUNCIONALES 
 
 function obtenerProductos($conexion) {
     $sql = "SELECT * FROM producto";
@@ -932,35 +952,7 @@ function obtenerTurnoPorId(PDO $conexion, int $idTurno) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-/**
- * Actualiza un registro de turno existente.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param int $idTurno ID del turno a actualizar.
- * @param array $datosTurno Array asociativo con los datos a actualizar.
- * @return bool True si se actualiza correctamente, false en caso contrario.
- */
-function actualizarTurno(PDO $conexion, int $idTurno, array $datosTurno): bool {
-    $campos = [];
-    $valores = [':idTurno' => $idTurno];
 
-    if (isset($datosTurno['ID_Cliente'])) { $campos[] = 'ID_Cliente = :idCliente'; $valores[':idCliente'] = $datosTurno['ID_Cliente']; }
-    if (isset($datosTurno['Nombre_Completo_Solicitante'])) { $campos[] = 'Nombre_Completo_Solicitante = :nombreCompleto'; $valores[':nombreCompleto'] = $datosTurno['Nombre_Completo_Solicitante']; }
-    if (isset($datosTurno['N_Documento_Solicitante'])) { $campos[] = 'N_Documento_Solicitante = :nDocumento'; $valores[':nDocumento'] = $datosTurno['N_Documento_Solicitante']; }
-    if (isset($datosTurno['Numero_Turno'])) { $campos[] = 'Numero_Turno = :numeroTurno'; $valores[':numeroTurno'] = $datosTurno['Numero_Turno']; }
-    if (isset($datosTurno['ID_Producto_Interes'])) { $campos[] = 'ID_Producto_Interes = :idProductoInteres'; $valores[':idProductoInteres'] = $datosTurno['ID_Producto_Interes']; }
-    if (isset($datosTurno['Fecha_Hora_Finalizacion'])) { $campos[] = 'Fecha_Hora_Finalizacion = :fechaFinalizacion'; $valores[':fechaFinalizacion'] = $datosTurno['Fecha_Hora_Finalizacion']; }
-    if (isset($datosTurno['ID_Estado_Turno'])) { $campos[] = 'ID_Estado_Turno = :idEstadoTurno'; $valores[':idEstadoTurno'] = $datosTurno['ID_Estado_Turno']; }
-    if (isset($datosTurno['Tiempo_Espera_Minutos'])) { $campos[] = 'Tiempo_Espera_Minutos = :tiempoEspera'; $valores[':tiempoEspera'] = $datosTurno['Tiempo_Espera_Minutos']; }
-    if (isset($datosTurno['Motivo_Turno'])) { $campos[] = 'Motivo_Turno = :motivoTurno'; $valores[':motivoTurno'] = $datosTurno['Motivo_Turno']; }
-
-    if (empty($campos)) {
-        return false;
-    }
-
-    $sql = "UPDATE turno SET " . implode(', ', $campos) . " WHERE ID_Turno = :idTurno";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute($valores);
-}
 
 // --- Funciones para tablas auxiliares (ejemplos) ---
 

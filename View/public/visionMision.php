@@ -1,3 +1,7 @@
+<?php
+  require_once(__DIR__ . '../../../Config/config.php');
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,7 +16,7 @@
 <body>
 
   <!-- Header -->
-   <?php include 'layout/layoutNav.php'; ?>
+  <?php include '../public/layout/barraNavAsesor.php'; ?>
 
   <!-- Contenido principal -->
   <main class="container">
@@ -42,8 +46,8 @@
   </main>
   <!-- Footer -->
  
-   <?php include 'layout/frontendBackend.php'; ?>
-    <?php include 'layout/layoutfooter.php'; ?>
+  <?php include '../public/layout/frontendBackend.php'; ?>
+  <?php include '../public/layout/layoutfooter.php'; ?>
 
 
 

@@ -1,3 +1,7 @@
+<?php
+  require_once(__DIR__ . '../../../Config/config.php');
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,15 +24,15 @@
 </head>
 <body>
 
-  <?php include 'layout/layoutNav.php'; ?>
+  <?php include '../public/layout/barraNavAsesor.php'; ?>
 
   <div class="container">
     <img src="assets/Img/carrusel/A16.jpg" alt="Imagen Contacto" class="imagen-contacto">
   </div>
 
 
-    <?php include 'layout/frontendBackend.php'; ?>  
-  <?php include 'layout/layoutfooter.php'; ?>
+  <?php include '../public/layout/frontendBackend.php'; ?>
+  <?php include '../public/layout/layoutfooter.php'; ?>
   
 
 </body>

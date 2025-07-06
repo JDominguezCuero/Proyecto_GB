@@ -9,19 +9,25 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-if (!isset($_SESSION['usuario'])) {
-    if (
-        isset($_SERVER['HTTP_ACCEPT']) && 
-        strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
-    ) {
-        // Si la petición espera JSON, devolvemos error JSON
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
-    } else {
-        // Si es una petición normal (navegador), redireccionamos
-        header("Location: /Proyecto_GB/View/public/inicio.php?login=error&reason=nologin");
+$accionesPublicas = ['crearTurnoPublico', 'verTurnos', 'listarTurnosPublicos']; 
+
+// Si la acción actual está en la lista pública, no validamos sesión
+$accion = $_GET['accion'] ?? '';
+
+if (!in_array($accion, $accionesPublicas)) {
+    if (!isset($_SESSION['usuario'])) {
+        if (
+            isset($_SERVER['HTTP_ACCEPT']) &&
+            strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
+        ) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
+        } else {
+            $mensajeError = "Usuario no logueado.";
+            header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
+        }
+        exit;
     }
-    exit;
 }
 
 $accion = $_GET['accion'] ?? 'listar';
@@ -31,7 +37,7 @@ try {
     switch ($accion) {
         case 'listar':
             // $personal = obtenerTodoElPersonal($conexion);
-            header("Location: /Proyecto_GB/View/asesor/asesorGerente.php?login=success");
+            // header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
         break;
 
         case 'Credito_Cliente':
@@ -391,7 +397,7 @@ try {
     error_log("Error en Controller de Cliente: " . $e->getMessage());
 
     $mensajeUsuario = "Ocurrió un error inesperado. Intente más tarde.";
-    header("Location: /Proyecto_GB/View/asesor/asesorGerente.php?login=error&error=" . urlencode($mensajeUsuario));
+    header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=" . urlencode($mensajeUsuario));
     exit;
 }
 ?>
