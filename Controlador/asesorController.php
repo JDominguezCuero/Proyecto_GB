@@ -22,6 +22,7 @@ try {
             header("Location: /Proyecto_GB/View/asesor/asesorGerente.php?login=success");
         break;
 
+        //Eliminar
         case 'listarCliente':
             $idPersonal = $_SESSION['idPersonal'];
             $idTurno = $_GET['idTurno'] ?? '';
@@ -42,10 +43,35 @@ try {
             include __DIR__ . '/../View/asesor/CrearCliente.php';
         break;
 
+        case 'Credito_Cliente':
+            $idPersonal = $_SESSION['idPersonal'];
+            $idTurno = $_GET['idTurno'] ?? '';
+
+            $turnoAtender = null;
+            $productoInteres = null;
+
+            if ($idTurno) {
+                $turnosEncontrados = obtenerTurnos($conexion, ['ID_Turno' => $idTurno]);
+
+                // Si se encontró un turno, tómalo (asumiendo que el ID es único)
+                if (!empty($turnosEncontrados)) {
+                    $turnoAtender = $turnosEncontrados[0];
+                }
+
+                if ($turnoAtender['ID_Producto_Interes']) {
+                    $productoInteres = obtenerProductoPorId($conexion, $turnoAtender['ID_Producto_Interes']);
+                }
+            }
+            
+            $productos = obtenerProductosPorAsesor($conexion, $idPersonal);
+            include __DIR__ . '/../View/asesor/Tab_Amortizacion.php';
+        break;
+
         case 'listarTurnos':
             $idPersonal = $_SESSION['idPersonal'];
             $productos = obtenerProductosPorAsesor($conexion, $idPersonal);
             $turnos = obtenerTurnos($conexion);
+            
             foreach ($turnos as &$turno) {
                 if ($turno['ID_Estado_Turno'] == 1) {
                     $fechaSolicitud = new DateTime($turno['Fecha_Hora_Solicitud']);
@@ -59,6 +85,12 @@ try {
 
             include __DIR__ . '/../View/asesor/turnos.php';
         break;
+
+        // case 'listarProductos_Servicios':
+
+        //     $listProductos = obtenerProductos($conexion);
+        //     include __DIR__ . '/../View/asesor/productosyservicios.php';
+        // break;
 
         case 'agregarAsesor':
             try{
@@ -160,6 +192,7 @@ try {
                     $nDocumento = $_POST['n_documento_solicitante'] ?? '';
                     $numeroTurno = $_POST['n_Turno'] ?? '';
                     $fecha_Solicitud = $_POST['fechaSolicitud'] ?? '';
+                    $productoInteresId = $_POST['producto_interes'] ?? '';
 
                     if (empty($nombreCompleto) || empty($nDocumento)) {
                         $mensajeError = "El nombre completo y el número de documento son obligatorios para registrar un turno.";
@@ -167,11 +200,25 @@ try {
                         exit;
                     }
 
-                    $resultado = registrarTurno($conexion, $nombreCompleto, $nDocumento, $numeroTurno, $fecha_Solicitud);
+                    $turnoData = registrarTurno($conexion, $nombreCompleto, $nDocumento, $productoInteresId);
 
-                    if ($resultado) {
-                        $mensaje = "Turno registrado correctamente.";
-                        header("Location: /Proyecto_GB/View/asesor/productosyservicios.php?success=success&msg=" . urlencode($mensaje));
+                    if ($turnoData) {
+                        // Si el registro fue exitoso y obtuvimos los datos del turno
+                        $mensajeExito = "¡Tu turno ha sido generado exitosamente!";
+
+                        // Preparamos los parámetros para la URL usando los datos REALES del turno insertado
+                        $params = [
+                            'success' => 'success',
+                            'msg' => $mensajeExito,
+                            'n_documento' => $turnoData['N_Documento_Solicitante'],
+                            'n_turno' => $turnoData['Numero_Turno'],
+                            'nombre_completo' => $turnoData['Nombre_Completo_Solicitante'],
+                            'fecha_solicitud' => $turnoData['Fecha_Hora_Solicitud'],
+                            'producto_interes' => $turnoData['ID_Producto_Interes'] 
+                        ];
+
+                        $queryString = http_build_query($params);
+                        header("Location: /Proyecto_GB/View/asesor/productosyservicios.php?" . $queryString);
                         exit;
                     } else {
                         $mensajeError = "Error al registrar el turno. Verifique los datos o la configuración del estado 'En Espera'.";
@@ -389,3 +436,4 @@ try {
     header("Location: /Proyecto_GB/View/asesor/asesorGerente.php?login=error&error=" . urlencode($mensajeUsuario));
     exit;
 }
+?>

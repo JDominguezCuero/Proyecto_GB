@@ -86,7 +86,8 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
                   <p><strong>Turno:</strong> ${turno.Numero_Turno}</p>
                   <p><strong>Solicitante:</strong> ${turno.Nombre_Completo_Solicitante}</p>
                   <p><strong>Documento:</strong> ${turno.N_Documento_Solicitante}</p>
-                  <p><strong>Producto:</strong> ${productos[turno.ID_Producto_Interes] ?? 'No Definido.'}</p>
+                  <p><strong>Producto:</strong> ${turno.Nombre_Producto ?? 'No Definido.'}</p>
+                  <p><strong>Detalle Producto:</strong> ${turno.Descripcion_Producto ?? 'No Definido.'}</p>
                   <p><strong>Motivo:</strong> ${turno.Motivo_Turno ?? 'No Definido.'}</p>
                   <p><strong>Tiempo de Espera:</strong> ${turno.Tiempo_Espera_Minutos ?? 'No Definido.'} min</p>
               </div>
@@ -123,7 +124,7 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
       console.log('Documento:', sessionStorage.getItem('atenderTurno_documento'));
       // ---------------------------------------------
 
-      window.location.href = `<?= BASE_URL ?>/Controlador/asesorController.php?accion=listarCliente&idTurno=${idTurno}`;
+      window.location.href = `<?= BASE_URL ?>/Controlador/asesorController.php?accion=Credito_Cliente&idTurno=${idTurno}`;
     }
 
     document.getElementById('filtroProducto').addEventListener('change', renderTurnos);

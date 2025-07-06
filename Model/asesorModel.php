@@ -39,18 +39,155 @@ function registrarPersonal(PDO $conexion, array $datosPersonal): bool {
 * @param string $nDocumento Número de documento del solicitante.
 * @return bool True si se registra correctamente, false en caso contrario.
 */
-function registrarTurno(PDO $conexion, string $nombreCompleto, string $nDocumento, string $numeroTurno, string $fechaSolicitud, int $idEstadoTurno = 1): bool {
-    $sql = "INSERT INTO turno (Nombre_Completo_Solicitante, N_Documento_Solicitante, Numero_Turno, Fecha_Hora_Solicitud, ID_Estado_Turno)
-            VALUES (:nombreCompleto, :nDocumento, :numeroTurno, :fechaSolicitud, :idEstadoTurno)";
+function registrarTurno(PDO $conexion, string $nombreCompleto, string $nDocumento, ?int $productoInteresId = null, int $idEstadoTurno = 1): ?array {
+    $fechaSolicitud = date('Y-m-d H:i:s');
+
+    $sql = "INSERT INTO turno (Nombre_Completo_Solicitante, N_Documento_Solicitante, Fecha_Hora_Solicitud, ID_Estado_Turno, ID_Producto_Interes)
+            VALUES (:nombreCompleto, :nDocumento, :fechaSolicitud, :idEstadoTurno, :productoInteresId)";
+    
     $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':nombreCompleto' => $nombreCompleto,
-        ':nDocumento' => $nDocumento,
-        ':numeroTurno' => $numeroTurno,
-        ':fechaSolicitud' => $fechaSolicitud,
-        ':idEstadoTurno' => $idEstadoTurno
-    ]);
+    
+    try {
+        $stmt->execute([
+            ':nombreCompleto' => $nombreCompleto,
+            ':nDocumento' => $nDocumento,
+            ':fechaSolicitud' => $fechaSolicitud,
+            ':idEstadoTurno' => $idEstadoTurno,
+            ':productoInteresId' => $productoInteresId // Nuevo campo
+        ]);
+
+        // Recuperar el ID del turno recién insertado
+        $lastInsertId = $conexion->lastInsertId();
+
+        // Ahora, recuperamos todos los datos del registro recién insertado
+        // Esto es crucial para obtener el ID real y cualquier campo con valor por defecto o autogenerado.
+        $sqlSelect = "SELECT ID_Turno, Nombre_Completo_Solicitante, N_Documento_Solicitante, Numero_Turno, Fecha_Hora_Solicitud, ID_Estado_Turno, ID_Producto_Interes 
+                      FROM turno 
+                      WHERE ID_Turno = :id";
+        $stmtSelect = $conexion->prepare($sqlSelect);
+        $stmtSelect->execute([':id' => $lastInsertId]);
+        
+        $registroTurno = $stmtSelect->fetch(PDO::FETCH_ASSOC);
+
+        if ($registroTurno && empty($registroTurno['Numero_Turno'])) {
+            $numeroTurnoGenerado = "T" . str_pad($registroTurno['ID_Turno'], 3, '0', STR_PAD_LEFT);
+            $sqlUpdateNumeroTurno = "UPDATE turno SET Numero_Turno = :numeroTurno WHERE ID_Turno = :id";
+            $stmtUpdate = $conexion->prepare($sqlUpdateNumeroTurno);
+            $stmtUpdate->execute([
+                ':numeroTurno' => $numeroTurnoGenerado,
+                ':id' => $registroTurno['ID_Turno']
+            ]);
+            $registroTurno['Numero_Turno'] = $numeroTurnoGenerado;
+        }
+
+        return $registroTurno; // Retorna el array con los datos del turno completo
+    } catch (PDOException $e) {
+        // Manejo de errores
+        error_log("Error al registrar turno: " . $e->getMessage());
+        return null; // Devuelve null si hay un error
+    }
 }
+
+/**
+ * Obtiene un producto por su ID.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idProducto ID del producto.
+ * @return array|false Array asociativo del producto o false si no se encuentra.
+ */
+function obtenerProductoPorId(PDO $conexion, int $idProducto) {
+    $sql = "SELECT p.*, ti.Tasa_Interes, per.Periodo
+            FROM producto p
+            JOIN tasa_interes ti ON p.ID_TI = ti.ID_TI
+            JOIN periodo per ON ti.ID_Periodo = per.ID_Periodo
+            WHERE p.ID_Producto = :idProducto";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':idProducto', $idProducto, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Obtiene todos los turnos, con filtros opcionales.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param array $filtros Array asociativo de filtros (ej. 'ID_Cliente', 'ID_Estado_Turno', 'ID_Turno').
+ * @return array Array asociativo de turnos.
+ */
+function obtenerTurnos(PDO $conexion, array $filtros = []): array {
+    $sql = "SELECT t.*, c.Nombre_Cliente, c.Apellido_Cliente, p.Nombre_Producto, p.Descripcion_Producto, e.Estado AS Estado_Turno
+            FROM turno t
+            LEFT JOIN cliente c ON t.ID_Cliente = c.ID_Cliente
+            LEFT JOIN producto p ON t.ID_Producto_Interes = p.ID_Producto
+            JOIN estado e ON t.ID_Estado_Turno = e.ID_Estado
+            WHERE e.Tipo_Estado = 'Turno'"; // Asegura que solo se traigan turnos y no otros tipos de estado.
+
+    $condiciones = [];
+    $valores = [];
+
+    // Filtro por ID de Cliente
+    if (isset($filtros['ID_Cliente'])) {
+        $condiciones[] = "t.ID_Cliente = :idCliente";
+        $valores[':idCliente'] = $filtros['ID_Cliente'];
+    }
+    // Filtro por ID de Estado de Turno
+    if (isset($filtros['ID_Estado_Turno'])) {
+        $condiciones[] = "t.ID_Estado_Turno = :idEstadoTurno";
+        $valores[':idEstadoTurno'] = $filtros['ID_Estado_Turno'];
+    }
+    // Filtro por Fecha de Inicio de Solicitud
+    if (isset($filtros['Fecha_Inicio_Solicitud'])) {
+        $condiciones[] = "t.Fecha_Hora_Solicitud >= :fechaInicio";
+        $valores[':fechaInicio'] = $filtros['Fecha_Inicio_Solicitud'];
+    }
+    // Filtro por Fecha de Fin de Solicitud
+    if (isset($filtros['Fecha_Fin_Solicitud'])) {
+        $condiciones[] = "t.Fecha_Hora_Solicitud <= :fechaFin";
+        $valores[':fechaFin'] = $filtros['Fecha_Fin_Solicitud'];
+    }
+    // Nuevo filtro por ID de Turno
+    if (isset($filtros['ID_Turno'])) {
+        $condiciones[] = "t.ID_Turno = :idTurno";
+        $valores[':idTurno'] = $filtros['ID_Turno'];
+    }
+
+    if (!empty($condiciones)) {
+        $sql .= " AND " . implode(' AND ', $condiciones);
+    }
+    $sql .= " ORDER BY t.Fecha_Hora_Solicitud ASC";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->execute($valores);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -773,58 +910,7 @@ function obtenerEventosBitacora(PDO $conexion, array $filtros = []): array {
 // --- Funciones para la tabla 'turno' ---
 
 
-/**
- * Obtiene todos los turnos, con filtros opcionales.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $filtros Array asociativo de filtros (ej. 'ID_Cliente', 'ID_Estado_Turno', 'ID_Turno').
- * @return array Array asociativo de turnos.
- */
-function obtenerTurnos(PDO $conexion, array $filtros = []): array {
-    $sql = "SELECT t.*, c.Nombre_Cliente, c.Apellido_Cliente, p.Nombre_Producto, e.Estado AS Estado_Turno
-            FROM turno t
-            LEFT JOIN cliente c ON t.ID_Cliente = c.ID_Cliente
-            LEFT JOIN producto p ON t.ID_Producto_Interes = p.ID_Producto
-            JOIN estado e ON t.ID_Estado_Turno = e.ID_Estado
-            WHERE e.Tipo_Estado = 'Turno'"; // Asegura que solo se traigan turnos y no otros tipos de estado.
 
-    $condiciones = [];
-    $valores = [];
-
-    // Filtro por ID de Cliente
-    if (isset($filtros['ID_Cliente'])) {
-        $condiciones[] = "t.ID_Cliente = :idCliente";
-        $valores[':idCliente'] = $filtros['ID_Cliente'];
-    }
-    // Filtro por ID de Estado de Turno
-    if (isset($filtros['ID_Estado_Turno'])) {
-        $condiciones[] = "t.ID_Estado_Turno = :idEstadoTurno";
-        $valores[':idEstadoTurno'] = $filtros['ID_Estado_Turno'];
-    }
-    // Filtro por Fecha de Inicio de Solicitud
-    if (isset($filtros['Fecha_Inicio_Solicitud'])) {
-        $condiciones[] = "t.Fecha_Hora_Solicitud >= :fechaInicio";
-        $valores[':fechaInicio'] = $filtros['Fecha_Inicio_Solicitud'];
-    }
-    // Filtro por Fecha de Fin de Solicitud
-    if (isset($filtros['Fecha_Fin_Solicitud'])) {
-        $condiciones[] = "t.Fecha_Hora_Solicitud <= :fechaFin";
-        $valores[':fechaFin'] = $filtros['Fecha_Fin_Solicitud'];
-    }
-    // Nuevo filtro por ID de Turno
-    if (isset($filtros['ID_Turno'])) {
-        $condiciones[] = "t.ID_Turno = :idTurno";
-        $valores[':idTurno'] = $filtros['ID_Turno'];
-    }
-
-    if (!empty($condiciones)) {
-        $sql .= " AND " . implode(' AND ', $condiciones);
-    }
-    $sql .= " ORDER BY t.Fecha_Hora_Solicitud ASC";
-
-    $stmt = $conexion->prepare($sql);
-    $stmt->execute($valores);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 
 /**
  * Obtiene un turno por su ID.
@@ -949,22 +1035,6 @@ function obtenerTodosLosProductos(PDO $conexion, bool $incluirInactivos = false)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/**
- * Obtiene un producto por su ID.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param int $idProducto ID del producto.
- * @return array|false Array asociativo del producto o false si no se encuentra.
- */
-function obtenerProductoPorId(PDO $conexion, int $idProducto) {
-    $sql = "SELECT p.*, ti.Tasa_Interes, per.Periodo
-            FROM producto p
-            JOIN tasa_interes ti ON p.ID_TI = ti.ID_TI
-            JOIN periodo per ON ti.ID_Periodo = per.ID_Periodo
-            WHERE p.ID_Producto = :idProducto";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bindParam(':idProducto', $idProducto, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
+
 
 ?>

@@ -274,6 +274,7 @@ INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `
 CREATE TABLE `producto` (
   `ID_Producto` int(11) NOT NULL,
   `Nombre_Producto` varchar(100) NOT NULL,
+  `Categoria_Productos` varchar(100) NOT NULL,
   `Descripcion_Producto` text DEFAULT NULL,
   `ID_TI` int(11) NOT NULL,
   `Monto_Minimo` decimal(12,2) NOT NULL,
@@ -285,13 +286,44 @@ CREATE TABLE `producto` (
 
 --
 -- Volcado de datos para la tabla `producto`
---
 
-INSERT INTO `producto` (`ID_Producto`, `Nombre_Producto`, `Descripcion_Producto`, `ID_TI`, `Monto_Minimo`, `Monto_Maximo`, `Plazo_Minimo`, `Plazo_Maximo`, `Activo_Producto`) VALUES
-(1, 'Préstamo Personal', 'Préstamo para necesidades personales', 1, 1000000.00, 50000000.00, 6, 60, 1),
-(2, 'Préstamo Hipotecario', 'Préstamo para compra de vivienda', 2, 50000000.00, 500000000.00, 60, 240, 1),
-(3, 'Préstamo Vehicular', 'Préstamo para compra de vehículo', 3, 10000000.00, 200000000.00, 12, 84, 1),
-(4, 'Luis Fernando', 'No sé cómo, pero funciono a la primera jajajaja', 2, 20.00, 60.00, 0, 0, 0);
+INSERT INTO `producto` (`ID_Producto`, `Nombre_Producto`, `Categoria_Productos`, `Descripcion_Producto`, `ID_TI`, `Monto_Minimo`, `Monto_Maximo`, `Plazo_Minimo`, `Plazo_Maximo`, `Activo_Producto`) VALUES
+(1, 'Compra de cartera de crédito hipotecario', 'Compra de cartera', 'Permite trasladar tu crédito de vivienda actual desde otra entidad financiera para mejorar condiciones como tasa de interés, plazo o cuota mensual.', 1, 5000000.00, 500000000.00, 12, 84, 1),
+(2, 'Compra de cartera de vehículo', 'Compra de cartera', 'Consiste en trasladar tu crédito vehicular actual a otra entidad que te ofrezca mejores condiciones de pago, tasas más bajas o mayor plazo.', 4, 5000000.00, 500000000.00, 12, 84, 1),
+(3, 'Compra de cartera de microcrédito', 'Compra de cartera', 'Traslada microcréditos obtenidos para pequeños negocios a otra entidad que ofrezca mejores tasas o plazos, facilitando el pago.', 8, 5000000.00, 500000000.00, 12, 84, 1),
+(4, 'Compra de cartera de crédito de educación', 'Compra de cartera', 'Es un producto financiero que te permite trasladar tu crédito educativo actual desde otra entidad hacia un nuevo banco o cooperativa.', 5, 5000000.00, 500000000.00, 12, 84, 1),
+(5, 'Compra de cartera de libranza', 'Compra de cartera', 'Permite unificar y trasladar tus créditos por libranza desde otra entidad para acceder a una mejor tasa o una menor cuota mensual.', 17, 5000000.00, 500000000.00, 12, 84, 1),
+(6, 'Compra de cartera de crédito agropecuario', 'Compra de cartera', 'Traslada créditos agropecuarios a otra entidad financiera para acceder a mejores condiciones y facilitar la sostenibilidad del negocio rural.', 10, 5000000.00, 500000000.00, 12, 84, 1),
+(7, 'Compra de cartera de crédito comercial (grandes empresas)', 'Compra de cartera', 'Dirigido a grandes empresas que desean trasladar sus obligaciones crediticias a otro banco con mejores condiciones, optimizando su flujo de caja.', 9, 5000000.00, 500000000.00, 12, 84, 1),
+(8, 'Compra de cartera de crédito de libre inversión', 'Compra de cartera', 'Permite trasladar un crédito de libre inversión a otra entidad para acceder a menores tasas, cuotas más cómodas o mejores plazos.', 16, 5000000.00, 500000000.00, 12, 84, 1),
+(9, 'Compra de cartera de crédito de consumo', 'Compra de cartera', 'Permite consolidar créditos de consumo (como préstamos personales) en una sola entidad, mejorando condiciones y reduciendo el valor de la cuota.', 15, 5000000.00, 500000000.00, 12, 84, 1),
+(10, 'Compra de cartera de tarjetas de crédito', 'Compra de cartera', 'Traslada el saldo de tus tarjetas de crédito a un nuevo crédito con menor tasa de interés y un plan de pagos fijo.', 14, 5000000.00, 500000000.00, 12, 84, 1),
+(11, 'Compra de cartera de crédito rotativo', 'Compra de cartera', 'Permite unificar saldos de créditos rotativos (líneas de crédito que se renuevan) para pagar en cuotas fijas y con menor interés.', 13, 5000000.00, 500000000.00, 12, 84, 1),
+(12, 'Compra de cartera (para personas naturales)', 'Compra de cartera', 'Es la opción para personas que desean unificar diferentes tipos de créditos personales (hipotecario, consumo, libranza, etc.) en una sola entidad con mejores condiciones.', 16, 5000000.00, 500000000.00, 12, 84, 1),
+(13, 'Crédito de Vehículo', 'Créditos Vehiculares', 'Un crédito de vehículo es un tipo de préstamo otorgado por una entidad financiera (como un banco, cooperativa o compañía de financiamiento) para que una persona pueda comprar un carro o una moto, ya sea nuevo o usado.', 3, 10000000.00, 300000000.00, 12, 72, 1),
+(14, 'Compra de Cartera de Vehículo', 'Créditos_Vehiculares', 'Es un crédito que reemplaza tu deuda actual de vehículo con otra entidad, ofreciéndote mejores condiciones como menor interés o cuota más baja.', 4, 10000000.00, 250000000.00, 12, 60, 1),
+(15, 'Crédito educativo a corto plazo', 'Créditos educativos', 'Cubre hasta el 100% de la matrícula en Colombia o el exterior. Puedes reutilizar el cupo a medida que pagas, y financiar desde uno hasta todos los periodos académicos. Se paga en 6 a 12 meses y va desde $700.000 hasta 25 SMLMV. Ideal para formación continua en plazos breves.', 5, 700000.00, 25000000.00, 6, 48, 1),
+(16, 'Crédito libre educativo', 'Créditos educativos', 'El Crédito Libre Educativo permite financiar estudios en Colombia con un solo desembolso a la institución. Se paga en 24, 36 o 48 meses y ofrece montos desde $700.000 hasta 25 SMLMV. Es flexible y se adapta a tus necesidades', 6, 700000.00, 25000000.00, 6, 48, 1),
+(17, 'Crediestudiantil', 'Créditos educativos', 'Este crédito financia hasta el 100% de la matrícula para estudios técnicos, tecnológicos, de pregrado y posgrado en Colombia. El plazo de pago depende del tipo de programa: 6 meses para pregrados semestrales 12 meses para programas anuales 12 a 36 meses para diplomados o posgrados', 7, 700000.00, 25000000.00, 6, 48, 1),
+(19, 'Microcrédito', 'Créditos Productivos o Empresariales', 'Préstamo de bajo monto dirigido a personas o microempresas con acceso a la banca tradicional, ideal para iniciar o fortalecer pequeños negocios.', 8, 1000000.00, 50000000.00, 6, 36, 1),
+(20, 'Crédito Comercial', 'Créditos Productivos o Empresariales', 'Financiamiento flexible para emprendedores o microempresarios que buscan invertir en actividades productivas como comercio, servicios o industria.', 9, 1000000.00, 50000000.00, 6, 36, 1),
+(21, 'Crédito Agrofácil', 'Créditos Productivos o Empresariales', 'Crédito ofrecido por Bancolombia para productores agropecuarios, con condiciones adaptadas al ciclo productivo y apoyo técnico especializado.', 10, 2000000.00, 200000000.00, 12, 120, 1),
+(22, 'Crédito Finagro', 'Créditos Productivos o Empresariales', 'Línea de crédito con recursos de fomento para actividades agropecuarias y rurales, con tasas preferenciales y apoyo del Gobierno.', 11, 2000000.00, 200000000.00, 12, 120, 1),
+(23, 'CDT', 'Créditos Productivos o Empresariales', 'Préstamo respaldado por un Certificado de Depósito a Término (CDT), que permite acceder a liquidez sin perder la inversión.', 12, 1000000.00, 50000000.00, 6, 36, 1),
+(24, 'Crédito Hipotecario', 'Créditos Hipotecarios y de Vivienda', 'Préstamo otorgado para comprar una vivienda, usando el inmueble como garantía.', 1, 50000000.00, 1000000000.00, 60, 240, 1),
+(27, 'Compra de Cartera de Vivienda', 'Créditos Hipotecarios y de Vivienda', 'Similar a la anterior, pero incluye la posibilidad de trasladar contratos de leasing habitacional.', 2, 50000000.00, 800000000.00, 60, 180, 1),
+(28, 'Crédito de descuento por nómina o mesada pencional', 'Créditos de libranza', 'Con pagos automáticos descontados del salario o pensión mediante un convenio con su empresa, este método elimina la necesidad de contar con fiadores, simplificando el proceso de aprobación; ofreciendo una tasa fija que permite financiar proyectos personales.', 17, 3000000.00, 100000000.00, 12, 60, 1),
+(30, 'Cuentas de Ahorro', 'Cuentas de Ahorros', 'Las cuentas de ahorro son herramientas financieras que permiten guardar dinero de forma segura, fomentando el hábito del ahorro y ayudando a alcanzar metas económicas. Existen diversos tipos según las necesidades del usuario', NULL, NULL, NULL, NULL, NULL, 1),
+(31, 'Cuenta de Ahorro Básica o Estándar', 'Cuentas de Ahorros', 'Permite guardar dinero con disponibilidad inmediata y genera intereses bajos. Ideal para uso cotidiano y manejo simple del dinero.', 18, NULL, NULL, NULL, NULL, 1),
+(32, 'Cuenta de Ahorro Programado', 'Cuentas de Ahorros', 'Permite ahorrar una cantidad fija regularmente durante un plazo definido, ayudando a alcanzar metas específicas.', 19, NULL, NULL, NULL, NULL, 1),
+(33, 'Cuenta de Ahorro para Jóvenes o Niños', 'Cuentas de Ahorros', 'Una cuenta de ahorro para jóvenes o niños es un producto financiero diseñado especialmente para menores de edad, con el objetivo de enseñarles a manejar el dinero y fomentar el hábito del ahorro desde temprana edad.', 20, NULL, NULL, NULL, NULL, 1),
+(34, 'Cuenta de Ahorro de Nómina', 'Cuentas de Ahorros', 'Recibe directamente el salario del empleador. Suele tener beneficios como cero cuota de manejo y retiros gratuitos.', 21, NULL, NULL, NULL, NULL, 1),
+(35, 'Cuenta de Ahorro para Pensionados', 'Cuentas de Ahorros', 'Especial para recibir mesadas pensionales. Ofrece beneficios como exención del 4x1000 y retiros sin costo.', 22, NULL, NULL, NULL, NULL, 1),
+(36, 'Cuenta de Ahorro en Moneda Extranjera', 'Cuentas de Ahorros', 'Permite ahorrar en divisas como dólares o euros. Útil para protegerse de la devaluación o hacer transacciones internacionales.', 23, NULL, NULL, NULL, NULL, 1),
+(37, 'Crédito Rotativo', 'Créditos de Consumo y Libre Inversión', 'Disponible para tus compras y avances cuando lo necesites. Flexibilidad en pagos y uso.', 13, 1000000.00, 100000000.00, 6, 60, 1),
+(38, 'Tarjeta de crédito', 'Créditos de Consumo y Libre Inversión', 'Usa tu tarjeta de crédito como quieras y disfrútala.', 14, 1000000.00, 100000000.00, 6, 60, 1),
+(39, 'Crédito de Consumo', 'Créditos de Consumo y Libre Inversión', 'Financia gastos personales como viajes, educación o tecnología con tasas preferenciales.', 15, 1000000.00, 100000000.00, 6, 60, 1),
+(40, 'Crédito Libre Inversión', 'Créditos de Consumo y Libre Inversión', 'Usa el crédito como quieras: remodela, paga deudas o realiza tus planes personales.', 16, 1000000.00, 100000000.00, 6, 60, 1);
 
 -- --------------------------------------------------------
 
@@ -359,11 +391,29 @@ CREATE TABLE `tasa_interes` (
 --
 
 INSERT INTO `tasa_interes` (`ID_TI`, `Tasa_Interes`, `ID_Periodo`, `Activo_TI`) VALUES
-(1, 45.78, 4, 1),
-(2, 8.75, 1, 1),
-(3, 10.25, 1, 1),
-(4, 50.50, 4, 1),
-(11, 75.00, 3, 0);
+(1, 10.50, 6, 1),
+(2, 9.75, 6, 1),
+(3, 12.25, 6, 1),
+(4, 11.50, 6, 1),
+(5, 8.50, 6, 1),
+(6, 9.25, 6, 1),
+(7, 7.75, 6, 1),
+(8, 15.00, 6, 1),
+(9, 13.50, 6, 1),
+(10, 10.00, 6, 1),
+(11, 8.50, 6, 1),
+(12, 6.50, 6, 1),
+(13, 1.75, 2, 1),
+(14, 2.25, 2, 1),
+(15, 1.50, 2, 1),
+(16, 1.85, 2, 1),
+(17, 1.20, 2, 1),
+(18, 5.00, 6, 1),
+(19, 6.50, 6, 1),
+(20, 7.00, 6, 1),
+(21, 4.50, 6, 1),
+(22, 5.50, 6, 1),
+(23, 3.00, 6, 1);
 
 -- --------------------------------------------------------
 

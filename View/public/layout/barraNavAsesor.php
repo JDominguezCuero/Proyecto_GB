@@ -14,11 +14,10 @@
   <ul>
     <li><a href="<?= BASE_URL ?>/View/asesor/asesorGerente.php">Inicio</a></li>
     <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=listarTurnos">Turnos</a></li>
-    <li><a href="<?= BASE_URL ?>/View/asesor/productosyservicios.php">Productos y Servicios </a></li>
-    <li><a href="<?= BASE_URL ?>/View/asesor/Tab_Amortizacion.php">Solicitud credito</a></li>
-    <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=listarCliente">Crear cliente</a></li>
+    <li><a href="<?= BASE_URL ?>/View/asesor/productosyservicios.php">Productos y Servicios</a></li>
+    <li><a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=Credito_Cliente">Solicitud credito</a></li>
     <?php 
-      if($_SESSION['rol'] == 3){
+      if(isset($_SESSION['rol']) && $_SESSION['rol'] == 3){
         echo '<li><a href="../asesor/RegistroAsesor.php">Crear Asesor</a></li>';
       }
     ?>
