@@ -23,7 +23,7 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
 <body>
   <?php include __DIR__ . '/../public/layout/barraNavAsesor.php'; ?>
 
-  <div class="contenido-turnos max-w-7xl mx-auto p-6">
+  <div class="bg-white contenido-turnos max-w-7xl mx-auto p-6 mt-6">
     <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Módulo de Gestión de Turnos</h1>
 
     <!-- Filtro por producto -->
@@ -86,6 +86,7 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
                   <p><strong>Turno:</strong> ${turno.Numero_Turno}</p>
                   <p><strong>Solicitante:</strong> ${turno.Nombre_Completo_Solicitante}</p>
                   <p><strong>Documento:</strong> ${turno.N_Documento_Solicitante}</p>
+                  <p><strong>Tipo de Usuario:</strong> ${turno.EsCliente}</p>
                   <p><strong>Producto:</strong> ${turno.Nombre_Producto ?? 'No Definido.'}</p>
                   <p><strong>Detalle Producto:</strong> ${turno.Descripcion_Producto ?? 'No Definido.'}</p>
                   <p><strong>Motivo:</strong> ${turno.Motivo_Turno ?? 'No Definido.'}</p>

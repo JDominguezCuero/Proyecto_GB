@@ -113,7 +113,7 @@ function obtenerProductoPorId(PDO $conexion, int $idProducto) {
  * @return array Array asociativo de turnos.
  */
 function obtenerTurnos(PDO $conexion, array $filtros = []): array {
-    $sql = "SELECT t.*, c.Nombre_Cliente, c.Apellido_Cliente, p.Nombre_Producto, p.Descripcion_Producto, e.Estado AS Estado_Turno
+    $sql = "SELECT t.*, c.Nombre_Cliente, c.Apellido_Cliente, p.Nombre_Producto, p.Descripcion_Producto, t.ID_Estado_Turno AS Estado_Turno
             FROM turno t
             LEFT JOIN cliente c ON t.ID_Cliente = c.ID_Cliente
             LEFT JOIN producto p ON t.ID_Producto_Interes = p.ID_Producto
@@ -188,6 +188,156 @@ function actualizarTurno(PDO $conexion, int $idTurno, array $datosTurno): bool {
     $stmt = $conexion->prepare($sql);
     return $stmt->execute($valores);
 }
+
+/**
+ * Registra un evento en la bitácora.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param array $datosBitacora Array asociativo con los datos del evento.
+ * @return bool True si se registra correctamente, false en caso contrario.
+ */
+function registrarEventoBitacora(PDO $conexion, array $datosBitacora): bool {
+    $sql = "INSERT INTO bitacora (ID_Cliente, ID_Personal, ID_RegistroAsesoramiento, Tipo_Evento, Descripcion_Evento)
+            VALUES (:idCliente, :idPersonal, :idRegistroAsesoramiento, :tipoEvento, :descripcionEvento)";
+    $stmt = $conexion->prepare($sql);
+    return $stmt->execute([
+        ':idCliente' => $datosBitacora['ID_Cliente'] ?? null,
+        ':idPersonal' => $datosBitacora['ID_Personal'] ?? null,
+        ':idRegistroAsesoramiento' => $datosBitacora['ID_RegistroAsesoramiento'] ?? null,
+        ':tipoEvento' => $datosBitacora['Tipo_Evento'],
+        ':descripcionEvento' => $datosBitacora['Descripcion_Evento'] ?? null
+    ]);
+}
+
+/**
+ * Registra un nuevo asesoramiento.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param array $datosAsesoramiento Array asociativo con los datos del asesoramiento.
+ * @return bool True si se registra correctamente, false en caso contrario.
+ */
+function registrarAsesoramiento(PDO $conexion, array $datosAsesoramiento): ?int {
+    $sql = "INSERT INTO RegistroAsesoramiento (ID_Personal, ID_Cliente, ID_Turno, Fecha_Hora_Inicio, Fecha_Hora_Fin, Observaciones, Resultado)
+            VALUES (:idPersonal, :idCliente, :idTurno, :fechaInicio, :fechaFin, :observaciones, :resultado)";
+    
+    $stmt = $conexion->prepare($sql);
+    $resultado = $stmt->execute([
+        ':idPersonal' => $datosAsesoramiento['ID_Personal'],
+        ':idCliente' => $datosAsesoramiento['ID_Cliente'],
+        ':idTurno' => $datosAsesoramiento['ID_Turno'] ?? null,
+        ':fechaInicio' => $datosAsesoramiento['Fecha_Hora_Inicio'],
+        ':fechaFin' => $datosAsesoramiento['Fecha_Hora_Fin'],
+        ':observaciones' => $datosAsesoramiento['Observaciones'] ?? null,
+        ':resultado' => $datosAsesoramiento['Resultado'] ?? 'Pendiente'
+    ]);
+
+    if ($resultado) {
+        return (int)$conexion->lastInsertId();
+    }
+
+    return null;
+}
+
+/**
+ * Obtiene un registro de cliente por su número de documento.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param string $nDocumento Número de documento del cliente.
+ * @return array|false Array asociativo del cliente o false si no se encuentra.
+ */
+function obtenerClientePorDocumento(PDO $conexion, string $nDocumento) {
+    $sql = "SELECT c.*, g.Genero AS Nombre_Genero, td.Tipo_Documento AS Nombre_Tipo_Documento
+            FROM cliente c
+            LEFT JOIN genero g ON c.ID_Genero = g.ID_Genero
+            LEFT JOIN tipo_documento td ON c.ID_TD = td.ID_TD
+            WHERE c.N_Documento_Cliente = :nDocumento";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':nDocumento', $nDocumento, PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function obtenerCreditoActivoPorCliente(PDO $conexion, int $idCliente) {
+    $sql = "SELECT * FROM Credito WHERE ID_Cliente = :idCliente AND ID_Estado_Credito = 1 LIMIT 1"; // 1 = Activo
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':idCliente', $idCliente, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Obtiene todas las cuotas de un crédito específico.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idCredito ID del crédito.
+ * @return array Array asociativo de cuotas.
+ */
+function obtenerCuotasPorCredito(PDO $conexion, int $idCredito): array {
+    $sql = "SELECT cc.*, e.Estado AS Estado_Cuota
+            FROM CuotaCredito cc
+            JOIN estado e ON cc.ID_Estado_Cuota = e.ID_Estado
+            WHERE cc.ID_Credito = :idCredito AND e.Tipo_Estado = 'Cuota'
+            ORDER BY cc.Numero_Cuota ASC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':idCredito', $idCredito, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -331,23 +481,6 @@ function obtenerClientePorId(PDO $conexion, int $idCliente) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-/**
- * Obtiene un registro de cliente por su número de documento.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param string $nDocumento Número de documento del cliente.
- * @return array|false Array asociativo del cliente o false si no se encuentra.
- */
-function obtenerClientePorDocumento(PDO $conexion, string $nDocumento) {
-    $sql = "SELECT c.*, g.Genero AS Nombre_Genero, td.Tipo_Documento AS Nombre_Tipo_Documento
-            FROM cliente c
-            LEFT JOIN genero g ON c.ID_Genero = g.ID_Genero
-            LEFT JOIN tipo_documento td ON c.ID_TD = td.ID_TD
-            WHERE c.N_Documento_Cliente = :nDocumento";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bindParam(':nDocumento', $nDocumento, PDO::PARAM_STR);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
 
 /**
  * Registra un nuevo cliente.
@@ -597,23 +730,7 @@ function actualizarCredito(PDO $conexion, int $idCredito, array $datosCredito): 
 
 // --- Funciones para la tabla 'CuotaCredito' ---
 
-/**
- * Obtiene todas las cuotas de un crédito específico.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param int $idCredito ID del crédito.
- * @return array Array asociativo de cuotas.
- */
-function obtenerCuotasPorCredito(PDO $conexion, int $idCredito): array {
-    $sql = "SELECT cc.*, e.Estado AS Estado_Cuota
-            FROM CuotaCredito cc
-            JOIN estado e ON cc.ID_Estado_Cuota = e.ID_Estado
-            WHERE cc.ID_Credito = :idCredito AND e.Tipo_Estado = 'Cuota'
-            ORDER BY cc.Numero_Cuota ASC";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bindParam(':idCredito', $idCredito, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+
 
 /**
  * Obtiene una cuota específica por su ID.
@@ -700,28 +817,7 @@ function obtenerPagosPorCuota(PDO $conexion, int $idCuotaCredito): array {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// --- Funciones para la tabla 'RegistroAsesoramiento' ---
 
-/**
- * Registra un nuevo asesoramiento.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $datosAsesoramiento Array asociativo con los datos del asesoramiento.
- * @return bool True si se registra correctamente, false en caso contrario.
- */
-function registrarAsesoramiento(PDO $conexion, array $datosAsesoramiento): bool {
-    $sql = "INSERT INTO RegistroAsesoramiento (ID_Personal, ID_Cliente, ID_Turno, Fecha_Hora_Inicio, Fecha_Hora_Fin, Observaciones, Resultado)
-            VALUES (:idPersonal, :idCliente, :idTurno, :fechaInicio, :fechaFin, :observaciones, :resultado)";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':idPersonal' => $datosAsesoramiento['ID_Personal'],
-        ':idCliente' => $datosAsesoramiento['ID_Cliente'],
-        ':idTurno' => $datosAsesoramiento['ID_Turno'] ?? null,
-        ':fechaInicio' => $datosAsesoramiento['Fecha_Hora_Inicio'],
-        ':fechaFin' => $datosAsesoramiento['Fecha_Hora_Fin'],
-        ':observaciones' => $datosAsesoramiento['Observaciones'] ?? null,
-        ':resultado' => $datosAsesoramiento['Resultado'] ?? 'Pendiente'
-    ]);
-}
 
 /**
  * Obtiene todos los registros de asesoramiento, opcionalmente filtrados por cliente o personal.
@@ -864,24 +960,7 @@ function actualizarEstadoAsesorProducto(PDO $conexion, int $idAsesorProducto, st
 
 // --- Funciones para la tabla 'bitacora' ---
 
-/**
- * Registra un evento en la bitácora.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $datosBitacora Array asociativo con los datos del evento.
- * @return bool True si se registra correctamente, false en caso contrario.
- */
-function registrarEventoBitacora(PDO $conexion, array $datosBitacora): bool {
-    $sql = "INSERT INTO bitacora (ID_Cliente, ID_Personal, ID_RegistroAsesoramiento, Tipo_Evento, Descripcion_Evento)
-            VALUES (:idCliente, :idPersonal, :idRegistroAsesoramiento, :tipoEvento, :descripcionEvento)";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':idCliente' => $datosBitacora['ID_Cliente'] ?? null,
-        ':idPersonal' => $datosBitacora['ID_Personal'] ?? null,
-        ':idRegistroAsesoramiento' => $datosBitacora['ID_RegistroAsesoramiento'] ?? null,
-        ':tipoEvento' => $datosBitacora['Tipo_Evento'],
-        ':descripcionEvento' => $datosBitacora['Descripcion_Evento'] ?? null
-    ]);
-}
+
 
 /**
  * Obtiene registros de la bitácora, con filtros opcionales.

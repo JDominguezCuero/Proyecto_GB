@@ -224,7 +224,7 @@
 
       <h1>Generador de Turnos</h1>
 
-      <form id="turnoForm" action="<?= BASE_URL ?>/Controlador/asesorController.php?accion=registrarTurno" method="POST">
+      <form id="turnoForm" action="<?= BASE_URL ?>/Controlador/asesorController.php?accion=registrarTurno&accionesPublicas=crearTurnoPublico" method="POST">
         <div class="form-group">
             <label for="nombre">Nombre Completo: *</label>
             <input type="text" id="nombre" name="nombre_completo_solicitante" required placeholder="Ej: Juan Pérez">

@@ -9,35 +9,34 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$accionesPublicas = ['crearTurnoPublico', 'verTurnos', 'listarTurnosPublicos']; 
+$accionesPublicas = $_GET['crearTurnoPublico'] ?? ''; 
 
 // Si la acción actual está en la lista pública, no validamos sesión
-$accion = $_GET['accion'] ?? '';
 
-if (!in_array($accion, $accionesPublicas)) {
+if ($accionesPublicas) {
     if (!isset($_SESSION['usuario'])) {
         if (
             isset($_SERVER['HTTP_ACCEPT']) &&
             strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
-        ) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
-        } else {
-            $mensajeError = "Usuario no logueado.";
-            header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
+            ) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
+            } else {
+                $mensajeError = "Usuario no logueado.";
+                header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
+            }
+            exit;
         }
-        exit;
     }
-}
-
+    
 $accion = $_GET['accion'] ?? 'listar';
 $error = "";
 
 try {
     switch ($accion) {
         case 'listar':
-            // $personal = obtenerTodoElPersonal($conexion);
-            // header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
+            $personal = obtenerTodoElPersonal($conexion);
+            header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
         break;
 
         case 'Credito_Cliente':
@@ -56,6 +55,48 @@ try {
                 }
 
                 if ($turnoAtender['ID_Producto_Interes']) {
+
+                    $nuevoEstadoTurno = 2; 
+
+                    $fechaSolicitud = new DateTime($turnoAtender['Fecha_Hora_Solicitud']);
+                    $ahora = new DateTime();
+                    $intervalo = $fechaSolicitud->diff($ahora);
+                    $minutosEspera = ($intervalo->days * 24 * 60) + ($intervalo->h * 60) + $intervalo->i;
+
+                    // Actualizar estado del turno
+                    $datosParaActualizarTurno = [
+                        'ID_Estado_Turno' => $nuevoEstadoTurno,
+                        'Tiempo_Espera_Minutos' => $minutosEspera
+                    ];
+
+                    $resultadoUpdateTurno = actualizarTurno($conexion, (int)$idTurno, $datosParaActualizarTurno);
+
+                    // Registrar Asesoramiento
+                    $datosAsesoramiento = [
+                        'ID_Personal' => $idPersonal,
+                        'ID_Cliente' => $turnoAtender['ID_Cliente'],
+                        'ID_Turno' => $idTurno,
+                        'Fecha_Hora_Inicio' => date('Y-m-d H:i:s'),
+                        'Fecha_Hora_Fin' => null, // o la misma fecha si es inmediato
+                        'Observaciones' => null,
+                        'Resultado' => 'Pendiente'
+                    ];
+
+                    $idRegistroAsesoramiento = registrarAsesoramiento($conexion, $datosAsesoramiento);
+
+                    // Registrar bitacora
+                    if ($idRegistroAsesoramiento) {
+                        $datosBitacora = [
+                            'ID_Cliente' => $turnoAtender['ID_Cliente'],
+                            'ID_Personal' => $idPersonal,
+                            'ID_RegistroAsesoramiento' => $idRegistroAsesoramiento,
+                            'Tipo_Evento' => 'Solicitud de crédito',
+                            'Descripcion_Evento' => 'Se registró asesoramiento para solicitud de crédito del cliente ID ' . $turnoAtender['ID_Cliente']
+                        ];
+
+                        registrarEventoBitacora($conexion, $datosBitacora);
+                    }
+
                     $productoInteres = obtenerProductoPorId($conexion, $turnoAtender['ID_Producto_Interes']);
                 }
             }
@@ -78,9 +119,40 @@ try {
                     $minutosEspera = ($intervalo->days * 24 * 60) + ($intervalo->h * 60) + $intervalo->i;
                     $turno['Tiempo_Espera_Minutos'] = $minutosEspera;
                 }
+
+                $cliente = obtenerClientePorDocumento($conexion, $turno['N_Documento_Solicitante']);
+                $turno['EsCliente'] = $cliente ? 'Cliente' : 'Nuevo usuario';
             }
 
             include __DIR__ . '/../View/asesor/turnos.php';
+        break;
+
+        case 'Simulador_Cajero':
+            $nDocumento = $_GET['documento'] ?? null;
+
+            if (!$nDocumento) {
+                echo "Documento no proporcionado.";
+                exit;
+            }
+
+            $cliente = obtenerClientePorDocumento($conexion, $nDocumento);
+
+            if (!$cliente) {
+                echo "Cliente no encontrado.";
+                exit;
+            }
+
+            // Asumimos que cada cliente solo tiene un crédito activo. Si tiene varios, adaptamos.
+            $credito = obtenerCreditoActivoPorCliente($conexion, $cliente['ID_Cliente']);
+
+            if (!$credito) {
+                echo "Este cliente no tiene crédito activo.";
+                exit;
+            }
+
+            $cuotas = obtenerCuotasPorCredito($conexion, $credito['ID_Credito']);
+
+            include __DIR__ . '/../View/asesor/cajero.php';
         break;
 
         //Modificar
@@ -337,11 +409,11 @@ try {
                         }
                     }
 
-                    // --- 4. Actualizar el estado del turno a 10 ---
+                    // --- 4. Actualizar el estado del turno a 3 ---
                     $idTurnoActual = $_GET['idTurno'] ?? null;
 
                     if ($idTurnoActual !== null && $idTurnoActual !== '') {
-                        $nuevoEstadoTurno = 10; 
+                        $nuevoEstadoTurno = 3; 
 
                         $datosParaActualizarTurno = [
                             'ID_Estado_Turno' => $nuevoEstadoTurno,
