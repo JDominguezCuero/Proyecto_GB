@@ -165,10 +165,72 @@ switch ($accion) {
         }
         break;
 
+        case 'getCreditStatusData':
+            try {
+                $creditStatusCounts = getCreditStatusCounts($conexion); // Implementar en creditoModelo.php
+
+                $labels = [];
+                $values = [];
+                foreach ($creditStatusCounts as $status) {
+                    $labels[] = $status['Estado']; // Asume que el array tiene una clave 'Estado'
+                    $values[] = $status['Count'];  // Asume que el array tiene una clave 'Count'
+                }
+
+                echo json_encode(['exito' => true, 'data' => ['labels' => $labels, 'values' => $values]]);
+            } catch (Exception $e) {
+                error_log("Error en getCreditStatusData: " . $e->getMessage());
+                echo json_encode(['exito' => false, 'mensaje' => 'Error al obtener datos de estado de créditos: ' . $e->getMessage()]);
+            }
+        break;
+
+    case 'getNewClientsData':
+        try {
+            $newClientsPerMonth = getNewClientsPerMonth($conexion); // Implementar en clienteModelo.php
+
+            $labels = [];
+            $values = [];
+            foreach ($newClientsPerMonth as $monthData) {
+                $labels[] = $monthData['Mes']; // Asume que el array tiene una clave 'Mes' (ej. 'Ene 2024')
+                $values[] = $monthData['Count']; // Asume que el array tiene una clave 'Count'
+            }
+
+            echo json_encode(['exito' => true, 'data' => ['labels' => $labels, 'values' => $values]]);
+        } catch (Exception $e) {
+            error_log("Error en getNewClientsData: " . $e->getMessage());
+            echo json_encode(['exito' => false, 'mensaje' => 'Error al obtener datos de nuevos clientes: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'getTransactionVolumeData':
+        try {
+            $transactionVolumePerMonth = getTransactionVolumePerMonth($conexion); // Implementar en pagoModelo.php
+
+            $labels = [];
+            $values = [];
+            foreach ($transactionVolumePerMonth as $monthData) {
+                $labels[] = $monthData['Mes']; // Asume que el array tiene una clave 'Mes'
+                $values[] = $monthData['TotalMonto']; // Asume que el array tiene una clave 'TotalMonto'
+            }
+
+            echo json_encode(['exito' => true, 'data' => ['labels' => $labels, 'values' => $values]]);
+        } catch (Exception $e) {
+            error_log("Error en getTransactionVolumeData: " . $e->getMessage());
+            echo json_encode(['exito' => false, 'mensaje' => 'Error al obtener datos de volumen de transacciones: ' . $e->getMessage()]);
+        }
+    break;
+
+    case 'listarBitacora':
+        try {
+            $bitacoraRegistros = obtenerRegistrosBitacora($conexion); 
+
+            echo json_encode(['exito' => true, 'registros' => $bitacoraRegistros]);
+        } catch (Exception $e) {
+            error_log("Error en listarBitacora: " . $e->getMessage());
+            echo json_encode(['exito' => false, 'mensaje' => 'Error al obtener registros de bitácora: ' . $e->getMessage()]);
+        }
+    break;
+
     default:
-        // Manejar acciones no válidas para evitar errores
-        // Si la acción no es 'listarGestionTotal' y no es una de las acciones AJAX esperadas,
-        // entonces es una acción no válida y se envía un error JSON.
         echo json_encode(['exito' => false, 'mensaje' => 'Acción no válida.']);
         break;
 }

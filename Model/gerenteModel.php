@@ -72,7 +72,7 @@ function getTotalCreditosEnMora(PDO $conexion): int {
 
 // --- Modelo/personalModelo.php ---
 function obtenerPersonalPorDocumento(PDO $conexion, string $documento) {
-    $sql = "SELECT p.*, r.Nombre_Rol
+    $sql = "SELECT p.*, r.Rol
             FROM Personal p
             JOIN Rol r ON p.ID_Rol = r.ID_Rol
             WHERE p.N_Documento_Personal = :documento";
@@ -119,7 +119,7 @@ function getRecentPagosCuota(PDO $conexion, int $limit = 10): array {
 
 // --- Modelo/asesorProductoModelo.php ---
 function obtenerProductosAsociadosAsesor(PDO $conexion, int $idPersonal): array {
-    $sql = "SELECT ap.ID_Producto, p.NombreProducto
+    $sql = "SELECT ap.ID_Producto, p.Nombre_Producto
             FROM Asesor_Producto ap
             JOIN Producto p ON ap.ID_Producto = p.ID_Producto
             WHERE ap.ID_Personal = :idPersonal AND ap.Estado_AsesorProducto = 1"; // Asumiendo 1 es activo
@@ -128,23 +128,80 @@ function obtenerProductosAsociadosAsesor(PDO $conexion, int $idPersonal): array 
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+// --- Modelo/creditoModelo.php ---
+function getCreditStatusCounts(PDO $conexion): array {
+    $sql = "SELECT e.Estado, COUNT(c.ID_Credito) AS Count
+            FROM Credito c
+            JOIN Estado e ON c.ID_Estado = e.ID_Estado
+            WHERE e.Tipo_Estado = 'Credito' -- Asegúrate de filtrar por tipo si es necesario
+            GROUP BY e.Estado
+            ORDER BY e.Estado";
+    $stmt = $conexion->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
-// // --- Modelo/productoModelo.php ---
-// function obtenerProductoPorId(PDO $conexion, int $idProducto) {
-//     $sql = "SELECT NombreProducto FROM Producto WHERE ID_Producto = :idProducto";
-//     $stmt = $conexion->prepare($sql);
-//     $stmt->bindParam(':idProducto', $idProducto, PDO::PARAM_INT);
-//     $stmt->execute();
-//     return $stmt->fetch(PDO::FETCH_ASSOC);
-// }
+// --- Modelo/clienteModelo.php ---
+function getNewClientsPerMonth(PDO $conexion): array {
+    // Asume que tienes una columna Fecha_Creacion_Cliente en tu tabla Cliente
+    $sql = "SELECT DATE_FORMAT(Fecha_Creacion_Cliente, '%Y-%m') AS Mes,
+                   COUNT(ID_Cliente) AS Count
+            FROM Cliente
+            GROUP BY Mes
+            ORDER BY Mes"; // Ordenar por mes para la línea de tiempo
+    $stmt = $conexion->query($sql);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// // --- Modelo/estadoModelo.php ---
-// function obtenerEstadoPorId(PDO $conexion, int $idEstado) {
-//     $sql = "SELECT Estado, Descripcion, Tipo_Estado FROM Estado WHERE ID_Estado = :idEstado";
-//     $stmt = $conexion->prepare($sql);
-//     $stmt->bindParam(':idEstado', $idEstado, PDO::PARAM_INT);
-//     $stmt->execute();
-//     return $stmt->fetch(PDO::FETCH_ASSOC);
-// }
+    // Formatear el mes para que sea más legible en el gráfico (ej. 'Ene 2024')
+    $formattedResults = [];
+    foreach ($results as $row) {
+        $dateObj = DateTime::createFromFormat('Y-m', $row['Mes']);
+        $row['Mes'] = $dateObj->format('M Y'); // Ej: 'Jan 2024'
+        $formattedResults[] = $row;
+    }
+    return $formattedResults;
+}
+
+// --- Modelo/pagoModelo.php (o tu modelo de transacciones) ---
+function getTransactionVolumePerMonth(PDO $conexion): array {
+    // Asume que tienes una columna Fecha_Hora_Pago en tu tabla PagoCuota
+    $sql = "SELECT DATE_FORMAT(Fecha_Hora_Pago, '%Y-%m') AS Mes,
+                   SUM(Monto_Pagado_Transaccion) AS TotalMonto
+            FROM PagoCuota
+            GROUP BY Mes
+            ORDER BY Mes"; // Ordenar por mes para la línea de tiempo
+    $stmt = $conexion->query($sql);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Formatear el mes para que sea más legible en el gráfico (ej. 'Ene 2024')
+    $formattedResults = [];
+    foreach ($results as $row) {
+        $dateObj = DateTime::createFromFormat('Y-m', $row['Mes']);
+        $row['Mes'] = $dateObj->format('M Y'); // Ej: 'Jan 2024'
+        $formattedResults[] = $row;
+    }
+    return $formattedResults;
+}
+
+function obtenerRegistrosBitacora(PDO $conexion): array {
+    $sql = "SELECT 
+                b.ID_Bitacora,
+                b.ID_Cliente,
+                c.Nombre_Cliente,
+                c.Apellido_Cliente,
+                b.ID_Personal,
+                p.Nombre_Personal,
+                p.Apellido_Personal,
+                b.ID_RegistroAsesoramiento,
+                b.Tipo_Evento,
+                b.Descripcion_Evento,
+                b.Fecha_Hora
+            FROM Bitacora b
+            LEFT JOIN Cliente c ON b.ID_Cliente = c.ID_Cliente
+            LEFT JOIN Personal p ON b.ID_Personal = p.ID_Personal
+            ORDER BY b.Fecha_Hora DESC"; // Ordenar por fecha más reciente
+    
+    $stmt = $conexion->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 ?>

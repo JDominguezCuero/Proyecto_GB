@@ -108,12 +108,17 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
         }
         .action-buttons button {
+            background-color: #2e7d32; /* Color principal */
+            color: white;
             padding: 12px 25px;
             font-size: 17px;
+            border: none;
             border-radius: 8px;
+            cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .action-buttons button:hover {
+            background-color: #1b5e20; /* Tono más oscuro al pasar el ratón */
             transform: translateY(-2px);
         }
 
@@ -212,6 +217,37 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
         .modal-search-btn:hover {
             background-color: #1b5e20;
         }
+
+        /* Estilos específicos para la modal de gráficos */
+        #chartsModal .modal-content {
+            max-width: 950px; /* Más ancho para los gráficos */
+        }
+        .chart-container {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            /* --- CAMBIOS CLAVE PARA EL TAMAÑO DE LOS GRÁFICOS --- */
+            height: 300px; /* Altura fija para el contenedor del gráfico */
+            display: flex; /* Para centrar el canvas si es necesario */
+            justify-content: center;
+            align-items: center;
+            position: relative; /* Necesario para que el canvas se posicione correctamente */
+        }
+        .chart-container canvas {
+            /* Asegura que el canvas ocupe el 100% del contenedor */
+            width: 100% !important; 
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .chart-container h4 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
     </style>
 </head>
 <body>
@@ -267,6 +303,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             <button onclick="openConsultModal('client')">Consultar Cliente</button>
             <button onclick="openConsultModal('advisor')">Consultar Asesor</button>
             <button onclick="openConsultModal('credit')">Consultar Crédito</button>
+            <button onclick="openChartsModal()">Ver Gráficos</button> <!-- NUEVO BOTÓN -->
         </div>
     </div>
 
@@ -335,7 +372,39 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
         </div>
     </div>
 
+    <!-- NUEVA MODAL PARA GRÁFICOS -->
+    <div id="chartsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Dashboard de Gráficos</h3>
+                <button type="button" class="modal-close-btn" onclick="closeChartsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-container">
+                    <h4>Estado de Créditos</h4>
+                    <canvas id="creditStatusChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Nuevos Clientes por Mes</h4>
+                    <canvas id="newClientsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Volumen de Transacciones por Mes</h4>
+                    <canvas id="transactionVolumeChart"></canvas>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeChartsModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Variables para almacenar las instancias de los gráficos
+        let creditStatusChartInstance = null;
+        let newClientsChartInstance = null;
+        let transactionVolumeChartInstance = null;
+
         // Función genérica para abrir una modal de consulta
         function openConsultModal(type) {
             document.getElementById(`${type}Modal`).classList.add('show');
@@ -349,7 +418,231 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             document.getElementById(`${type}Modal`).classList.remove('show');
         }
 
-        // --- Funciones para cargar datos del Dashboard ---
+        // --- Funciones para la Modal de Gráficos ---
+        async function openChartsModal() {
+            document.getElementById('chartsModal').classList.add('show');
+            // Cargar y renderizar los gráficos cuando la modal se abre
+            await loadAndRenderCharts();
+        }
+
+        function closeChartsModal() {
+            document.getElementById('chartsModal').classList.remove('show');
+        }
+
+        async function loadAndRenderCharts() {
+            try {
+                // Obtener datos para el estado de créditos
+                const creditStatusResponse = await fetch("<?= BASE_URL ?>/Controlador/gerenteController.php?accion=getCreditStatusData");
+                if (!creditStatusResponse.ok) throw new Error('Error al cargar datos de estado de créditos.');
+                const creditStatusData = await creditStatusResponse.json();
+
+                // Obtener datos para nuevos clientes por mes
+                const newClientsResponse = await fetch("<?= BASE_URL ?>/Controlador/gerenteController.php?accion=getNewClientsData");
+                if (!newClientsResponse.ok) throw new Error('Error al cargar datos de nuevos clientes.');
+                const newClientsData = await newClientsResponse.json();
+
+                // Obtener datos para volumen de transacciones por mes
+                const transactionVolumeResponse = await fetch("<?= BASE_URL ?>/Controlador/gerenteController.php?accion=getTransactionVolumeData");
+                if (!transactionVolumeResponse.ok) throw new Error('Error al cargar datos de volumen de transacciones.');
+                const transactionVolumeData = await transactionVolumeResponse.json();
+
+                // Renderizar los gráficos con los datos obtenidos
+                renderCreditStatusChart(creditStatusData.data);
+                renderNewClientsChart(newClientsData.data);
+                renderTransactionVolumeChart(transactionVolumeData.data);
+
+            } catch (error) {
+                console.error("Error al cargar y renderizar gráficos:", error);
+                showModal('Error de Gráficos', 'No se pudieron cargar los datos para los gráficos. ' + error.message, 'error');
+            }
+        }
+
+        function renderCreditStatusChart(chartData) {
+            const ctx = document.getElementById('creditStatusChart').getContext('2d');
+            
+            // Destruir la instancia anterior si existe para evitar duplicados
+            if (creditStatusChartInstance) {
+                creditStatusChartInstance.destroy();
+            }
+
+            creditStatusChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        data: chartData.values,
+                        backgroundColor: [
+                            'rgba(46, 125, 50, 0.8)', /* Verde oscuro para Activo */
+                            'rgba(255, 99, 132, 0.8)', /* Rojo para Mora */
+                            'rgba(54, 162, 235, 0.8)', /* Azul para Pagado */
+                            'rgba(255, 206, 86, 0.8)', /* Amarillo para Otros */
+                        ],
+                        borderColor: [
+                            'rgba(46, 125, 50, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Permite que el gráfico se ajuste al tamaño del contenedor
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 11 // Tamaño de fuente más pequeño para la leyenda
+                                }
+                            }
+                        },
+                        title: {
+                            display: false, // El título ya está en el h4
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderNewClientsChart(chartData) {
+            const ctx = document.getElementById('newClientsChart').getContext('2d');
+
+            if (newClientsChartInstance) {
+                newClientsChartInstance.destroy();
+            }
+
+            newClientsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels, // Ej: ['Ene', 'Feb', 'Mar']
+                    datasets: [{
+                        label: 'Nuevos Clientes',
+                        data: chartData.values, // Ej: [10, 15, 8]
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Número de Clientes',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mes',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTransactionVolumeChart(chartData) {
+            const ctx = document.getElementById('transactionVolumeChart').getContext('2d');
+
+            if (transactionVolumeChartInstance) {
+                transactionVolumeChartInstance.destroy();
+            }
+
+            transactionVolumeChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels, // Ej: ['Ene', 'Feb', 'Mar']
+                    datasets: [{
+                        label: 'Volumen de Transacciones',
+                        data: chartData.values, // Ej: [1200000, 1500000, 900000]
+                        backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 2,
+                        fill: false, // No rellenar el área bajo la línea
+                        tension: 0.1 // Curva de la línea
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Monto ($)',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return '$' + value.toLocaleString('es-CO'); // Formato de moneda
+                                },
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mes',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // --- Funciones para cargar datos del Dashboard (Métricas) ---
         async function loadDashboardMetrics() {
             try {
                 const response = await fetch("<?= BASE_URL ?>/Controlador/gerenteController.php?accion=getDashboardMetrics");
