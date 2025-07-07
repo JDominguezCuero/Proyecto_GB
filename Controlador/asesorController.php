@@ -128,68 +128,274 @@ try {
         break;
 
         case 'Simulador_Cajero':
-            $nDocumento = $_GET['documento'] ?? null;
+            // Asegúrate de que el método sea POST
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Método no permitido.']);
+                exit;
+            }
+
+            // Obtener el cuerpo de la solicitud JSON
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+
+            $nDocumento = $data['documento'] ?? null;
 
             if (!$nDocumento) {
-                echo "Documento no proporcionado.";
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Documento no proporcionado.']);
                 exit;
             }
 
-            $cliente = obtenerClientePorDocumento($conexion, $nDocumento);
+           $cliente = obtenerClientePorDocumento($conexion, $nDocumento);
 
             if (!$cliente) {
-                echo "Cliente no encontrado.";
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Cliente no encontrado.']);
                 exit;
             }
 
-            // Asumimos que cada cliente solo tiene un crédito activo. Si tiene varios, adaptamos.
             $credito = obtenerCreditoActivoPorCliente($conexion, $cliente['ID_Cliente']);
 
             if (!$credito) {
-                echo "Este cliente no tiene crédito activo.";
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Este cliente no tiene crédito activo.']);
                 exit;
             }
 
+            // 1. Obtener las cuotas inicialmente (pueden tener mora desactualizada)
             $cuotas = obtenerCuotasPorCredito($conexion, $credito['ID_Credito']);
 
-            include __DIR__ . '/../View/asesor/cajero.php';
-        break;
-
-        //Modificar
-        case 'agregarAsesor':
-            try{
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $nombre = $_POST['nombre'] ?? '';
-                    $apellido = $_POST['apellido'] ?? '';
-                    $idRol = $_POST['id_rol'] ?? 3;
-                    $genero = $_POST['genero'] ?? '';
-                    $tipoDocumento = $_POST['tipo_documento'] ?? '';
-                    $documento = $_POST['documento'] ?? '';
-                    $celular = $_POST['celular'] ?? '';
-                    $correo = $_POST['correo'] ?? '';
-                    $contrasena = $_POST['contrasena'] ?? '';
-
-                    if ($nombre && $apellido && $tipoDocumento && $documento && $correo && $contrasena) {
-                        $resultado = registrarPersonal($conexion, $nombre, $apellido, $idRol, $genero, $tipoDocumento, $documento, $celular, $correo, $contrasena);
-                        if ($resultado) {
-                            $mensajeError = "Usuario agregado correctamente.";
-                            header("Location: /Proyecto_GB/View/asesor/RegistroAsesor.php?success=success&msg=" . urlencode($mensajeError));
-                            exit;
-                        } else {
-                            $mensajeError = "Error al registrar el usuario.";
-                            header("Location: /Proyecto_GB/View/asesor/RegistroAsesor.php?error=error&msg=" . urlencode($mensajeError));
-                        }
-                    } else {
-                        $mensajeError = "Faltan campos obligatorios.";
-                        header("Location: /Proyecto_GB/View/asesor/RegistroAsesor.php?error=error&msg=" . urlencode($mensajeError));
+            // 2. Recorrer las cuotas para actualizar la mora de las que estén vencidas y no pagadas
+            foreach ($cuotas as $cuota) {
+                if ($cuota['ID_Estado_Cuota'] != 7 && strtotime($cuota['Fecha_Vencimiento']) < strtotime(date('Y-m-d'))) {
+                    try {
+                        // Llamar al Stored Procedure para actualizar la mora de esta cuota
+                        $stmt = $conexion->prepare("CALL sp_actualizar_mora_cuota_individual(:idCuota)");
+                        $stmt->bindParam(':idCuota', $cuota['ID_CuotaCredito'], PDO::PARAM_INT);
+                        $stmt->execute();
+                        // Es CRUCIAL cerrar el cursor después de cada CALL para poder hacer más operaciones de DB
+                        $stmt->closeCursor(); 
+                    } catch (PDOException $e) {
+                        // Si hay un error al actualizar la mora de una cuota, lo registramos
+                        // pero no detenemos la consulta del cliente completo.
+                        error_log("Error al actualizar mora para cuota " . $cuota['ID_CuotaCredito'] . ": " . $e->getMessage());
                     }
                 }
-            } catch (Exception $e) {
-                $mensajeError = "Error inesperado, ". urlencode($e);
-                header("Location: /Proyecto_GB/View/asesor/RegistroAsesor.php?error=error&msg=" . urlencode($mensajeError));
-                exit;    
             }
-            break;
+
+            // 3. Volver a obtener las cuotas para reflejar los cambios realizados por el SP.
+            // Esto asegura que los datos enviados al frontend estén completamente actualizados.
+            $cuotas = obtenerCuotasPorCredito($conexion, $credito['ID_Credito']);
+
+            // 4. Si todo es exitoso, envía los datos en formato JSON
+            header('Content-Type: application/json');
+            echo json_encode([
+                'exito' => true,
+                'cliente' => $cliente,
+                'credito' => $credito,
+                'cuotas' => $cuotas
+            ]);
+            exit;
+        break;
+
+        case 'Abonar_Cuota':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Método no permitido.']);
+                exit;
+            }
+
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+
+            $idCuotaCredito = $data['idCuotaCredito'] ?? null;
+            $idPersonal = $data['idPersonal'] ?? null;
+            $montoPagadoTransaccion = $data['montoPagadoTransaccion'] ?? null;
+            $observaciones = $data['observaciones'] ?? '';
+
+            if (!$idCuotaCredito || !$idPersonal || !is_numeric($montoPagadoTransaccion) || $montoPagadoTransaccion <= 0) {
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Datos de abono incompletos o inválidos.']);
+                exit;
+            }
+
+            // Iniciar una transacción de base de datos para asegurar la atomicidad
+            $conexion->beginTransaction();
+
+            try {
+                // 1. Obtener la información actual de la cuota (antes de cualquier actualización de mora)
+                $cuotaOriginal = obtenerCuotaPorId($conexion, $idCuotaCredito);
+
+                if (!$cuotaOriginal) {
+                    throw new Exception("Cuota no encontrada.");
+                }
+
+                // Validar que la cuota no esté ya pagada
+                if ($cuotaOriginal['Estado_Cuota'] === 'Pagado') { // Asumiendo 'Pagado' es el texto del estado
+                    throw new Exception("Esta cuota ya ha sido pagada.");
+                }
+
+                // --- DEBUG: Mostrar cuota original ---
+                error_log("DEBUG ABONO: Cuota Original (ID: {$idCuotaCredito}): " . print_r($cuotaOriginal, true));
+
+                // 2. Llamar al Stored Procedure para ACTUALIZAR LA MORA de esta cuota en la DB.
+                // Esto recalcula y guarda Dias_Mora_Al_Pagar y Monto_Recargo_Mora en la tabla CuotaCredito.
+                $stmt = $conexion->prepare("CALL sp_actualizar_mora_cuota_individual(:idCuota)");
+                $stmt->bindParam(':idCuota', $idCuotaCredito, PDO::PARAM_INT);
+                $stmt->execute();
+                $stmt->closeCursor(); // ¡CRUCIAL! Cierra el cursor para liberar el recurso y permitir la siguiente consulta.
+
+                // 3. RE-OBTENER la información de la cuota para tener los valores de mora ACTUALIZADOS por el SP.
+                $cuotaActualizadaConMora = obtenerCuotaPorId($conexion, $idCuotaCredito);
+
+                if (!$cuotaActualizadaConMora) {
+                    throw new Exception("Error al re-obtener la cuota después de actualizar la mora.");
+                }
+
+                // --- DEBUG: Mostrar cuota después de SP y re-obtener ---
+                error_log("DEBUG ABONO: Cuota Actualizada con Mora (ID: {$idCuotaCredito}): " . print_r($cuotaActualizadaConMora, true));
+
+
+                // Calcular el nuevo Monto_Pagado acumulado y determinar el nuevo estado de la cuota
+                $nuevoMontoPagadoAcumulado = (float)$cuotaActualizadaConMora['Monto_Pagado'] + (float)$montoPagadoTransaccion;
+                $montoTotalCuota = (float)$cuotaActualizadaConMora['Monto_Total_Cuota'];
+
+                $datosCuotaParaActualizar = [
+                    'Monto_Pagado' => $nuevoMontoPagadoAcumulado,
+                    // Ahora usamos los valores de mora que ya fueron actualizados por el SP y re-obtenidos
+                    'Dias_Mora_Al_Pagar' => $cuotaActualizadaConMora['Dias_Mora_Al_Pagar'],
+                    'Monto_Recargo_Mora' => $cuotaActualizadaConMora['Monto_Recargo_Mora'],
+                ];
+
+                // Determinar el nuevo estado de la cuota y la fecha de pago
+                if ($nuevoMontoPagadoAcumulado >= $montoTotalCuota) {
+                    $datosCuotaParaActualizar['ID_Estado_Cuota'] = 7; // Asumiendo 7 es el ID para 'Pagado'
+                    $datosCuotaParaActualizar['Fecha_Pago'] = date('Y-m-d H:i:s'); // Fecha de pago completa
+                } else {
+                    // Abono parcial: el estado de la cuota se mantiene (ej. 'Pendiente', 'Mora')
+                    $datosCuotaParaActualizar['ID_Estado_Cuota'] = $cuotaActualizadaConMora['ID_Estado_Cuota']; // Mantener estado actual
+                    $datosCuotaParaActualizar['Fecha_Pago'] = null; // No se ha pagado completamente
+                }
+
+                // --- DEBUG: Mostrar datos que se enviarán a actualizarCuotaCredito ---
+                error_log("DEBUG ABONO: Datos para actualizarCuotaCredito (ID: {$idCuotaCredito}): " . print_r($datosCuotaParaActualizar, true));
+
+                // 4. Registrar el pago en la tabla pagoCuota
+                $datosPago = [
+                    'ID_CuotaCredito' => $idCuotaCredito,
+                    'ID_Personal' => $idPersonal,
+                    'Monto_Pagado_Transaccion' => $montoPagadoTransaccion,
+                    'ID_Estado_Pago' => 7, // Asumiendo 7 es el ID_Estado para 'Pagado' de la transacción de pago
+                    'Observaciones_Pago' => $observaciones
+                ];
+                $exitoRegistroPago = registrarPagoCuota($conexion, $datosPago);
+
+                if (!$exitoRegistroPago) {
+                    throw new Exception("Error al registrar el pago.");
+                }
+
+                // 5. Actualizar la tabla CuotaCredito con los datos completos
+                $exitoActualizacionCuota = actualizarCuotaCredito($conexion, $idCuotaCredito, $datosCuotaParaActualizar);
+
+                if (!$exitoActualizacionCuota) {
+                    throw new Exception("Error al actualizar la cuota.");
+                }
+
+                $conexion->commit(); // Confirmar la transacción si todo fue exitoso
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => true, 'mensaje' => 'Abono registrado y cuota actualizada con éxito.']);
+                exit;
+
+            } catch (Exception $e) {
+                $conexion->rollBack(); // Revertir la transacción en caso de cualquier error
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => $e->getMessage()]);
+                exit;
+            }
+        break;
+
+
+         case 'agregarAsesor':
+            try {
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    // Iniciar una transacción para asegurar la atomicidad
+                    $conexion->beginTransaction();
+
+                    // --- 1. Preparar datos del Asesor ---
+                    $datosAsesorParaDB = [
+                        'Nombre_Personal' => $_POST['nombre'] ?? '',
+                        'Apellido_Personal' => $_POST['apellido'] ?? '',
+                        'ID_Genero' => $_POST['genero'] ?? '',
+                        'ID_TD' => $_POST['tipo_documento'] ?? '',
+                        'N_Documento_Personal' => $_POST['documento'] ?? '',
+                        'Celular_Personal' => $_POST['celular'] ?? '',
+                        'Correo_Personal' => $_POST['correo'] ?? '',
+                        'Contraseña_Personal' => $_POST['contrasena'] ?? '', // Se hashea dentro de registrarPersonal
+                        'ID_Rol' => $_POST['idRol'] ?? 3, // Valor por defecto si no se selecciona o no es gerente
+                        'Activo_Personal' => 1, // Asume que el asesor se crea activo
+                        'Fecha_Creacion_Personal' => date('Y-m-d H:i:s'),
+                        'Foto_Perfil_Personal' => null // Puedes manejar esto si tienes carga de fotos
+                    ];
+
+                    // Validación básica de campos obligatorios para Personal
+                    if (empty($datosAsesorParaDB['Nombre_Personal']) || empty($datosAsesorParaDB['Apellido_Personal']) ||
+                        empty($datosAsesorParaDB['ID_TD']) || empty($datosAsesorParaDB['N_Documento_Personal']) ||
+                        empty($datosAsesorParaDB['Correo_Personal']) || empty($datosAsesorParaDB['Contraseña_Personal'])) {
+                        throw new Exception("Faltan campos obligatorios para registrar el asesor.");
+                    }
+
+                    // Llamar a tu función para registrar el personal (asesor)
+                    $resultadoPersonal = registrarPersonal($conexion, $datosAsesorParaDB); 
+                    if (!$resultadoPersonal) {
+                        throw new Exception("Error al registrar el asesor. El documento o correo ya podría estar en uso.");
+                    }
+                    $idPersonal = $conexion->lastInsertId(); // Obtener el ID del asesor recién insertado
+
+                    // --- 2. Procesar Productos Asociados ---
+                    // $_POST['productos_asociados'] será un array de IDs si se seleccionaron, o null si no
+                    $productosAsociadosJSON = $_POST['productos_asociados'] ?? '[]';
+                    $productosAsociados = json_decode($productosAsociadosJSON, true); // Decodificar a un array de PHP
+
+                    if (!is_array($productosAsociados)) {
+                        $productosAsociados = []; // Asegurarse de que sea un array válido
+                    }
+
+                    // Llamar a la nueva función del modelo para asociar productos
+                    // Puedes pasar una descripción o estado si lo necesitas, aquí se usan los valores por defecto
+                    $exitoAsociacion = asociarAsesorProducto($conexion, $idPersonal, $productosAsociados);
+
+                    if (!$exitoAsociacion) {
+                        throw new Exception("Error al asociar productos al asesor.");
+                    }
+
+                    // Confirmar la transacción si todo fue exitoso
+                    $conexion->commit();
+
+                    // Redirigir con mensaje de éxito
+                    header('Location: ' . BASE_URL . '/View/asesor/RegistroAsesor.php?success=success&msg=' . urlencode('Asesor registrado y productos asociados exitosamente.'));
+                    exit;
+
+                } else {
+                    throw new Exception("Método de solicitud no permitido.");
+                }
+            } catch (PDOException $e) {
+                $conexion->rollBack(); // Revertir la transacción en caso de error de DB
+                $errorMessage = "Error de base de datos: " . $e->getMessage();
+                if ($e->getCode() == '23000') { // Violación de restricción de unicidad (ej. documento o correo duplicado)
+                    $errorMessage = "Error: El número de documento o correo electrónico ya está registrado.";
+                }
+                error_log("Error en 'agregarAsesor' (DB): " . $e->getMessage());
+                header('Location: ' . BASE_URL . '/View/asesor/RegistroAsesor.php?error=error&msg=' . urlencode($errorMessage));
+                exit;
+            } catch (Exception $e) {
+                $conexion->rollBack(); // Revertir la transacción en caso de error general
+                $errorMessage = "Error inesperado: " . $e->getMessage();
+                error_log("Error en 'agregarAsesor' (general): " . $e->getMessage());
+                header('Location: ' . BASE_URL . '/View/asesor/RegistroAsesor.php?error=error&msg=' . urlencode($errorMessage));
+                exit;
+            }
+        break;
 
         case 'registrarTurno':
             try {
@@ -328,7 +534,7 @@ try {
                         default: $periodoMesesParaVencimiento = $numeroCuotas; break;
                     }
                     $fechaVencimientoCredito = date('Y-m-d', strtotime("+$periodoMesesParaVencimiento months"));
-                    $idEstadoCreditoActivo = 7; // ID para 'Activo' (confirma tu valor)
+                    $idEstadoCreditoActivo = 4; // ID para 'Activo' (confirma tu valor)
 
                     $datosCreditoParaDB = [
                         'ID_Cliente' => $idCliente,
@@ -360,7 +566,7 @@ try {
                     $idCredito = $conexion->lastInsertId(); // Obtener el ID del crédito
 
                     // --- 3. Generar y Registrar Cuotas de Amortización (tabla CuotaCliente) ---
-                    $idEstadoCuotaPendiente = 8; // ID para 'Pendiente' (confirma tu valor)
+                    $idEstadoCuotaPendiente = 14; // ID para 'Pendiente' (confirma tu valor)
                     $saldoActual = $montoPrestamo;
                     $fechaInicioCredito = date('Y-m-d'); // Fecha de inicio para calcular vencimientos de cuotas
 

@@ -255,12 +255,16 @@ function obtenerClientePorDocumento(PDO $conexion, string $nDocumento) {
 }
 
 function obtenerCreditoActivoPorCliente(PDO $conexion, int $idCliente) {
-    $sql = "SELECT * FROM Credito WHERE ID_Cliente = :idCliente AND ID_Estado_Credito = 1 LIMIT 1"; // 1 = Activo
+    $sql = "SELECT c.*, p.Nombre_Producto AS NombreProducto
+            FROM Credito c
+            JOIN Producto p ON c.ID_Producto = p.ID_Producto
+            WHERE c.ID_Cliente = :idCliente AND c.ID_Estado = 4 LIMIT 1";
     $stmt = $conexion->prepare($sql);
     $stmt->bindParam(':idCliente', $idCliente, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
 
 /**
  * Obtiene todas las cuotas de un crédito específico.
@@ -272,7 +276,7 @@ function obtenerCuotasPorCredito(PDO $conexion, int $idCredito): array {
     $sql = "SELECT cc.*, e.Estado AS Estado_Cuota
             FROM CuotaCredito cc
             JOIN estado e ON cc.ID_Estado_Cuota = e.ID_Estado
-            WHERE cc.ID_Credito = :idCredito AND e.Tipo_Estado = 'Cuota'
+            WHERE cc.ID_Credito = :idCredito AND e.Tipo_Estado = 'Credito'
             ORDER BY cc.Numero_Cuota ASC";
     $stmt = $conexion->prepare($sql);
     $stmt->bindParam(':idCredito', $idCredito, PDO::PARAM_INT);
@@ -280,10 +284,110 @@ function obtenerCuotasPorCredito(PDO $conexion, int $idCredito): array {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Obtiene una cuota específica por su ID.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idCuotaCredito ID de la cuota.
+ * @return array|false Array asociativo de la cuota o false si no se encuentra.
+ */
+function obtenerCuotaPorId(PDO $conexion, int $idCuotaCredito) {
+    $sql = "SELECT cc.*, e.Estado AS Estado_Cuota
+            FROM CuotaCredito cc
+            JOIN estado e ON cc.ID_Estado_Cuota = e.ID_Estado
+            WHERE cc.ID_CuotaCredito = :idCuotaCredito AND e.Tipo_Estado = 'Credito'";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':idCuotaCredito', $idCuotaCredito, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
+/**
+ * Actualiza el estado de una cuota (ej. cuando es pagada).
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idCuotaCredito ID de la cuota a actualizar.
+ * @param array $datosCuota Array asociativo con los datos a actualizar (ej. Fecha_Pago, Monto_Pagado, Dias_Mora_Al_Pagar, Monto_Recargo_Mora, ID_Estado_Cuota).
+ * @return bool True si se actualiza correctamente, false en caso contrario.
+ */
+function actualizarCuotaCredito(PDO $conexion, int $idCuotaCredito, array $datosCuota): bool {
+    $campos = [];
+    
+    $valores = [':idCuotaCredito' => $idCuotaCredito];
 
+    if (isset($datosCuota['Fecha_Pago'])) { $campos[] = 'Fecha_Pago = :fechaPago'; $valores[':fechaPago'] = $datosCuota['Fecha_Pago']; }
+    if (isset($datosCuota['Monto_Pagado'])) { $campos[] = 'Monto_Pagado = :montoPagado'; $valores[':montoPagado'] = $datosCuota['Monto_Pagado']; }
+    if (isset($datosCuota['Dias_Mora_Al_Pagar'])) { $campos[] = 'Dias_Mora_Al_Pagar = :diasMora'; $valores[':diasMora'] = $datosCuota['Dias_Mora_Al_Pagar']; }
+    if (isset($datosCuota['Monto_Recargo_Mora'])) { $campos[] = 'Monto_Recargo_Mora = :montoRecargo'; $valores[':montoRecargo'] = $datosCuota['Monto_Recargo_Mora']; }
+    if (isset($datosCuota['ID_Estado_Cuota'])) { $campos[] = 'ID_Estado_Cuota = :idEstadoCuota'; $valores[':idEstadoCuota'] = $datosCuota['ID_Estado_Cuota']; }
 
+    if (empty($campos)) {
+        return false;
+    }
 
+    $sql = "UPDATE CuotaCredito SET " . implode(', ', $campos) . " WHERE ID_CuotaCredito = :idCuotaCredito";
+    $stmt = $conexion->prepare($sql);
+    return $stmt->execute($valores);
+}
+
+/**
+ * Registra un nuevo pago de cuota.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param array $datosPago Array asociativo con los datos del pago.
+ * @return bool True si se registra correctamente, false en caso contrario.
+ */
+function registrarPagoCuota(PDO $conexion, array $datosPago): bool {
+    $sql = "INSERT INTO PagoCuota (ID_CuotaCredito, ID_Personal, Fecha_Hora_Pago, Monto_Pagado_Transaccion, ID_Estado_Pago, Observaciones_Pago)
+            VALUES (:idCuotaCredito, :idPersonal, NOW(), :montoPagadoTransaccion, :idEstadoPago, :observacionesPago)";
+    $stmt = $conexion->prepare($sql);
+    return $stmt->execute([
+        ':idCuotaCredito' => $datosPago['ID_CuotaCredito'],
+        ':idPersonal' => $datosPago['ID_Personal'] ?? null,
+        ':montoPagadoTransaccion' => $datosPago['Monto_Pagado_Transaccion'],
+        ':idEstadoPago' => $datosPago['ID_Estado_Pago'],
+        ':observacionesPago' => $datosPago['Observaciones_Pago'] ?? null
+    ]);
+}
+
+/**
+ * Asocia una lista de productos a un asesor específico.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idPersonal ID del asesor.
+ * @param array $idProductos Array de IDs de productos a asociar.
+ * @param string $descripcion Opcional, descripción para la asociación.
+ * @param int $estado Opcional, estado de la asociación (1 activo, 0 inactivo).
+ * @return bool True si todas las asociaciones se registran correctamente, false en caso contrario.
+ */
+function asociarAsesorProducto(PDO $conexion, int $idPersonal, array $idProductos, string $descripcion = '', int $estado = 1): bool {
+    // Si no hay productos seleccionados, se considera exitoso (no hay nada que asociar)
+    if (empty($idProductos)) {
+        return true;
+    }
+
+    $sql = "INSERT INTO Asesor_Producto (ID_Personal, ID_Producto, Descripcion_AP, Fecha_Asignacion, Estado_AsesorProducto)
+            VALUES (:idPersonal, :idProducto, :descripcionAP, NOW(), :estadoAP)";
+    $stmt = $conexion->prepare($sql);
+
+    foreach ($idProductos as $idProducto) {
+        // Asegurarse de que el ID del producto sea un entero válido
+        $idProducto = (int)$idProducto;
+        if ($idProducto <= 0) {
+            error_log("Intento de asociar un ID_Producto inválido: " . $idProducto);
+            // Podrías lanzar una excepción o simplemente saltar este producto
+            continue;
+        }
+
+        $stmt->bindParam(':idPersonal', $idPersonal, PDO::PARAM_INT);
+        $stmt->bindParam(':idProducto', $idProducto, PDO::PARAM_INT);
+        $stmt->bindParam(':descripcionAP', $descripcion, PDO::PARAM_STR);
+        $stmt->bindParam(':estadoAP', $estado, PDO::PARAM_INT);
+        
+        // Ejecutar la inserción. Si falla, la función devuelve false
+        if (!$stmt->execute()) {
+            error_log("Error al asociar producto ID {$idProducto} al personal ID {$idPersonal}.");
+            return false; // Si una inserción falla, se reporta el error
+        }
+    }
+    return true; // Todas las asociaciones fueron exitosas
+}
 
 
 
@@ -732,71 +836,13 @@ function actualizarCredito(PDO $conexion, int $idCredito, array $datosCredito): 
 
 
 
-/**
- * Obtiene una cuota específica por su ID.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param int $idCuotaCredito ID de la cuota.
- * @return array|false Array asociativo de la cuota o false si no se encuentra.
- */
-function obtenerCuotaPorId(PDO $conexion, int $idCuotaCredito) {
-    $sql = "SELECT cc.*, e.Estado AS Estado_Cuota
-            FROM CuotaCredito cc
-            JOIN estado e ON cc.ID_Estado_Cuota = e.ID_Estado
-            WHERE cc.ID_CuotaCredito = :idCuotaCredito AND e.Tipo_Estado = 'Cuota'";
-    $stmt = $conexion->prepare($sql);
-    $stmt->bindParam(':idCuotaCredito', $idCuotaCredito, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
 
 
-/**
- * Actualiza el estado de una cuota (ej. cuando es pagada).
- * @param PDO $conexion Objeto de conexión PDO.
- * @param int $idCuotaCredito ID de la cuota a actualizar.
- * @param array $datosCuota Array asociativo con los datos a actualizar (ej. Fecha_Pago, Monto_Pagado, Dias_Mora_Al_Pagar, Monto_Recargo_Mora, ID_Estado_Cuota).
- * @return bool True si se actualiza correctamente, false en caso contrario.
- */
-function actualizarCuotaCredito(PDO $conexion, int $idCuotaCredito, array $datosCuota): bool {
-    $campos = [];
-    
-    $valores = [':idCuotaCredito' => $idCuotaCredito];
 
-    if (isset($datosCuota['Fecha_Pago'])) { $campos[] = 'Fecha_Pago = :fechaPago'; $valores[':fechaPago'] = $datosCuota['Fecha_Pago']; }
-    if (isset($datosCuota['Monto_Pagado'])) { $campos[] = 'Monto_Pagado = :montoPagado'; $valores[':montoPagado'] = $datosCuota['Monto_Pagado']; }
-    if (isset($datosCuota['Dias_Mora_Al_Pagar'])) { $campos[] = 'Dias_Mora_Al_Pagar = :diasMora'; $valores[':diasMora'] = $datosCuota['Dias_Mora_Al_Pagar']; }
-    if (isset($datosCuota['Monto_Recargo_Mora'])) { $campos[] = 'Monto_Recargo_Mora = :montoRecargo'; $valores[':montoRecargo'] = $datosCuota['Monto_Recargo_Mora']; }
-    if (isset($datosCuota['ID_Estado_Cuota'])) { $campos[] = 'ID_Estado_Cuota = :idEstadoCuota'; $valores[':idEstadoCuota'] = $datosCuota['ID_Estado_Cuota']; }
-
-    if (empty($campos)) {
-        return false;
-    }
-
-    $sql = "UPDATE CuotaCredito SET " . implode(', ', $campos) . " WHERE ID_CuotaCredito = :idCuotaCredito";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute($valores);
-}
 
 // --- Funciones para la tabla 'PagoCuota' ---
 
-/**
- * Registra un nuevo pago de cuota.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param array $datosPago Array asociativo con los datos del pago.
- * @return bool True si se registra correctamente, false en caso contrario.
- */
-function registrarPagoCuota(PDO $conexion, array $datosPago): bool {
-    $sql = "INSERT INTO PagoCuota (ID_CuotaCredito, ID_Personal, Monto_Pagado_Transaccion, ID_Estado_Pago, Observaciones_Pago)
-            VALUES (:idCuotaCredito, :idPersonal, :montoPagadoTransaccion, :idEstadoPago, :observacionesPago)";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute([
-        ':idCuotaCredito' => $datosPago['ID_CuotaCredito'],
-        ':idPersonal' => $datosPago['ID_Personal'] ?? null,
-        ':montoPagadoTransaccion' => $datosPago['Monto_Pagado_Transaccion'],
-        ':idEstadoPago' => $datosPago['ID_Estado_Pago'],
-        ':observacionesPago' => $datosPago['Observaciones_Pago'] ?? null
-    ]);
-}
+
 
 /**
  * Obtiene todos los pagos de una cuota específica.
