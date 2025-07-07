@@ -1,3 +1,9 @@
+<?php
+session_start();
+  require_once(__DIR__ . '../../../../Config/config.php');
+  
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,16 +11,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tarjeta de Credito.
   </title>
-    <link rel="stylesheet" href="../../../Assets/stilo.css" />
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/stilo.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
+
 </head>
 <body>
+
+<!-- Header -->
+  <?php include '../../public/layout/barraNavAsesor.php'; ?>
 
 <div class="porque">
   <div class="texto-encabezado">
     <h1>Solicita la tuya hoy <br>mismo con inteligencia </h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="../../../Assets/Img/Creditos/A5.png" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A5.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -25,7 +36,7 @@
 
   <div class="card-container">
     <div class="card">
-      <img src="../../../Assets/Img/Creditos/X1.png" alt="Crédito Rotativo">
+      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X1.png" alt="Crédito Rotativo">
       <div class="card-content">
         <h3>Tarjeta de Credito Clasica</h3>
         <p>Ofrece acceso a crédito básico <br>Tasa de interés 25% E.A <br>cupos desde $400.00 mil hasta $4.900.000 millones</p>
@@ -33,7 +44,7 @@
     </div>
 
     <div class="card">
-      <img src="../../../Assets/Img/Creditos/X3.png" alt="Tarjeta de crédito">
+      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X3.png" alt="Tarjeta de crédito">
       <div class="card-content">
         <h3>Tarjeta de crédito Oro</h3>
         <p>incluye beneficios adicionales <br>Tasa de interés 27.20% E.A <br>con montos desde $5.000.000 millones hasta $50.000.000 millones</p>
@@ -41,7 +52,7 @@
     </div>
 
     <div class="card">
-      <img src="../../../Assets/Img/Creditos/X4.PNG" alt="Crédito de Consumo">
+      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X4.PNG" alt="Crédito de Consumo">
       <div class="card-content">
         <h3>Tarjeta De Credito Platino</h3>
         <p>Proporción acceso a salónes <br>tasas de interés y 28.12% E.A <br>cupos desde $10.000.000 millones hasta $200.000.000 millones
@@ -50,7 +61,7 @@
     </div>
 
     <div class="card">
-      <img src="../../../Assets/Img/Creditos/X2.png" alt="Crédito Libre Inversión">
+      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X2.png" alt="Crédito Libre Inversión">
       <div class="card-content">
         <h3>Tarjeta De Credito Red</h3>
         <p>Ofrece beneficios exclusivos <br> tasas de 23.20% E.A <br>montos desde $10.000.000 millones hasta $300.000.000 millones</p>
@@ -71,14 +82,14 @@
    
   <div class="info-box">
   
-<center><img src="../../../Assets/Img/Creditos/a1.png" alt=""></center>
+<center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
       <h3>¿Qué es una tarjeta de credito?</h3>
       <p>Es un medio de pago que te permite hacer compras,
         pagos o avances sin necesidad de tener dinero en efectivo, usando un cupo de crédito aprobado por el Banco.</p>
     </div>
 
     <div class="info-box">
-      <center>  <img src="../../../Assets/Img/Creditos/A3.png" alt="" ></center>
+      <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
         <li>Flexibilidad de pago en cuotas</li>
@@ -91,7 +102,7 @@
     </div>
 
     <div class="info-box">
-        <center><img src="../../../Assets/Img/Creditos/A2.png" alt=""></center>
+        <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
         <li>Fotocopia de identidad ampliada al 150%</li>

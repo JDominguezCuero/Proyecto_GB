@@ -1,3 +1,8 @@
+<?php
+session_start();
+  require_once(__DIR__ . '../../../../Config/config.php');
+  
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -5,16 +10,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Compra de Cartera de Vivienda</title>
-    <link rel="stylesheet" href="../../../Assets/stilo.css" />
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/stilo.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
+
 </head>
 <body>
+
+<!-- Header -->
+  <?php include '../../public/layout/barraNavAsesor.php'; ?>
 
 <div class="porque">
   <div class="texto-encabezado">
     <h1>Compra de Cartera de Vivienda</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="../../../Assets/Img/Creditos/A10.webp" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A10.webp" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -25,7 +35,7 @@
    
   <div class="info-box">
   
-<center><img src="../../../Assets/Img/Creditos/a1.png" alt=""></center>
+<center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
       <h3>¿Qué es una Compra de Cartera de Vivienda
       </h3>
 <p>La compra de cartera de vivienda permite trasladar un crédito existente hipotecario o leasing habitacional a otra entidad financiera con mejores condiciones, como tasas más bajas, plazos flexibles y beneficios tributarios, con el objetivo de reducir las cuotas mensuales y optimizar la gestión financiera sin asumir gastos adicionales importantes.
@@ -33,7 +43,7 @@
     </div>
 
     <div class="info-box">
-      <center>  <img src="../../../Assets/Img/Creditos/A3.png" alt="" ></center>
+      <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
         <li>Reducción de tasas de interés, lo que disminuye el valor total del crédito.</li>
@@ -47,7 +57,7 @@
 
 
     <div class="info-box">
-        <center><img src="../../../Assets/Img/Creditos/A2.png" alt=""></center>
+        <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
         <li>Cédula de ciudadanía o extranjería.</li>

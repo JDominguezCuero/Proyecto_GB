@@ -1,19 +1,30 @@
+<?php
+session_start();
+  require_once(__DIR__ . '../../../../Config/config.php');
+  
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Crédito Rotativo</title>
-    <link rel="stylesheet" href="../../../Assets/stilo.css" />
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/stilo.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
+
 </head>
 <body>
+
+<!-- Header -->
+  <?php include '../../public/layout/barraNavAsesor.php'; ?>
 
 <div class="porque">
   <div class="texto-encabezado">
     <h1>SOLICITA TU CRÉDITO ROTATIVO HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="../../../Assets/Img/Creditos/A4.png" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A4.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -24,13 +35,13 @@
    
   <div class="info-box">
   
-<center><img src="../../../Assets/Img/Creditos/a1.png" alt=""></center>
+<center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
       <h3>¿Qué es un Crédito Rotativo (Crediágil)?</h3>
       <p>Es un crédito diseñado para brindarte flexibilidad y disponibilidad inmediata de recursos, que se renueva a medida que se hacen abonos a la deuda, permitiendo disponer de él de manera parcial o total.</p>
     </div>
 
     <div class="info-box">
-      <center>  <img src="../../../Assets/Img/Creditos/A3.png" alt="" ></center>
+      <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
         <li>Abonos y pagos sin costo adicional.</li>
@@ -48,7 +59,7 @@
 
 
     <div class="info-box">
-        <center><img src="../../../Assets/Img/Creditos/A2.png" alt=""></center>
+        <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
         <li>Tener entre 18 y 84 años.</li>

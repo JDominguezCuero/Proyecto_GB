@@ -1,19 +1,30 @@
+<?php
+session_start();
+  require_once(__DIR__ . '../../../../Config/config.php');
+  
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Crediestudiantil</title>
-    <link rel="stylesheet" href="../../../Assets/stilo.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/stilo.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
+
 </head>
 <body>
+
+<!-- Header -->
+  <?php include '../../public/layout/barraNavAsesor.php'; ?>
 
 <div class="porque">
   <div class="texto-encabezado">
     <h1>SOLICITA TU CREDIESTUDIANTIL HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="../../../Assets/Img/Creditos/J23.jpg" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J23.jpg" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -24,13 +35,13 @@
    
   <div class="info-box">
   
-<center><img src="../../../Assets/Img/Creditos/a1.png" alt=""></center>
+<center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
       <h3> crediestudiantil</h3>
       <p>Haz realidad tus sueños profesionales con nuestro Crédito "crediestudiantil". Financia hasta el 100% de tus estudios superiores de forma sencilla, rápida y con plazos flexibles. Porque tu talento no espera… ¡tu futuro empieza hoy!</p>
     </div>
 
     <div class="info-box">
-      <center>  <img src="../../../Assets/Img/Creditos/A3.png" alt="" ></center>
+      <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
         <li>Financia hasta el 100% de la matrícula o gastos asociados.</li>
@@ -47,7 +58,7 @@
 
 
     <div class="info-box">
-        <center><img src="../../../Assets/Img/Creditos/A2.png" alt=""></center>
+        <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requerimientos</h3>
       <ul>
        <li>Declaración de renta del último año gravable (si aplica)</li>

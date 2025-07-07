@@ -1,3 +1,8 @@
+<?php
+session_start();
+  require_once(__DIR__ . '../../../../Config/config.php');
+  
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -5,16 +10,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Crédito de Consumo</title>
-    <link rel="stylesheet" href="../../../Assets/stilo.css" />
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/stilo.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
+
 </head>
 <body>
+
+<!-- Header -->
+  <?php include '../../public/layout/barraNavAsesor.php'; ?>
 
 <div class="porque">
   <div class="texto-encabezado">
     <h1>EL CREDITO Consumo PUEDE SER TU MEJOR OPCION SOLICITALO YA!</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="../../../Assets/Img/Creditos/A6.png" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A6.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -25,14 +35,14 @@
    
   <div class="info-box">
   
-<center><img src="../../../Assets/Img/Creditos/a1.png" alt=""></center>
+<center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
       <h3>¿Qué es un Crédito Consumo?</h3>
 <p>El crédito de consumo es un tipo de préstamo otorgado por entidades financieras a personas naturales para financiar gastos personales, como la compra de bienes y servicios, educación, viajes o mejoras en el hogar. No está destinado a actividades productivas o comerciales.
 </p>
     </div>
 
     <div class="info-box">
-      <center>  <img src="../../../Assets/Img/Creditos/A3.png" alt="" ></center>
+      <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
         <li>Acceso rápido a financiamiento.</li>
@@ -45,7 +55,7 @@
 
 
     <div class="info-box">
-        <center><img src="../../../Assets/Img/Creditos/A2.png" alt=""></center>
+        <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
         <h3>Empleados</h3>

@@ -1,10 +1,18 @@
+<?php
+session_start();
+  require_once(__DIR__ . '../../../../Config/config.php');
+  
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cuneta de Ahorro Basica o Estandar</title>
-    <link rel="stylesheet" href="../../../Assets/stilo.css" />
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/stilo.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
+
 </head>
 <body>
 
@@ -13,7 +21,7 @@
     <h1>Cuenta de Ahorro Basica o Estandar</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="../../../Assets/Img/Creditos/N6.png" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/N6.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -24,14 +32,14 @@
    
   <div class="info-box">
   
-<center><img src="../../../Assets/Img/Creditos/a1.png" alt=""></center>
+<center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
       <h3>¿Qué es una Cuneta de Ahorro Basica o Estandar?</h3>
 <p>Es una cuenta bancaria que permite guardar dinero de forma segura, ganar intereses (aunque bajos) y realizar operaciones como transferencias, retiros en cajeros, pagos de servicios y compras con tarjeta débito.</p>
 
     </div>
 
     <div class="info-box">
-      <center>  <img src="../../../Assets/Img/Creditos/A3.png" alt="" ></center>
+      <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
    <li>Acceso fácil y rápido a tu dinero.</li>
@@ -45,7 +53,7 @@
 
 
     <div class="info-box">
-        <center><img src="../../../Assets/Img/Creditos/A2.png" alt=""></center>
+        <center><img src="<?= BASE_URL ?>/View/public/assets//Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
        <li>Ser mayor de edad o menor con autorización.</li>
@@ -59,6 +67,3 @@
 
 </body>
 </html>
-	
-
-

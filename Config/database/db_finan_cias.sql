@@ -840,6 +840,93 @@ ALTER TABLE `turno`
   ADD CONSTRAINT `fk_turno_producto` FOREIGN KEY (`ID_Producto_Interes`) REFERENCES `producto` (`ID_Producto`);
 COMMIT;
 
+--
+-- Volcado de datos para la tabla `asesor_producto`
+--
+
+INSERT INTO asesor_producto (
+  ID_Personal, ID_Producto, Descripcion_AP, Fecha_Asignacion, Estado_AsesorProducto
+) VALUES
+-- Nubia Lorena Montoya Palomo (ID_Personal = 1)
+(1, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(1, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(1, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(1, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+(1, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Dina Mayerli Muñoz Erazo (ID_Personal = 2)
+(2, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(2, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(2, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(2, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+(2, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Luisa Fernanda Cuesta Rivera (ID_Personal = 3)
+(3, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+(3, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(3, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(3, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Angela Maria Valencia Tabarez (ID_Personal = 4)
+(4, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(4, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(4, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(4, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Miguel Ángel Hernández Cárdenas (ID_Personal = 5)
+(5, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(5, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(5, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(5, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+(5, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Lilian Yohana Ocampo Henao (ID_Personal = 6)
+(6, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+(6, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+(6, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(6, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(6, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Naftali Estefani Moreno Murcia (ID_Personal = 7)
+(7, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(7, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(7, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(7, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+(7, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Siara Vanesa Madero Ramirez (ID_Personal = 8)
+(8, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(8, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(8, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(8, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+(8, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Ana Yulieth Palacio Cuellar (ID_Personal = 9)
+(9, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+(9, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(9, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(9, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Nicoll Daniela Flores Pacheco (ID_Personal = 10)
+(10, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
+(10, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
+(10, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
+(10, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Angie Lorena Murcia (ID_Personal = 11)
+(11, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
+(11, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
+(11, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
+(11, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
+(11, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
+
+-- Heilyn Stefany Hernández Pérez (ID_Personal = 12)
+(12, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
+(12, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
+(12, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
+(12, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
+(12, 1, NULL, '2025-07-05 18:12:35', 'Activo');
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
