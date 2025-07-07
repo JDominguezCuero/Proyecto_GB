@@ -58,15 +58,44 @@ try {
 
                     $nuevoEstadoTurno = 2; 
 
+                    $fechaSolicitud = new DateTime($turnoAtender['Fecha_Hora_Solicitud']);
+                    $ahora = new DateTime();
+                    $intervalo = $fechaSolicitud->diff($ahora);
+                    $minutosEspera = ($intervalo->days * 24 * 60) + ($intervalo->h * 60) + $intervalo->i;
+
                     // Actualizar estado del turno
                     $datosParaActualizarTurno = [
-                        'ID_Estado_Turno' => $nuevoEstadoTurno
+                        'ID_Estado_Turno' => $nuevoEstadoTurno,
+                        'Tiempo_Espera_Minutos' => $minutosEspera
                     ];
 
                     $resultadoUpdateTurno = actualizarTurno($conexion, (int)$idTurno, $datosParaActualizarTurno);
 
-                    // Registrar Bitacora
-                    // registrarEventoBitacora($conexion, );
+                    // Registrar Asesoramiento
+                    $datosAsesoramiento = [
+                        'ID_Personal' => $idPersonal,
+                        'ID_Cliente' => $turnoAtender['ID_Cliente'],
+                        'ID_Turno' => $idTurno,
+                        'Fecha_Hora_Inicio' => date('Y-m-d H:i:s'),
+                        'Fecha_Hora_Fin' => null, // o la misma fecha si es inmediato
+                        'Observaciones' => null,
+                        'Resultado' => 'Pendiente'
+                    ];
+
+                    $idRegistroAsesoramiento = registrarAsesoramiento($conexion, $datosAsesoramiento);
+
+                    // Registrar bitacora
+                    if ($idRegistroAsesoramiento) {
+                        $datosBitacora = [
+                            'ID_Cliente' => $turnoAtender['ID_Cliente'],
+                            'ID_Personal' => $idPersonal,
+                            'ID_RegistroAsesoramiento' => $idRegistroAsesoramiento,
+                            'Tipo_Evento' => 'Solicitud de crédito',
+                            'Descripcion_Evento' => 'Se registró asesoramiento para solicitud de crédito del cliente ID ' . $turnoAtender['ID_Cliente']
+                        ];
+
+                        registrarEventoBitacora($conexion, $datosBitacora);
+                    }
 
                     $productoInteres = obtenerProductoPorId($conexion, $turnoAtender['ID_Producto_Interes']);
                 }
@@ -90,9 +119,40 @@ try {
                     $minutosEspera = ($intervalo->days * 24 * 60) + ($intervalo->h * 60) + $intervalo->i;
                     $turno['Tiempo_Espera_Minutos'] = $minutosEspera;
                 }
+
+                $cliente = obtenerClientePorDocumento($conexion, $turno['N_Documento_Solicitante']);
+                $turno['EsCliente'] = $cliente ? 'Cliente' : 'Nuevo usuario';
             }
 
             include __DIR__ . '/../View/asesor/turnos.php';
+        break;
+
+        case 'Simulador_Cajero':
+            $nDocumento = $_GET['documento'] ?? null;
+
+            if (!$nDocumento) {
+                echo "Documento no proporcionado.";
+                exit;
+            }
+
+            $cliente = obtenerClientePorDocumento($conexion, $nDocumento);
+
+            if (!$cliente) {
+                echo "Cliente no encontrado.";
+                exit;
+            }
+
+            // Asumimos que cada cliente solo tiene un crédito activo. Si tiene varios, adaptamos.
+            $credito = obtenerCreditoActivoPorCliente($conexion, $cliente['ID_Cliente']);
+
+            if (!$credito) {
+                echo "Este cliente no tiene crédito activo.";
+                exit;
+            }
+
+            $cuotas = obtenerCuotasPorCredito($conexion, $credito['ID_Credito']);
+
+            include __DIR__ . '/../View/asesor/cajero.php';
         break;
 
         //Modificar
