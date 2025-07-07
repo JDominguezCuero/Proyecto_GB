@@ -57,6 +57,7 @@
       if(isset($_SESSION['rol']) && ($_SESSION['rol'] == 1 || $_SESSION['rol'] == 5)){
         echo '<li><a href="' . BASE_URL . '/View/asesor/RegistroAsesor.php">Crear Asesor</a></li>';
         echo '<li><a href="' . BASE_URL . '/View/asesor/Bitacora.php">Bitacora</a></li>';
+        echo '<li><a href="' . BASE_URL . '/Controlador/gerenteController.php?accion=listarGestionTotal">Gestión Total</a></li>';
       }
     ?>   
 

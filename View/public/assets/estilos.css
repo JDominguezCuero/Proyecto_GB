@@ -1,0 +1,412 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Estilos del encabezado */
+.header {
+    background: linear-gradient(90deg, #ef6c00, #2e7d32); /* Tus colores */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.logo-nombre {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 150px; /* Ajusta el tamaño del logo */
+    margin-right: 15px;
+}
+
+.titulo {
+    text-align: left;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* Menú de navegación */
+.nav {
+    background-color: #000;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 0;
+    margin: 0;
+}
+
+.nav a {
+    color: rgb(253, 251, 251);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 20px;
+    transition: background 0.3s ease;
+}
+
+.nav a:hover {
+    background-color: #2e7d32;
+}
+
+/* Contenedor principal */
+main {
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Título de la sección principal (dentro de main) */
+main h2 {
+    color: #2e7d32;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 2em;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+/* Estilos para el formulario de actualización (actualizar_datos.php) y genéricos de formularios */
+.form-container { 
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px; 
+}
+
+/* Para el formulario de Actualizar Datos */
+.form-container.update-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+/* Estilos para los grupos de formulario (etiqueta + input) */
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"] { 
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="email"]:focus {
+    border-color: #ef6c00;
+    outline: none;
+}
+
+/* Estilos para el botón primario (Guardar Cambios, Generar PDF, Buscar Cliente) */
+.btn-primary { 
+    display: inline-block; 
+    background-color: #ef6c00; 
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none; 
+    transition: background-color 0.3s ease;
+    margin-top: 10px; 
+}
+
+.btn-primary:hover {
+    background-color: #d84315; 
+}
+
+/* Ajuste para el botón dentro del flex container del formulario de actualización */
+.form-container.update-form .btn-primary {
+    align-self: center; 
+    width: auto; 
+    margin-top: 20px; 
+}
+
+
+/* Mensajes de estado (success/error/info) */
+.message-box {
+    text-align: center;
+    padding: 15px;
+    margin: 20px auto; 
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-size: 1.1em;
+    max-width: 600px; 
+}
+.message-box p {
+    margin: 0; 
+    font-weight: normal; 
+}
+
+.message-box.error {
+    background-color: #ffe0e0; 
+    border: 1px solid #ff0000; 
+    color: #cc0000; 
+}
+
+.message-box.success {
+    background-color: #e0ffe0; 
+    border: 1px solid #008000; 
+    color: #008000; 
+}
+
+.message-box.info {
+    background-color: #e0f2f7; 
+    border: 1px solid #81d4fa; 
+    color: #01579b; 
+}
+
+
+
+/* Estilos para el formulario de búsqueda de certificado (.search-form) */
+.search-form {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.search-form form {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    gap: 15px; 
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    max-width: 500px; 
+    margin: 0 auto 20px auto; 
+}
+
+.search-form label {
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap; 
+}
+
+.search-form input[type="text"] {
+    flex-grow: 1; 
+    max-width: 250px; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+
+/* Estilos de la validación de productos */
+.product-validation-info {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #e9f7ef; 
+    margin-top: 30px;
+    text-align: center;
+}
+.product-validation-info p {
+    margin-bottom: 10px;
+}
+.product-validation-info strong {
+    color: #2e7d32;
+}
+
+/* Pie de página */
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    background-color: #333;
+    color: white;
+    font-size: 0.9em;
+}
+
+/* PERFIL CLIENTE */
+
+.perfil-cliente-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    text-align: center; 
+}
+
+.perfil-cliente-container h3 {
+    color: #2e7d32;
+    margin-top: 0;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+    text-align: center;
+    font-size: 1.8em;
+}
+
+.profile-photo-container {
+    width: 150px; 
+    height: 150px;
+    border-radius: 50%; 
+    background-color: #f0f0f0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; 
+    margin: 0 auto 25px auto; 
+    border: 3px solid #2e7d32; 
+    box-shadow: 0 0 10px rgba(0,0,0,0.15); 
+}
+
+.profile-photo {
+    width: 100%; 
+    height: 100%;
+    object-fit: cover; 
+    display: block;
+}
+
+.info-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #e0e0e0;
+    font-size: 1.1em;
+}
+
+.info-group:last-child {
+    border-bottom: none;
+}
+
+.info-group label {
+    font-weight: bold;
+    color: #555;
+    flex-basis: 45%; 
+    text-align: left;
+    padding-right: 15px;
+}
+
+.info-group span {
+    color: #333;
+    flex-basis: 55%; 
+    text-align: right;
+    word-break: break-word; 
+}
+
+.button-container {
+    text-align: center; 
+    margin-top: 30px;
+}
+
+
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        padding: 10px;
+        text-align: center;
+    }
+    .logo-nombre {
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+    .titulo {
+        text-align: center;
+        margin-left: 0;
+    }
+    .nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+    main {
+        padding: 15px;
+        margin: 10px auto;
+    }
+    .form-container.update-form {
+        gap: 10px; 
+    }
+    .form-container.update-form .btn-primary {
+        width: 100%; 
+        box-sizing: border-box;
+    }
+    .search-form form {
+        flex-direction: column;
+        gap: 10px;
+        max-width: 100%;
+    }
+    .search-form input[type="text"] {
+        max-width: 100%;
+    }
+    #certificado-content { 
+        padding: 20px;
+    }
+    .certificate-header .bank-name {
+        font-size: 2em;
+    }
+    .certificate-title {
+        font-size: 1.5em;
+    }
+
+    /* Media Queries para responsividad del perfil */
+    .perfil-cliente-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+    .info-group {
+        flex-direction: column; 
+        align-items: flex-start;
+        padding: 8px 0;
+        border-bottom: none;
+    }
+    .info-group:not(:last-child) {
+        border-bottom: 1px dashed #e0e0e0;
+    }
+    .info-group label {
+        flex-basis: auto;
+        text-align: left;
+        padding-right: 0;
+        margin-bottom: 5px;
+    }
+    .info-group span {
+        flex-basis: auto;
+        text-align: left;
+        margin-left: 15px; 
+    }
+    .button-container .btn-primary { 
+        width: 100%; 
+        box-sizing: border-box; 
+    }
+}

@@ -12,7 +12,6 @@ CREATE DATABASE db_finan_cias2;
 
 USE db_finan_cias2;
 
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -26,6 +25,77 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `db_finan_cias2`
 --
+
+DELIMITER $$
+--
+-- Procedimientos
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_actualizar_mora_cuota_individual` (IN `p_idCuotaCredito` INT)   BEGIN
+    DECLARE v_fechaVencimiento DATE;
+    DECLARE v_montoTotalCuota DECIMAL(10,2);
+    DECLARE v_tasaMoraAnual DECIMAL(5,2); -- Tasa de mora fija
+    DECLARE v_diasMora INT;
+    DECLARE v_montoRecargoMora DECIMAL(10,2);
+    DECLARE v_idEstadoCuota INT; -- Estado actual de la cuota
+
+    -- Establecemos la tasa de mora anual fija
+    SET v_tasaMoraAnual = 28.00; -- 28.00% anual
+
+    -- 1. Obtener los datos necesarios de la cuota
+    SELECT
+        Fecha_Vencimiento,
+        Monto_Total_Cuota,
+        ID_Estado_Cuota
+    INTO
+        v_fechaVencimiento,
+        v_montoTotalCuota,
+        v_idEstadoCuota
+    FROM
+        CuotaCredito
+    WHERE
+        ID_CuotaCredito = p_idCuotaCredito;
+
+    -- Solo calcular mora si la cuota NO está pagada (ID_Estado_Cuota = 7 'Pagado')
+    -- y si la cuota existe y tiene fecha de vencimiento válida
+    IF v_idEstadoCuota IS NOT NULL AND v_idEstadoCuota != 7 AND v_fechaVencimiento IS NOT NULL THEN
+        -- Calcular días en mora: desde la fecha de vencimiento hasta la fecha actual
+        SET v_diasMora = DATEDIFF(CURDATE(), v_fechaVencimiento);
+
+        -- Asegurarse de que los días en mora no sean negativos (si aún no vence o si venció hoy)
+        SET v_diasMora = GREATEST(0, v_diasMora);
+
+        -- Calcular recargo por mora
+        IF v_diasMora > 0 THEN
+            -- La tasa moratoria diaria se aplica sobre el Monto_Total_Cuota
+            SET v_montoRecargoMora = (v_montoTotalCuota * (v_tasaMoraAnual / 100 / 365)) * v_diasMora;
+            
+            -- Actualizar el estado a "Mora" si tiene días de mora y no está ya en ese estado
+            -- Asumiendo 8 es el ID para 'Mora'
+            IF v_idEstadoCuota != 8 THEN
+                 UPDATE CuotaCredito
+                 SET ID_Estado_Cuota = 8 -- Cambiar estado a Mora
+                 WHERE ID_CuotaCredito = p_idCuotaCredito;
+            END IF;
+        ELSE
+            SET v_montoRecargoMora = 0;
+            -- Opcional: Si el estado era 'Mora' y ahora no tiene días de mora,
+            -- podrías cambiarlo a 'Pendiente' o 'Activo' (si es el caso).
+            -- Asumiré que no lo cambiamos automáticamente si los días de mora llegan a 0 por un pago,
+            -- ya que el estado 'Pagado' se maneja por separado.
+        END IF;
+
+        -- Actualizar los campos de mora en la tabla CuotaCredito
+        UPDATE CuotaCredito
+        SET
+            Dias_Mora_Al_Pagar = v_diasMora,
+            Monto_Recargo_Mora = ROUND(v_montoRecargoMora, 2) -- Redondear a 2 decimales
+        WHERE
+            ID_CuotaCredito = p_idCuotaCredito;
+    END IF;
+
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -103,7 +173,10 @@ INSERT INTO `asesor_producto` (`ID_Asesor_Producto`, `ID_Personal`, `ID_Producto
 (55, 17, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
 (56, 17, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
 (57, 17, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
-(58, 17, 1, NULL, '2025-07-05 18:12:35', 'Activo');
+(58, 17, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
+(59, 23, 2, '', '2025-07-07 02:07:30', 'Activo'),
+(60, 23, 3, '', '2025-07-07 02:07:30', 'Activo'),
+(61, 23, 4, '', '2025-07-07 02:07:30', 'Activo');
 
 -- --------------------------------------------------------
 
@@ -126,7 +199,9 @@ CREATE TABLE `bitacora` (
 --
 
 INSERT INTO `bitacora` (`ID_Bitacora`, `ID_Cliente`, `ID_Personal`, `ID_RegistroAsesoramiento`, `Tipo_Evento`, `Descripcion_Evento`, `Fecha_Hora`) VALUES
-(1, 1, 1, 1, 'Asesoramiento Inicial', 'Se brindó asesoramiento financiero sobre manejo de presupuesto mensual.', '2025-07-04 15:32:00');
+(1, 1, 1, 1, 'Asesoramiento Inicial', 'Se brindó asesoramiento financiero sobre manejo de presupuesto mensual.', '2025-07-04 15:32:00'),
+(2, NULL, 6, 2, 'Solicitud de crédito', 'Se registró asesoramiento para solicitud de crédito del cliente ID ', '2025-07-06 21:11:13'),
+(3, NULL, 3, 3, 'Solicitud de crédito', 'Se registró asesoramiento para solicitud de crédito del cliente ID ', '2025-07-07 01:17:36');
 
 -- --------------------------------------------------------
 
@@ -165,7 +240,8 @@ INSERT INTO `cliente` (`ID_Cliente`, `Nombre_Cliente`, `Apellido_Cliente`, `ID_G
 (15, 'Jose', 'Dominguez Cuero', 1, 1, '23223', '322332', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-30', 1, '2025-07-06 11:07:45', 1, '$2y$10$HSx9Pf8.CdZS8Z92RfZEhOZZb00hBBOnShs0/hUrOQmxmZ3oKKdjK'),
 (16, 'Prueba', 'turno', 1, 1, '23242342', '233232', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-30', 1, '2025-07-06 11:08:37', 1, '$2y$10$Qzw1RH2fFLAh3eWwHy595.m..BdkPC2.NQO2IAOojn/kiZP.3Alei'),
 (18, 'Prueba', 'turno', 2, 1, '2323323223', '3206339397', 'jose@gmail.com', 'Cra 11 # 39-4', 'dsdsd', '2025-07-23', 1, '2025-07-06 11:11:56', 1, '$2y$10$460pCjxt4Oz1CjEW37uBO.cyX9VHSqEjuw3af025KHoec6BM8.Dy6'),
-(21, 'asd', 'dsdsd', 1, 1, '223223', '22332', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-14', 1, '2025-07-06 11:23:57', 1, '$2y$10$HmGekjSAz65VRtA3mcBQpeLHpaYYI7rszB9Sb2KAXLA3DZt4z/Ps6');
+(21, 'asd', 'dsdsd', 1, 1, '223223', '22332', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-14', 1, '2025-07-06 11:23:57', 1, '$2y$10$HmGekjSAz65VRtA3mcBQpeLHpaYYI7rszB9Sb2KAXLA3DZt4z/Ps6'),
+(22, 'Jose', 'Dominguez Cuero', 1, 1, '1037665857', '3206339397', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-07', 3, '2025-07-07 01:18:56', 1, '$2y$10$hQZIwvXx8JQxIUBPqQ8Td.zRhi56aCDGkDoQwB35Hju1FnD3rUeDO');
 
 -- --------------------------------------------------------
 
@@ -194,12 +270,13 @@ CREATE TABLE `credito` (
 --
 
 INSERT INTO `credito` (`ID_Credito`, `ID_Cliente`, `Monto_Total_Credito`, `Monto_Pendiente_Credito`, `Fecha_Apertura_Credito`, `Fecha_Vencimiento_Credito`, `ID_Producto`, `ID_Estado`, `Tasa_Interes_Anual`, `Tasa_Interes_Periodica`, `Numero_Cuotas`, `Valor_Cuota_Calculado`, `Periodicidad`) VALUES
-(1, 12, 23232.00, 23232.00, '2025-07-06 17:44:55', '2025-09-06', 37, 7, 3.00, 0.25000, 2, 11659.58, 'Mensual'),
-(2, 14, 32233.00, 32233.00, '2025-07-06 18:00:23', '2025-09-06', 37, 7, 2.00, 0.16667, 2, 16156.80, 'Mensual'),
-(3, 15, 222332.00, 222332.00, '2025-07-06 18:07:45', '2025-09-06', 1, 7, 3.00, 0.25000, 2, 111583.05, 'Mensual'),
-(4, 16, 232323.00, 232323.00, '2025-07-06 18:08:37', '2025-09-06', 37, 7, 3.00, 0.25000, 2, 116597.29, 'Mensual'),
-(5, 18, 323.00, 323.00, '2025-07-06 18:11:56', '2025-08-06', 37, 7, 2.00, 0.16667, 1, 323.54, 'Mensual'),
-(8, 21, 232332.00, 232332.00, '2025-07-06 18:23:57', '2025-08-06', 17, 7, 3.00, 0.25000, 1, 232912.83, 'Mensual');
+(1, 12, 23232.00, 23232.00, '2025-07-06 17:44:55', '2025-09-06', 37, 4, 3.00, 0.25000, 2, 11659.58, 'Mensual'),
+(2, 14, 32233.00, 32233.00, '2025-07-06 18:00:23', '2025-09-06', 37, 4, 2.00, 0.16667, 2, 16156.80, 'Mensual'),
+(3, 15, 222332.00, 222332.00, '2025-07-06 18:07:45', '2025-09-06', 1, 4, 3.00, 0.25000, 2, 111583.05, 'Mensual'),
+(4, 16, 232323.00, 232323.00, '2025-07-06 18:08:37', '2025-09-06', 37, 4, 3.00, 0.25000, 2, 116597.29, 'Mensual'),
+(5, 18, 323.00, 323.00, '2025-07-06 18:11:56', '2025-08-06', 37, 4, 2.00, 0.16667, 1, 323.54, 'Mensual'),
+(8, 21, 232332.00, 232332.00, '2025-07-06 18:23:57', '2025-08-06', 17, 4, 3.00, 0.25000, 1, 232912.83, 'Mensual'),
+(9, 22, 1000000.00, 1000000.00, '2025-07-07 08:18:56', '2026-07-07', 11, 4, 26.00, 2.16667, 12, 95530.14, 'Mensual');
 
 -- --------------------------------------------------------
 
@@ -227,16 +304,28 @@ CREATE TABLE `cuotacredito` (
 --
 
 INSERT INTO `cuotacredito` (`ID_CuotaCredito`, `ID_Credito`, `Numero_Cuota`, `Monto_Capital`, `Monto_Interes`, `Monto_Total_Cuota`, `Fecha_Vencimiento`, `Fecha_Pago`, `Monto_Pagado`, `Dias_Mora_Al_Pagar`, `Monto_Recargo_Mora`, `ID_Estado_Cuota`) VALUES
-(1, 1, 1, 11601.50, 58.08, 11659.58, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
-(2, 1, 2, 11630.50, 29.08, 11659.58, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
-(3, 2, 1, 16103.08, 53.72, 16156.80, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
-(4, 2, 2, 16129.92, 26.88, 16156.80, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
-(5, 3, 1, 111027.22, 555.83, 111583.05, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
-(6, 3, 2, 111304.78, 278.26, 111583.05, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
-(7, 4, 1, 116016.48, 580.81, 116597.29, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
-(8, 4, 2, 116306.52, 290.77, 116597.29, '2025-09-06', NULL, 0.00, 0, 0.00, 8),
-(9, 5, 1, 323.00, 0.54, 323.54, '2025-08-06', NULL, 0.00, 0, 0.00, 8),
-(14, 8, 1, 232332.00, 580.83, 232912.83, '2025-08-06', NULL, 0.00, 0, 0.00, 8);
+(1, 1, 1, 11601.50, 58.08, 11659.58, '2025-08-06', '2025-07-07 06:55:29', 11601.50, 0, 0.00, 7),
+(2, 1, 2, 11630.50, 29.08, 11659.58, '2025-09-06', '2025-07-07 06:55:29', 11630.50, 0, 0.00, 7),
+(3, 2, 1, 16103.08, 53.72, 16156.80, '2025-08-06', '2025-07-07 07:52:25', 32312.00, 0, 0.00, 7),
+(4, 2, 2, 16129.92, 26.88, 16156.80, '2025-09-06', NULL, 16156.00, 0, 0.00, 14),
+(5, 3, 1, 111027.22, 555.83, 111583.05, '2025-08-06', NULL, 0.00, 0, 0.00, 14),
+(6, 3, 2, 111304.78, 278.26, 111583.05, '2025-09-06', NULL, 0.00, 0, 0.00, 14),
+(7, 4, 1, 116016.48, 580.81, 116597.29, '2025-08-06', NULL, 0.00, 0, 0.00, 14),
+(8, 4, 2, 116306.52, 290.77, 116597.29, '2025-09-06', NULL, 0.00, 0, 0.00, 14),
+(9, 5, 1, 323.00, 0.54, 323.54, '2025-08-06', NULL, 323.00, 0, 0.00, 14),
+(14, 8, 1, 232332.00, 580.83, 232912.83, '2025-08-06', NULL, 0.00, 0, 0.00, 14),
+(15, 9, 1, 73863.47, 21666.67, 95530.14, '2025-08-07', '2025-07-07 08:20:33', 95530.14, 0, 0.00, 7),
+(16, 9, 2, 75463.85, 20066.29, 95530.14, '2025-07-05', NULL, 0.00, 2, 146.57, 8),
+(17, 9, 3, 77098.90, 18431.24, 95530.14, '2025-10-07', NULL, 0.00, 0, 0.00, 14),
+(18, 9, 4, 78769.37, 16760.77, 95530.14, '2025-11-07', NULL, 0.00, 0, 0.00, 14),
+(19, 9, 5, 80476.04, 15054.10, 95530.14, '2025-12-07', NULL, 0.00, 0, 0.00, 14),
+(20, 9, 6, 82219.69, 13310.45, 95530.14, '2026-01-07', NULL, 0.00, 0, 0.00, 14),
+(21, 9, 7, 84001.12, 11529.02, 95530.14, '2026-02-07', NULL, 0.00, 0, 0.00, 14),
+(22, 9, 8, 85821.14, 9709.00, 95530.14, '2026-03-07', NULL, 0.00, 0, 0.00, 14),
+(23, 9, 9, 87680.60, 7849.54, 95530.14, '2026-04-07', NULL, 0.00, 0, 0.00, 14),
+(24, 9, 10, 89580.35, 5949.79, 95530.14, '2026-05-07', NULL, 0.00, 0, 0.00, 14),
+(25, 9, 11, 91521.25, 4008.89, 95530.14, '2026-06-07', NULL, 0.00, 0, 0.00, 14),
+(26, 9, 12, 93504.21, 2025.92, 95530.14, '2026-07-07', NULL, 0.00, 0, 0.00, 14);
 
 -- --------------------------------------------------------
 
@@ -268,7 +357,8 @@ INSERT INTO `estado` (`ID_Estado`, `Estado`, `Descripcion`, `Tipo_Estado`) VALUE
 (10, 'Completado', 'Pago completado', 'Pago'),
 (11, 'Rechazado', 'Pago rechazado', 'Pago'),
 (12, 'Activo', 'Registro activo', 'General'),
-(13, 'Inactivo', 'Registro inactivo', 'General');
+(13, 'Inactivo', 'Registro inactivo', 'General'),
+(14, 'Pendiente ', 'Crédito pendiente', 'Credito');
 
 -- --------------------------------------------------------
 
@@ -305,6 +395,16 @@ CREATE TABLE `pagocuota` (
   `ID_Estado_Pago` int(11) NOT NULL,
   `Observaciones_Pago` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `pagocuota`
+--
+
+INSERT INTO `pagocuota` (`ID_PagoCuota`, `ID_CuotaCredito`, `ID_Personal`, `Fecha_Hora_Pago`, `Monto_Pagado_Transaccion`, `ID_Estado_Pago`, `Observaciones_Pago`) VALUES
+(1, 1, 1, '2025-07-06 23:46:22', 11659.00, 7, 'Abono de cuota desde simulador cajero'),
+(2, 1, 1, '2025-07-06 23:55:29', 11659.00, 7, 'Abono de cuota desde simulador cajero'),
+(17, 9, 1, '2025-07-07 01:07:37', 323.00, 7, 'Abono de cuota desde simulador cajero'),
+(18, 15, 1, '2025-07-07 01:20:33', 95530.14, 7, 'Abono de cuota desde simulador cajero');
 
 -- --------------------------------------------------------
 
@@ -359,9 +459,9 @@ INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `
 (1, 'Gerente', 'Primero', 1, 1, 1, '0000000000', '3130000001', 'jsdmngzc@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:00:44', NULL),
 (2, 'SubGerente', 'Segundo', 2, 2, 2, '0000000002', '3130000002', 'SubGerente@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
 (3, 'Asesor', 'tercero', 3, 3, 3, '0000000003', '3130000003', 'jose@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
-(4, 'Cajero', 'Cuarto', 4, 1, 1, '0000000004', '3130000004', 'Cajero@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
+(4, 'Cajero', 'Cuarto', 4, 1, 1, '0000000004', '3130000004', 'cajero@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
 (5, 'ADMIN', 'SUPER', 5, 1, 1, '0000000001', '3206339397', 'admin1$#$@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-07-06 13:03:05', 'N/A'),
-(6, 'Nubia Lorena', 'Montoya Palomo', 3, 3, 3, '00000000000', '3130000001', 'montoyapalomo1997@gmail.com', 'Montoya1', 1, '2025-06-20 17:02:48', NULL),
+(6, 'Nubia Lorena', 'Montoya Palomo', 3, 3, 3, '00000000000', '3130000001', 'montoyapalomo1997@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
 (7, 'Dina Mayerli', 'Muñoz Erazo', 3, 3, 3, '00000000002', '3130000001', 'izajhoss@gmail.com', 'Muñoz2', 1, '2025-06-20 17:02:48', NULL),
 (8, 'Luisa Fernanda', 'Cuesta Rivera', 3, 3, 3, '00000000003', '3130000002', 'luisacuesta180@gmail.com', 'Cuesta3', 1, '2025-06-20 17:02:48', NULL),
 (9, 'Angela Maria', 'Valencia Tabarez', 3, 3, 3, '00000000004', '3130000003', 'Angelavalenciatabarez09@gmail.com', 'Valencia4', 1, '2025-06-20 17:02:48', NULL),
@@ -372,7 +472,9 @@ INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `
 (14, 'Ana Yulieth', 'Palacio Cuellar', 3, 3, 3, '00000000009', '3130000008', 'Anayuliethpalacio04@gmail.com', 'Palacio9', 1, '2025-06-20 17:02:48', NULL),
 (15, 'Nicoll Daniela', 'Flores Pacheco', 3, 3, 3, '00000000010', '3130000009', 'florezdaniela313@gmail.com', 'Flores10', 1, '2025-06-20 17:02:48', NULL),
 (16, 'Angie Lorena', 'Murcia', 3, 3, 3, '00000000011', '3130000010', 'lorenamurcia199905@gmail.com', 'Murcia11', 1, '2025-06-20 17:02:48', NULL),
-(17, 'Heilyn Stefany', 'Hernández Pérez', 3, 3, 3, '00000000012', '3130000011', 'heihernandez111@gmail.com', 'Hernández12', 1, '2025-06-20 17:02:48', NULL);
+(17, 'Heilyn Stefany', 'Hernández Pérez', 3, 3, 3, '00000000012', '3130000011', 'heihernandez111@gmail.com', 'Hernández12', 1, '2025-06-20 17:02:48', NULL),
+(22, 'Prueba', 'Dominguez Cuero', 3, 1, 1, '103766585733', '3206339397', 'jose33@gmail.com', '$2y$10$.K5isTwrtwKz/gLUDMJMwO/nKd706y3W0lTR.W1A4kFeA2.XfprHK', 1, '2025-07-07 02:02:34', NULL),
+(23, 'Envio', 'Nuevo', 3, 2, 1, '1234532233', '3206339397', '111jose@gmail.com', '$2y$10$VuU38WZgO1Kp5E5dwSaKMe62mmtSUsDZNUTaQjWWk.HsXZXWW9TrS', 1, '2025-07-07 02:07:30', NULL);
 
 -- --------------------------------------------------------
 
@@ -444,10 +546,10 @@ INSERT INTO `producto` (`ID_Producto`, `Nombre_Producto`, `Categoria_Productos`,
 CREATE TABLE `registroasesoramiento` (
   `ID_RegistroAsesoramiento` int(11) NOT NULL,
   `ID_Personal` int(11) NOT NULL,
-  `ID_Cliente` int(11) NOT NULL,
+  `ID_Cliente` int(11) DEFAULT NULL,
   `ID_Turno` int(11) DEFAULT NULL,
-  `Fecha_Hora_Inicio` datetime NOT NULL DEFAULT current_timestamp(),
-  `Fecha_Hora_Fin` datetime NOT NULL DEFAULT current_timestamp(),
+  `Fecha_Hora_Inicio` datetime DEFAULT current_timestamp(),
+  `Fecha_Hora_Fin` datetime DEFAULT current_timestamp(),
   `Observaciones` text DEFAULT NULL,
   `Resultado` enum('Aprobado','Denegado','Pendiente') NOT NULL DEFAULT 'Pendiente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -457,7 +559,9 @@ CREATE TABLE `registroasesoramiento` (
 --
 
 INSERT INTO `registroasesoramiento` (`ID_RegistroAsesoramiento`, `ID_Personal`, `ID_Cliente`, `ID_Turno`, `Fecha_Hora_Inicio`, `Fecha_Hora_Fin`, `Observaciones`, `Resultado`) VALUES
-(1, 1, 1, 1, '2025-07-04 14:00:00', '2025-07-04 14:45:00', 'Cliente interesado en consolidar sus deudas. Se identificaron gastos innecesarios.', '');
+(1, 1, 1, 1, '2025-07-04 14:00:00', '2025-07-04 14:45:00', 'Cliente interesado en consolidar sus deudas. Se identificaron gastos innecesarios.', ''),
+(2, 6, NULL, 41, '2025-07-07 04:11:13', NULL, NULL, 'Pendiente'),
+(3, 3, NULL, 45, '2025-07-07 08:17:36', NULL, NULL, 'Pendiente');
 
 -- --------------------------------------------------------
 
@@ -574,12 +678,14 @@ CREATE TABLE `turno` (
 INSERT INTO `turno` (`ID_Turno`, `ID_Cliente`, `Nombre_Completo_Solicitante`, `N_Documento_Solicitante`, `Numero_Turno`, `ID_Producto_Interes`, `Fecha_Hora_Solicitud`, `Fecha_Hora_Finalizacion`, `ID_Estado_Turno`, `Tiempo_Espera_Minutos`, `Motivo_Turno`) VALUES
 (1, 1, 'Laura Camila Ríos Martínez', '1032456789', 'T-000', NULL, '2025-07-04 13:30:00', '2025-07-04 14:00:00', 1, 15, 'Solicitud de asesoría para inversión en CDT'),
 (37, NULL, 'Jose Dominguez Cuero', '3233', 'T037', NULL, '2025-07-06 02:13:29', NULL, 1, NULL, NULL),
-(38, NULL, 'asd', '232', 'T038', 17, '2025-07-06 02:17:02', '2025-07-06 18:23:57', 3, NULL, NULL),
-(39, NULL, 'Prueba turno', '2324234', 'T039', 37, '2025-07-06 02:24:54', NULL, 1, NULL, NULL),
+(38, NULL, 'asd', '232', 'T038', 17, '2025-07-06 02:17:02', '2025-07-06 18:23:57', 2, 1547, NULL),
+(39, NULL, 'Prueba turno', '2324234', 'T039', 37, '2025-07-06 02:24:54', NULL, 1, 1517, NULL),
 (40, NULL, 'Jose Dominguez Cuero', '122552522', 'T040', 11, '2025-07-06 03:30:58', NULL, 1, NULL, NULL),
-(41, NULL, 'Jose Dominguez Cuero', '67', 'T041', 38, '2025-07-06 04:27:31', NULL, 1, NULL, NULL),
-(42, NULL, 'sdsd', '3223', 'T042', 15, '2025-07-06 21:21:32', NULL, 2, NULL, NULL),
-(43, NULL, 'Prueba Turno PUBLICO', '025245255', 'T043', 1, '2025-07-06 21:22:16', NULL, 2, NULL, NULL);
+(41, NULL, 'Jose Dominguez Cuero', '67', 'T041', 38, '2025-07-06 04:27:31', NULL, 2, 1423, NULL),
+(42, NULL, 'sdsd', '3223', 'T042', 15, '2025-07-06 21:21:32', NULL, 2, 408, NULL),
+(43, NULL, 'Prueba Turno PUBLICO', '025245255', 'T043', 1, '2025-07-06 21:22:16', NULL, 2, 398, NULL),
+(44, NULL, 'Jose Dominguez Cuero', '2324234', 'T044', 14, '2025-07-07 04:22:56', NULL, 1, NULL, NULL),
+(45, NULL, 'Jose Dominguez Cuero', '1037665857', 'T045', 11, '2025-07-07 08:17:07', '2025-07-07 08:18:56', 3, 0, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -719,37 +825,37 @@ ALTER TABLE `turno`
 -- AUTO_INCREMENT de la tabla `asesor_producto`
 --
 ALTER TABLE `asesor_producto`
-  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT de la tabla `bitacora`
 --
 ALTER TABLE `bitacora`
-  MODIFY `ID_Bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID_Bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `ID_Cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `ID_Cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `credito`
 --
 ALTER TABLE `credito`
-  MODIFY `ID_Credito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID_Credito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `cuotacredito`
 --
 ALTER TABLE `cuotacredito`
-  MODIFY `ID_CuotaCredito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `ID_CuotaCredito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `estado`
 --
 ALTER TABLE `estado`
-  MODIFY `ID_Estado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `ID_Estado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `genero`
@@ -761,7 +867,7 @@ ALTER TABLE `genero`
 -- AUTO_INCREMENT de la tabla `pagocuota`
 --
 ALTER TABLE `pagocuota`
-  MODIFY `ID_PagoCuota` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_PagoCuota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `periodo`
@@ -773,7 +879,7 @@ ALTER TABLE `periodo`
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `ID_Personal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID_Personal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -785,7 +891,7 @@ ALTER TABLE `producto`
 -- AUTO_INCREMENT de la tabla `registroasesoramiento`
 --
 ALTER TABLE `registroasesoramiento`
-  MODIFY `ID_RegistroAsesoramiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID_RegistroAsesoramiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -809,7 +915,7 @@ ALTER TABLE `tipo_documento`
 -- AUTO_INCREMENT de la tabla `turno`
 --
 ALTER TABLE `turno`
-  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- Restricciones para tablas volcadas
@@ -897,93 +1003,6 @@ ALTER TABLE `turno`
   ADD CONSTRAINT `fk_turno_estado` FOREIGN KEY (`ID_Estado_Turno`) REFERENCES `estado` (`ID_Estado`),
   ADD CONSTRAINT `fk_turno_producto` FOREIGN KEY (`ID_Producto_Interes`) REFERENCES `producto` (`ID_Producto`);
 COMMIT;
-
---
--- Volcado de datos para la tabla `asesor_producto`
---
-
-INSERT INTO asesor_producto (
-  ID_Personal, ID_Producto, Descripcion_AP, Fecha_Asignacion, Estado_AsesorProducto
-) VALUES
--- Nubia Lorena Montoya Palomo (ID_Personal = 1)
-(1, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
-(1, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
-(1, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
-(1, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
-(1, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Dina Mayerli Muñoz Erazo (ID_Personal = 2)
-(2, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
-(2, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
-(2, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
-(2, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
-(2, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Luisa Fernanda Cuesta Rivera (ID_Personal = 3)
-(3, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
-(3, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
-(3, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
-(3, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Angela Maria Valencia Tabarez (ID_Personal = 4)
-(4, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
-(4, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
-(4, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
-(4, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Miguel Ángel Hernández Cárdenas (ID_Personal = 5)
-(5, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
-(5, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
-(5, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
-(5, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
-(5, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Lilian Yohana Ocampo Henao (ID_Personal = 6)
-(6, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
-(6, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
-(6, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
-(6, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
-(6, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Naftali Estefani Moreno Murcia (ID_Personal = 7)
-(7, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
-(7, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
-(7, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
-(7, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
-(7, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Siara Vanesa Madero Ramirez (ID_Personal = 8)
-(8, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
-(8, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
-(8, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
-(8, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
-(8, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Ana Yulieth Palacio Cuellar (ID_Personal = 9)
-(9, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
-(9, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
-(9, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
-(9, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Nicoll Daniela Flores Pacheco (ID_Personal = 10)
-(10, 23, NULL, '2025-07-05 18:12:35', 'Activo'),
-(10, 37, NULL, '2025-07-05 18:12:35', 'Activo'),
-(10, 28, NULL, '2025-07-05 18:12:35', 'Activo'),
-(10, 24, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Angie Lorena Murcia (ID_Personal = 11)
-(11, 19, NULL, '2025-07-05 18:12:35', 'Activo'),
-(11, 13, NULL, '2025-07-05 18:12:35', 'Activo'),
-(11, 21, NULL, '2025-07-05 18:12:35', 'Activo'),
-(11, 27, NULL, '2025-07-05 18:12:35', 'Activo'),
-(11, 38, NULL, '2025-07-05 18:12:35', 'Activo'),
-
--- Heilyn Stefany Hernández Pérez (ID_Personal = 12)
-(12, 17, NULL, '2025-07-05 18:12:35', 'Activo'),
-(12, 40, NULL, '2025-07-05 18:12:35', 'Activo'),
-(12, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
-(12, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
-(12, 1, NULL, '2025-07-05 18:12:35', 'Activo');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
