@@ -68,14 +68,9 @@ Que tus deudas no superen tu capacidad mensual (máximo 30 %–40 % de tus i
     </div>
   </section>
 
-  Ser mayor de edad
-Tener mínimo 18 años.
-
-
-
-
- 
-
+  <?php include '../../public/layout/mensajesModal.php'; ?>
+  <?php include '../../public/layout/frontendBackend.php'; ?>
+  <?php include '../../public/layout/layoutfooter.php'; ?>
 
 </body>
 </html>
