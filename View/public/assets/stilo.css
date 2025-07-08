@@ -108,7 +108,7 @@ body {
 
 .texto-encabezado h1 {
   font-size: 1.8rem;
-  color: #111;
+  color: #fff;
   max-width: 600px;
   margin: 0;
 }
@@ -250,7 +250,7 @@ body {
 
 .panel-texto h1 {
   font-size: 2.5rem;
-  color: green;
+  color: #fff;
   text-align: left;
   margin: 0;
   max-width: 250px;
