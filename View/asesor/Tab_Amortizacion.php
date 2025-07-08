@@ -111,6 +111,102 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
         .hover\:bg-lime-700:hover { background-color: #4d7c0f; }
         .bg-purple-600 { background-color: #9333ea; } /* Mantener para finalizar proceso */
         .hover\:bg-purple-800:hover { background-color: #6b21a8; }
+
+
+    /* Botón abrir modal */
+    #abrirModal {
+      padding: 12px 25px;
+      font-size: 16px;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-contenido {
+      background-color: white;
+      margin: 5% auto;
+      padding: 30px;
+      border: 2px solid orange;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 10px limegreen;
+      position: relative;
+    }
+
+    .modal h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1.5px solid orange;
+      border-radius: 5px;
+    }
+
+    input::placeholder {
+      color: #999;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: orange;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .cerrar {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .resultado {
+      margin-top: 20px;
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+    }
+
+    .resultado strong {
+      color: #007BFF;
+    }
     </style>
 </head>
 <body>
@@ -129,6 +225,8 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
             <button id="btnSeleccionarProducto" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300">
                 Seleccionar Producto
             </button>
+            <button id="abrirModal" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300">
+                🧮Capacidad de Endeudamiento</button>
         </div>
 
         <div id="statusSection" class="mb-8">
@@ -334,7 +432,39 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
             </div>
         </div>
     </div>
+   
+<!-- Modal -->
+<div id="miModal" class="modal">
+  <div class="modal-contenido">
+    <span class="cerrar" id="cerrarModal">&times;</span>
 
+    <form id="formulario">
+      <h2> Capacidad de Endeudamiento</h2>
+
+      <label for="nombre">Nombre del Cliente</label>
+      <input type="text" id="nombre" required>
+
+      <label for="id">Identificación</label>
+      <input type="text" id="id" placeholder="ingrese CC" required>
+
+      <label for="fecha">Fecha</label>
+      <input type="date" id="fecha" required>
+
+      <label for="ingresos">Ingresos Mensuales (COP)</label>
+      <input type="number" id="ingresos"  required>
+
+      <label for="gastos">Gastos Mensuales (COP)</label>
+      <input type="number" id="gastos" required>
+
+      <label for="deudas">Deudas Actuales (COP)</label>
+      <input type="number" id="deudas" required>
+
+      <button type="submit">Calcular</button>
+    </form>
+
+    <div id="resultado" class="resultado" style="display: none;"></div>
+  </div>
+</div>
     <script>
         window.initialProductFromTurn = <?= isset($productoInteres) && !empty($productoInteres) ? json_encode($productoInteres) : 'null' ?>;
 
@@ -350,6 +480,42 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
     <?php include __DIR__ . '/../public/layout/frontendBackend.php'; ?>
     <?php include __DIR__ . '/../public/layout/layoutfooter.php'; ?>    
     <?php include __DIR__ . '../../../View/public/layout/mensajesModal.php'; ?>
+
+
+
+
+ <script>
+  // Mostrar modal
+  document.getElementById("abrirModal").addEventListener("click", function () {
+    document.getElementById("miModal").style.display = "block";
+  });
+
+  // Cerrar modal
+  document.getElementById("cerrarModal").addEventListener("click", function () {
+    document.getElementById("miModal").style.display = "none";
+    document.getElementById("resultado").style.display = "none";
+    document.getElementById("formulario").reset();
+  });
+
+  // Calcular
+  document.getElementById("formulario").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const ingresos = parseFloat(document.getElementById("ingresos").value);
+    const gastos = parseFloat(document.getElementById("gastos").value);
+    const deudas = parseFloat(document.getElementById("deudas").value);
+
+    const capacidadPago = ingresos - gastos;
+    const capacidadEndeudamiento = (capacidadPago * 0.30) - deudas;
+
+    const resultadoDiv = document.getElementById("resultado");
+    resultadoDiv.style.display = "block";
+    resultadoDiv.innerHTML = `
+      ✅ <strong>Capacidad de Pago:</strong> $${capacidadPago.toLocaleString('es-CO')}<br>
+      💰 <strong>Capacidad de Endeudamiento:</strong> $${(capacidadEndeudamiento > 0 ? capacidadEndeudamiento : 0).toLocaleString('es-CO')}
+    `;
+  });
+</script>
 
 </body>
 </html>

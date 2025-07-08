@@ -26,21 +26,21 @@ session_start();
   <div class="panel-texto">
     <h1>Créditos de Consumo  y Libre Inversión</h1>
   </div>
- <div class="swiper mySwiper">
-  <div class="swiper-wrapper">
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P2.png" alt="Imagen 1">
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P2.png" alt="Imagen 1">
+      </div>
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P3.png" alt="Imagen 2">
+      </div>
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P4.png" alt="Imagen 3">
+      </div>
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P1.png" alt="Imagen 4">
+      </div>
     </div>
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P3.png" alt="Imagen 2">
-    </div>
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P4.png" alt="Imagen 3">
-    </div>
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/P1.png" alt="Imagen 4">
-    </div>
-  </div>
   <!-- Paginación (puntos) -->
   <div class="swiper-pagination"></div>
 </div>
@@ -97,7 +97,7 @@ session_start();
     </div>
   </div>
 
-
+</div>
  
 <!-- Swiper JS -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -115,6 +115,10 @@ session_start();
     },
   });
 </script>
+
+<?php include '../../public/layout/mensajesModal.php'; ?>
+  <?php include '../../public/layout/frontendBackend.php'; ?>
+  <?php include '../../public/layout/layoutfooter.php'; ?>
 
 
 </body>
