@@ -5,9 +5,10 @@
     <div class="equipo-info">
       <h3>Equipo Backend</h3>
       <ul>
-        <li>Nombre</li>
+        <li>José Domingez </li>
         <li>Dana Cifuentes</li>
-        <li>nombre</li>
+        <li>Brian Rodriguez</li>
+        
       </ul>
     </div>
   </div>
@@ -17,9 +18,10 @@
     <div class="equipo-info">
       <h3>Equipo Frontend</h3>
       <ul>
-        <li>Junior Santamaria</li>
-        <li>nombre</li>
-        <li>nombre</li>
+        <li>Junior Santamaria (lider de proyecto)</li>
+        <li>Juan David Huertas</li>
+        <li>Daniel Suarez</li>
+        <li>Juan Pablo Martinez </li>
       </ul>
     </div>
   </div>
@@ -31,6 +33,7 @@
       <ul>
         <li>Luis Fernando Acosta</li>
         <li>Eder Galeano</li>
+        <li>José Dominguez</li>
       </ul>
     </div>
   </div>

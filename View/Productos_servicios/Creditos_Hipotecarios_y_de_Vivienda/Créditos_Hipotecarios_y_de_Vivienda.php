@@ -94,7 +94,7 @@ session_start();
   </div>
 
 
- 
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
@@ -112,6 +112,9 @@ session_start();
   });
 </script>
 
+<?php include '../../public/layout/mensajesModal.php'; ?>
+  <?php include '../../public/layout/frontendBackend.php'; ?>
+  <?php include '../../public/layout/layoutfooter.php'; ?>
 
 </body>
 </html>
