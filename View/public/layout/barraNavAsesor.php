@@ -3,7 +3,7 @@
   <div class="logo-nombre">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/logos/logo2.png" alt="Logo Banco" class="logo">
     <div class="titulo">
-      <h1>Banco Finan-CIAS</h1>
+      <h1 style="font-size: 3rem;">Banco Finan-CIAS</h1>
       <h6>¡La Banca que te ayuda a crecer!</h6>
     </div>
   </div>
