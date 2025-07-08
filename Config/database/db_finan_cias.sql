@@ -1004,6 +1004,17 @@ ALTER TABLE `turno`
   ADD CONSTRAINT `fk_turno_producto` FOREIGN KEY (`ID_Producto_Interes`) REFERENCES `producto` (`ID_Producto`);
 COMMIT;
 
+--
+-- Volcado de datos para la tabla `personal`
+--
+INSERT INTO personal ( `Nombre_Personal`, `Apellido_Personal`, `ID_Rol`, `ID_Genero`, `ID_TD`, `N_Documento_Personal`, `Celular_Personal`, `Correo_Personal`, `Contraseña_Personal`, `Activo_Personal`, `Fecha_Creacion_Personal`, `Foto_Perfil_Personal`) VALUES
+('Zharick Valentina', 'Barrera García', 4, 2, 3, '00000000018', '3130000012', 'barreragarciavalentina646@gmail.com', '$2y$10$rkKHkUEXmUeH6CAyexrT0O9lvMfM.5BaSMD1eGjVmMQvRU3JRIqvy', 1, '2025-06-20 17:02:48', NULL),
+('Alisson Yulieth', 'Palacios Arrieta', 4, 2, 3, '00000000019', '3130000013', 'alissonpalaciosa@gmail.com', '$2y$10$oxYMXGtxsEU4qV2TwG6STu3twIhkN5qPYfbdH3Qtun0wzSKMZzN6y', 1, '2025-06-20 17:02:48', NULL),
+('Angoli Angelica', 'Martinez Sandoval', 4, 2, 3, '00000000020', '3130000014', 'Sandovalanyoli44@gmail.com', '$2y$10$8OhNUmQj6Lra9CefCZ9kXOlb9U6R4.nACWAnbh1IRKU/pdALRTlLi', 1, '2025-06-20 17:02:48', NULL),
+('Geraldin', 'Ulloa Martinez', 4, 2, 3, '00000000021', '3130000015', 'Alexcrissdbz@gmail.com', '$2y$10$ASyYo4W1m99M7YbXp34GFOkV7n1ZbJZqGrj65gEfnrQw/7NfjRLje', 1, '2025-06-20 17:02:48', NULL),
+('Laura Dayana', 'Hernández Cuellar', 4, 2, 3, '00000000022', '3130000016', 'lauradayanahernandezcuellar@gmail.com', '$2y$10$MhiC2aMQAJIl5tShY23Q/ON1CdZbZLsc74vYfbB7BqBNu8XW5crlq', 1, '2025-06-20 17:02:48', NULL),
+('Lesly Nathalia', 'Suárez Rendón', 4, 2, 3, '00000000023', '3130000017', 'suarezrendonnathalia2807@gmail.com', '$2y$10$RzeLnsLgHd6vAO5QoazpiuOfVuPbi4lmMFG6D3t5DWkD8BYfdIgKq', 1, '2025-06-20 17:02:48', NULL);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
