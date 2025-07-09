@@ -24,8 +24,7 @@ session_start();
 
 <div class="panel">
   <div class="panel-texto">
-    <h1>Créditos Productivos o Empresariales
-</h1>
+    <h1>Créditos Productivos o Empresariales</h1>
   </div>
  <div class="swiper mySwiper">
   <div class="swiper-wrapper">
@@ -67,7 +66,7 @@ session_start();
       <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A12.png" alt="Tarjeta de crédito">
       <div class="card-content">
         <h3>Crédito Comercial</h3>
-        <p>Financiamiento flexible para emprendedores o microempresarios que buscan invertir en actividades productivas como comercio, servicios o industria</p>
+        <p>Financiamiento flexible para emprendedores o microempresarios que buscan invertir en actividades productivas como comercio, servicios o industria.</p>
       </div>
       <div class="card-button">
         <a href="./Credito_Productivo.php">Saber más <span>→</span></a>

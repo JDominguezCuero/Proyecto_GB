@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Credito Agrofácil</h1>
+    <h1>CREDITO AGROFÁCIL</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X11.png" alt="Imagen crédito" floatr="right">
@@ -58,13 +58,13 @@ session_start();
         <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
-<li>Cédula de ciudadanía (persona natural)</li>
-<li>Para persona jurídica (copia del RUT, certificado de existencia y representación legal)</li>
-<li>Ser mayor de edad (18 años)</li>
-<li>Extractos bancarios</li>
-<li>Declaración renta (si aplica)</li>
-<li>Si cuenta con un proyecto (plan de inversión y estados financieros)</li>
-<li>Certificado cámara de comercio</li>
+<li>Cédula de ciudadanía (persona natural).</li>
+<li>Para persona jurídica (copia del RUT, certificado de existencia y representación legal).</li>
+<li>Ser mayor de edad (18 años).</li>
+<li>Extractos bancarios.</li>
+<li>Declaración renta (si aplica).</li>
+<li>Si cuenta con un proyecto (plan de inversión y estados financieros).</li>
+<li>Certificado cámara de comercio.</li>
 
       </ul>
 

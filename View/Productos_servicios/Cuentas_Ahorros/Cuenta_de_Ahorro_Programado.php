@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Cuenta de Ahorro Programado</h1>
+    <h1>CUENTA DE AHORRO PROGRAMADO</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/N5.avif" alt="Imagen crédito" floatr="right">
@@ -48,7 +48,7 @@ session_start();
 
 <li>Tasa de interés más alta que la de una cuenta de ahorro tradicional.</li>
 <li>Fomenta el ahorro constante y planificado.</li>
-<i>Puede servir como respaldo para créditos o subsidios de vivienda (como el programa Mi Casa Ya).</i>
+<li>Puede servir como respaldo para créditos o subsidios de vivienda (como el programa Mi Casa Ya).</li>
 <li>No cobran cuota de manejo.</li>
 <li>Algunas cuentas permiten bloquear los retiros hasta cumplir la meta, ayudando a evitar el uso impulsivo del dinero.</li>
 </ul>

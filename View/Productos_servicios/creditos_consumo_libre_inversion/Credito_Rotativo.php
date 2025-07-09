@@ -48,7 +48,7 @@ session_start();
         <li>Tasa y cuota fija por desembolso.</li>
         <li>Exoneración de comisión por 3 meses.</li>
         <li>Montos de desembolso.</li>
-        <li>Comisión mensua.</li>
+        <li>Comisión mensual.</li>
         <li>Seguro de vida.</li>
         <li>Plazos flexibles.</li> 
     </div>

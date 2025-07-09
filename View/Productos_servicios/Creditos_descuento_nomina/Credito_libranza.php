@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>SOLICITA TU CRÉDITO DE LIBRANZA HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
+    <h1>SOLICITA TU CRÉDITO DE LIBRANZA HOY <br>CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/j2.png" alt="Imagen crédito" floatr="right">
@@ -44,7 +44,7 @@ session_start();
       <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
-        <li>Bajas tazas de interés </li>
+        <li>Bajas tasas de interés. </li>
         <li>Descuentos directos por nómina o mesada.</li>
         <li>Elegir plazos de pagos ajustados a la necesidad.</li>
         <li>Libre destinación del dinero.</li>

@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>EL CREDITO Consumo PUEDE SER TU MEJOR OPCION SOLICITALO YA!</h1>
+    <h1>EL CREDITO CONSUMO PUEDE SER TU MEJOR OPCION SOLICITALO YA!</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A6.png" alt="Imagen crédito" floatr="right">
@@ -49,7 +49,7 @@ session_start();
         <li>Flexibilidad de pago.</li>
         <li>Historial crediticio.</li>
         <li>No requiere garantías en la mayoría de los casos.</li>
-        <li>asas competitivas.</li>
+        <li>Tasas competitivas.</li>
        
     </div>
 
@@ -59,20 +59,20 @@ session_start();
       <h3>Requisitos</h3>
       <ul>
         <h3>Empleados</h3>
-        <li>Cédula de ciudadanía</li>
-        <li>Certificado laboral (con cargo, antigüedad, salario y tipo de contrato)</li>
-        <li>Desprendibles de nómina (2-3 meses)</li>
-        <li>Extractos bancarios (3-6 meses)</li>
-        <h3>Independientes</h3>
-        <li>Cédula de ciudadanía</li>
-        <li>Declaración de renta (si aplica)</li>
-        <li>Certificación de ingresos (firmada por contador público)</li>
-        <li>Registro mercantil (si tiene empresa o actividad comercial)</li>
-        <li>Extracto bancario de 3 a 6 meses</li>
+        <li>Cédula de ciudadanía.</li>
+        <li>Certificado laboral (con cargo, antigüedad, salario y tipo de contrato).</li>
+        <li>Desprendibles de nómina (2-3 meses).</li>
+        <li>Extractos bancarios (3-6 meses).</li>
+        <h3>Independientes.</h3>
+        <li>Cédula de ciudadanía.</li>
+        <li>Declaración de renta (si aplica).</li>
+        <li>Certificación de ingresos (firmada por contador público).</li>
+        <li>Registro mercantil (si tiene empresa o actividad comercial).</li>
+        <li>Extracto bancario de 3 a 6 meses.</li>
 <h3>Pensionados</h3>
-<li>Cédula de ciudadanía</li>
-<li>Comprobantes de pago de pensión</li>
-<li>Extractos bancarios (3-6 meses)</li>
+<li>Cédula de ciudadanía.</li>
+<li>Comprobantes de pago de pensión.</li>
+<li>Extractos bancarios (3-6 meses).</li>
       </ul>
     </div>
   </section>

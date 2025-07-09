@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Microcrédito</h1>
+    <h1>MICROCRÉDITO</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X8.jpg" alt="Imagen crédito" floatr="right">
@@ -48,9 +48,8 @@ session_start();
         <li>Estudio de crédito sin costo, adjuntando los documentos que soporten tus ingresos, como facturas de venta.</li>
         <li>Acompañamiento personalizado desde la solicitud del producto.</li>
         <li>El Fondo Nacional de Garantías te sirve como garantía del crédito.</li>
-      
         <li>Luego de la aprobación puedes desembolsar el dinero en un tiempo de minimo 24 horas.</li>
-        <li>Puedes autorizar el débito automático de tu cuenta de ahorros o realiza tus pagos con la Sucursal Virtual o Física.</li>
+        <li>Puedes autorizar el débito automático de tu cuenta de ahorros o realiza tus pagos con la sucursal virtual o física.</li>
       </ul>
 
     </div>
@@ -60,13 +59,13 @@ session_start();
         <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
-<li>Documento de identificación</li>
-<li>Ser mayor de edad (18 años)</li>
-<li>Plan de negocios</li>
-<li>Registro cámara de comercio</li>
-<li>Facturas de venta</li>
-<li>Declaración de impuestos</li>
-<li>Residir en el país que hace la solicitud</li>
+<li>Documento de identificación.</li>
+<li>Ser mayor de edad (18 años).</li>
+<li>Plan de negocios.</li>
+<li>Registro cámara de comercio.</li>
+<li>Facturas de venta.</li>
+<li>Declaración de impuestos.</li>
+<li>Residir en el país que hace la solicitud.</li>
       </ul>
 
     </ul>

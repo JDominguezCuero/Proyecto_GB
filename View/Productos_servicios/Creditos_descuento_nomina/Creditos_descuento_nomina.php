@@ -24,7 +24,7 @@ session_start();
 
 <div class="panel">
   <div class="panel-texto">
-    <h1>Créditos de libranza </h1>
+    <h1>Créditos De Libranza </h1>
   </div>
  <div class="swiper mySwiper">
   <div class="swiper-wrapper">
@@ -52,11 +52,12 @@ session_start();
 
 
   <div class="card-container">
+    <div class="card empty"></div>
     <div class="card">
       <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/C6.png" alt="Crédito de libranza">
       <div class="card-content">
         <h3>Crédito de descuento por nómina o mesada pencional</h3>
-        <p>Con pagos automáticos descontados del salario o pensión mediante un convenio con su empresa, este método elimina la necesidad de contar con fiadores, simplificando el proceso de aprobación; ofreciendo una tasa fija que permite financiar proyectos personales.
+        <p>Con pagos automáticos descontados del salario o la pensión mediante un convenio con su empresa, este método elimina la necesidad de contar con fiadores, simplificando el proceso de aprobación y ofreciendo una tasa fija que permite financiar proyectos personales.
 </p>
       </div>
       <div class="card-button">
@@ -68,13 +69,13 @@ session_start();
       <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/C5.png" alt="Compra de cartera de libranza">
       <div class="card-content">
         <h3>Compra de cartera de libranza</h3>
-        <p>Es una línea de crédito que te permite unificar todas las obligaciones que tengas con otras entidades financieras en un solo producto, a una tasa especial y con amplio plazo de financiación para mejorar tu flujo de caja.</p>
+        <p>Permite unificar y trasladar tus créditos por libranza desde otra entidad para acceder a una mejor tasa o una menor cuota mensual.</p>
       </div>
       <div class="card-button">
         <a href="../creditos_descuento_nomina/compra_cartera_libranza.php">Saber más <span>→</span></a>
       </div>
     </div>
-
+<div class="card empty"></div>
   </div>
 
 </div>

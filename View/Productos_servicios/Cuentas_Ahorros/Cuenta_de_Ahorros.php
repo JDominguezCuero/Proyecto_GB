@@ -168,9 +168,8 @@ session_start();
   });
 </script>
 
-
+<?php include '../../public/layout/mensajesModal.php'; ?>
+  <?php include '../../public/layout/frontendBackend.php'; ?>
+  <?php include '../../public/layout/layoutfooter.php'; ?>
 </body>
 </html>
-
-
-

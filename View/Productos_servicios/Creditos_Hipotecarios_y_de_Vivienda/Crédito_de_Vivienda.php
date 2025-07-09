@@ -22,7 +22,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Credito de Vivienda</h1>
+    <h1>CREDITO DE VIVIENDA</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A7.avif" alt="Imagen crédito" floatr="right">
@@ -46,11 +46,11 @@ session_start();
       <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
-<li>·Permite comprar una vivienda sin necesidad de tener todo el dinero de inmediato </li>
-<li>·Se puede usar para remodelar, ampliar o construir </li>
-<li>·Es una inversión a largo plazo que genera patrimonio </li>
-<li>·En general, tiene tasas de interés más bajas que otros productos bancarios </li>
-<li>·Se puede elegir entre pagar en pesos o en UVR </li>
+<li>Permite comprar una vivienda sin necesidad de tener todo el dinero de inmediato </li>
+<li>Se puede usar para remodelar, ampliar o construir </li>
+<li>Es una inversión a largo plazo que genera patrimonio </li>
+<li>En general, tiene tasas de interés más bajas que otros productos bancarios </li>
+<li>Se puede elegir entre pagar en pesos o en UVR </li>
       </ul>
     </div>
 

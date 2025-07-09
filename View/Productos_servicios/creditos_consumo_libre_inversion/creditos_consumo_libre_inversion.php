@@ -24,7 +24,7 @@ session_start();
 
 <div class="panel">
   <div class="panel-texto">
-    <h1>Créditos de Consumo  y Libre Inversión</h1>
+    <h1>Créditos De Consumo  Y Libre Inversión</h1>
   </div>
   <div class="swiper mySwiper">
     <div class="swiper-wrapper">

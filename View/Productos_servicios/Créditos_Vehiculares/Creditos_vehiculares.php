@@ -1,7 +1,6 @@
 <?php
 session_start();
-  require_once(__DIR__ . '../../../../Config/config.php');
-  
+require_once(__DIR__ . '../../../../Config/config.php');
 ?>
 
 <!DOCTYPE html>
@@ -14,68 +13,63 @@ session_start();
   <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
 
   <!-- Swiper CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 <body>
 
 <!-- Header -->
-  <?php include '../../public/layout/barraNavAsesor.php'; ?>
+<?php include '../../public/layout/barraNavAsesor.php'; ?>
 
 <div class="panel">
   <div class="panel-texto">
     <h1>Créditos Vehiculares</h1>
   </div>
- <div class="swiper mySwiper">
-  <div class="swiper-wrapper">
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J13.jpg" alt="Imagen 1">
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J13.jpg" alt="Imagen 1">
+      </div>
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J14.jpg" alt="Imagen 2">
+      </div>
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J15.jpg" alt="Imagen 3">
+      </div>
+      <div class="swiper-slide">
+        <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J16.jpg" alt="Imagen 4">
+      </div>
     </div>
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J14.jpg" alt="Imagen 2">
+    <!-- Paginación (puntos) -->
+    <div class="swiper-pagination"></div>
+  </div>
+</div> <!-- ESTE DIV FALTABA CERRAR -->
+
+<div class="card-container">
+  <div class="card empty"></div>
+  <div class="card">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J21.jpg" alt="Crédito de libranza">
+    <div class="card-content">
+      <h3>Crédito de Vehículo</h3>
+      <p>Un crédito de vehículo es un tipo de préstamo otorgado por una entidad financiera (como un banco, cooperativa o compañía de financiamiento) para que una persona pueda comprar un carro o una moto, ya sea nuevo o usado.</p>
     </div>
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J15.jpg" alt="Imagen 3">
-    </div>
-    <div class="swiper-slide">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J16.jpg" alt="Imagen 4">
+    <div class="card-button">
+      <a href="./Credito_Vehiculo.php">Saber más <span>→</span></a>
     </div>
   </div>
-  <!-- Paginación (puntos) -->
-  <div class="swiper-pagination"></div>
+
+  <div class="card">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J22.jpg" alt="Compra de cartera de libranza">
+    <div class="card-content">
+      <h3>Compra de Cartera de Vehículo</h3>
+      <p>Consiste en trasladar tu crédito vehicular actual a otra entidad que te ofrezca mejores condiciones de pago, tasas más bajas o mayor plazo.</p>
+    </div>
+    <div class="card-button">
+      <a href="./Compra_cartera_Vehiculo.php">Saber más <span>→</span></a>
+    </div>
+  </div>
+  <div class="card empty"></div>
 </div>
 
-
-
-
-
-
-
-  <div class="card-container">
-    <div class="card">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J21.jpg" alt="Crédito de libranza">
-      <div class="card-content">
-        <h3>Crédito de Vehículo</h3>
-        <p>Un crédito de vehículo es un tipo de préstamo otorgado por una entidad financiera (como un banco, cooperativa o compañía de financiamiento) para que una persona pueda comprar un carro o una moto, ya sea nuevo o usado.
-</p>
-      </div>
-      <div class="card-button">
-        <a href="./Credito_Vehiculo.php">Saber más <span>→</span></a>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J22.jpg" alt="Compra de cartera de libranza">
-      <div class="card-content">
-        <h3>Compra de Cartera de Vehículo</h3>
-        <p>Es un crédito que reemplaza tu deuda actual de vehículo con otra entidad, ofreciéndote mejores condiciones como menor interés o cuota más baja.</p>
-      </div>
-      <div class="card-button">
-        <a href="./Compra_cartera_Vehiculo.php">Saber más <span>→</span></a>
-      </div>
-    </div>
-  </div> 
-</div>
 <!-- Swiper JS -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
@@ -93,9 +87,8 @@ session_start();
   });
 </script>
 
-  <?php include '../../public/layout/mensajesModal.php'; ?>
-  <?php include '../../public/layout/frontendBackend.php'; ?>
-  <?php include '../../public/layout/layoutfooter.php'; ?>
-
+<?php include '../../public/layout/mensajesModal.php'; ?>
+<?php include '../../public/layout/frontendBackend.php'; ?>
+<?php include '../../public/layout/layoutfooter.php'; ?>
 </body>
 </html>

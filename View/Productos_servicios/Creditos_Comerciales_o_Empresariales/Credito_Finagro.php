@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Credito Finagro</h1>
+    <h1>CREDITO FINAGRO</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X10.webp" alt="Imagen crédito" floatr="right">
@@ -59,14 +59,14 @@ session_start();
         <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
-<li>Cédula de ciudadanía (persona natural o jurídica)</li>
-<li>Para persona jurídica (copia del RUT, certificado de existencia y representación legal)</li>
-<li>Tener entre 19 y 69 años</li>
-<li>Extractos bancarios</li>
-<li>Declaración renta (si aplica)</li>
-<li>Si cuenta con un proyecto (plan de inversión y estados financieros)</li>
-<li>Si no eres cliente vincularte al banco</li>
-<li>Certificado cámara de comercio</li>
+<li>Cédula de ciudadanía (persona natural o jurídica).</li>
+<li>Para persona jurídica (copia del RUT, certificado de existencia y representación legal).</li>
+<li>Tener entre 19 y 69 años.</li>
+<li>Extractos bancarios.</li>
+<li>Declaración renta (si aplica).</li>
+<li>Si cuenta con un proyecto (plan de inversión y estados financieros).</li>
+<li>Si no eres cliente vincularte al banco.</li>
+<li>Certificado cámara de comercio.</li>
       </ul>
 
     </ul>

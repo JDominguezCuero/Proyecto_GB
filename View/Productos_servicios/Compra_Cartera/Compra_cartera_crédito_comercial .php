@@ -24,7 +24,7 @@ session_start();
     <h1>SOLICITA TU COMPRA DE CARTERA DE CREDITO COMERCIAL HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J23.jpg" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/Y4.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 

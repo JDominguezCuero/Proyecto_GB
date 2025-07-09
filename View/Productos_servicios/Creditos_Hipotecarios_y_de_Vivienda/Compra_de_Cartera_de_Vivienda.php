@@ -36,7 +36,7 @@ session_start();
   <div class="info-box">
   
 <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
-      <h3>¿Qué es una Compra de Cartera de Vivienda
+      <h3>¿Qué es una Compra de Cartera de Vivienda?
       </h3>
 <p>La compra de cartera de vivienda permite trasladar un crédito existente hipotecario o leasing habitacional a otra entidad financiera con mejores condiciones, como tasas más bajas, plazos flexibles y beneficios tributarios, con el objetivo de reducir las cuotas mensuales y optimizar la gestión financiera sin asumir gastos adicionales importantes.
 </p>

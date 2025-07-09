@@ -16,9 +16,12 @@ session_start();
 </head>
 <body>
 
+<!-- Header -->
+  <?php include '../../public/layout/barraNavAsesor.php'; ?>
+
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Cuenta de Ahorro Basica o Estandar</h1>
+    <h1>CUENTA DE AHORRO BASICA O ESTANDAR</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/N6.png" alt="Imagen crédito" floatr="right">
@@ -47,7 +50,6 @@ session_start();
    <li>Tarjeta débito para compras y retiros.</li>
    <li>Permite pagar servicios, hacer transferencias y recibir depósitos.</li>
    <li>Puedes abrirla con bajos montos iniciales.</li>
-   <li></li>
     </ul>
     </div>
 
@@ -60,7 +62,7 @@ session_start();
        <li>Documento de identidad válido (cédula o tarjeta de identidad).</li>
        <li>Formulario de apertura.</li>
        <li>Aportar un monto mínimo de apertura (puede ser desde $10.000 COP).</li>
-<li>Certificado de ingresos o actividad económica (aunque no siempre se exige).</li>
+       <li>Certificado de ingresos o actividad económica (aunque no siempre se exige).</li>
       </ul>
     </div>
   </section>

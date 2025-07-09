@@ -22,7 +22,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Solicita la tuya hoy <br>mismo con inteligencia </h1>
+    <h1>SOLICITA LA TUYA HOY <br>MISMO CON INTELIGENCIA</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/N4.jpg" alt="Imagen crédito" floatr="right">
@@ -57,10 +57,10 @@ session_start();
         <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
-     <li>Ser mayor de edad</li>
-        <li>Cédula de ciudadanía, extranjería o tarjeta de identidad (autorización firmada por los padres)</li>
-        <li>Formulario de vinculación</li>
-        <li>RUT (si aplica)</li>
+        <li>Ser mayor de edad.</li>
+        <li>Cédula de ciudadanía, extranjería o tarjeta de identidad (autorización firmada por los padres).</li>
+        <li>Formulario de vinculación.</li>
+        <li>RUT (si aplica).</li>
       </ul>
     </div>
   </section>

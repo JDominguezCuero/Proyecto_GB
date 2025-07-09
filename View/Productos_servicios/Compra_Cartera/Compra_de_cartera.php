@@ -24,7 +24,7 @@ session_start();
     <h1>SOLICITA TU COMPRA DE CARTERA HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J23.jpg" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/Y10.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -73,7 +73,7 @@ session_start();
     <li>Comprobantes de ingresos.</li>
     <li>Desprendibles de nómina (empleados).</li>
     <li>Contratos, certificados de ingresos o estados financieros (independientes).</li>
-    <li>Carta de saldo de la entidad actual: documento que certifica el valor exacto de la deuda a trasladar.</li>
+    <li>Carta de saldo de la entidad actual: Documento que certifica el valor exacto de la deuda a trasladar.</li>
     </div>
   </section>
 

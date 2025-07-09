@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Cuenta de Ahorro para Pensionados</h1>
+    <h1>CUENTA DE AHORRO PARA PENSIONADOS</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/N9.png" alt="Imagen crédito" floatr="right">

@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Cuenta de Ahorro en Moneda Extranjera</h1>
+    <h1>CUENTA DE AHORRO EN MONEDA EXTRANJERA</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/N10.webp" alt="Imagen crédito" floatr="right">

@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Cuenta de Ahorro Para Jovenes o Niños</h1>
+    <h1>CUANTA DE AHORROS PARA JOVENES O NIÑOS</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/N7.png" alt="Imagen crédito" floatr="right">
@@ -44,9 +44,9 @@ session_start();
       <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
        <h3>Beneficios</h3>
       <ul>
-        <li>Sin cuota de manejo</li>
+        <li>Sin cuota de manejo.</li>
         <li>Intereses sobre el saldo.</li>
-        <li>Acceso a consultas y retiros limitados (con control adulto)</li>
+        <li>Acceso a consultas y retiros limitados (con control adulto).</li>
         <li>Facilita ahorros para estudios, regalos, metas personales, etc.</li>
       </ul>
     </div>

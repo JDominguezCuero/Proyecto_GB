@@ -44,10 +44,10 @@ session_start();
       <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
-        <li>Seguros opcionales (todo riesgo, vida, desempleo)</li>
-        <li>Asistencia en carretera y jurídica</li>
-        <li>Pagos por canales digitales 24/7</li>
-        <li>Acceso a promociones con concesionarios aliados</li>
+        <li>Seguros opcionales (todo riesgo, vida, desempleo).</li>
+        <li>Asistencia en carretera y jurídica.</li>
+        <li>Pagos por canales digitales 24/7.</li>
+        <li>Acceso a promociones con concesionarios aliados.</li>
        </ul>
 </div>
 
@@ -61,8 +61,8 @@ session_start();
       <h3>Requerimientos</h3>
       <ul>
        
-          <li>Ser mayor de edad (18 años)</li>
-          <li>El ingreso mínimo requerido es de 2 SMMLV</li>
+          <li>Ser mayor de edad (18 años).</li>
+          <li>El ingreso mínimo requerido es de 2 SMMLV.</li>
           <li>Para personas independientes se exige experiencia de 1 año en la actividad desempeñada.</li>
           <li>Para independientes no formales, el monto de crédito a otorgar no podrá exceder 66 SMMLV de requerir un valor a financiar superior, deberá aportar codeudor que cumpla políticas para acceder al monto o garantía adicional.</li>
 

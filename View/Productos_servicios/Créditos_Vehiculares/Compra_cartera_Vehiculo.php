@@ -65,7 +65,7 @@ session_start();
        <li>Solicitud de crédito diligenciada.</li>
        <li>Carta de saldo del crédito vehicular actual (valor a trasladar, tasa, plazo, y condiciones).</li>
        <li>Tarjeta de propiedad del vehículo.</li>
-       <li>Certificación de ingresos</li>
+       <li>Certificación de ingresos.</li>
        <li>Carta laboral reciente y desprendibles de nómina.</li>
        <li>Declaración de renta o estados financieros certificados.</li>
        <li>Extractos bancarios (últimos 3 meses).</li>

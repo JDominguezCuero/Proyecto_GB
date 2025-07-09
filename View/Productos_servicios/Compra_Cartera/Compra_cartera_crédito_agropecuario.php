@@ -24,7 +24,7 @@ session_start();
     <h1>SOLICITA TU COMPRA DE CARTERA DE CRÉDITO AGROPECUARIO HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J23.jpg" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/Y3.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -76,11 +76,6 @@ session_start();
       </ul>
     </div>
   </section>
-
-  <?php include '../../public/layout/mensajesModal.php'; ?>
-  <?php include '../../public/layout/frontendBackend.php'; ?>
-  <?php include '../../public/layout/layoutfooter.php'; ?>
-  
 
 </body>
 </html>

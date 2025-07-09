@@ -22,7 +22,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>Créditos Hipotecarios </h1>
+    <h1>CRÉDITOS HIPOTECARIOS</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A7.avif" alt="Imagen crédito" floatr="right">
@@ -35,6 +35,7 @@ session_start();
 
 
   <div class="card-container">
+    <div class="card empty"></div>
     <div class="card">
       <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X6.png" alt="Crédito Rotativo">
       <div class="card-content">
@@ -43,14 +44,9 @@ session_start();
     </div>
     </div>
 
-    <div >
-    </div>
+  
 
-    <div>
-   
-      <div >
-      </div>
-    </div>
+    
 
     <div class="card">
       <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/X7.PNG" alt="Crédito Libre Inversión">
@@ -59,6 +55,8 @@ session_start();
        <p>Un crédito hipotecario para construcción de vivienda financia la edificación de una casa desde cero en un terreno propio. Los fondos se desembolsan por etapas, a medida que la obra avanza, y el préstamo se garantiza con la vivienda una vez terminada.</p>
       </div>
     </div>
+    <div class="card empty"></div>
+  <div class="card empty"></div>
   </div>
 
 
@@ -76,11 +74,11 @@ session_start();
       <center>  <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A3.png" alt="" ></center>
       <h3>Beneficios</h3>
       <ul>
-        <li>Pagos mensuales <br>Permite dividir el costo de la vivienda en cuotas mensuales, lo que reduce la presión financiera.</li>
-        <li>Inversión a largo plazo <br>Al adquirir una propiedad, se invierte en un activo que puede aumentar su valor con el tiempo. </li>
-        <li>Seguridad financiera <br>La propiedad adquirida con un crédito hipotecario puede proporcionar seguridad financiera a largo plazo. </li>
-        <li>Control y privacidad <br>Al ser dueño de la vivienda, se tiene control y privacidad sobre el propio espacio.  </li>
-        <li>Facilidades de pago <br> Se puede elegir la forma de amortización que mejor se adapte a las necesidades. </li>
+        <li>Pagos mensuales: <br>Permite dividir el costo de la vivienda en cuotas mensuales, lo que reduce la presión financiera.</li>
+        <li>Inversión a largo plazo: <br>Al adquirir una propiedad, se invierte en un activo que puede aumentar su valor con el tiempo. </li>
+        <li>Seguridad financiera: <br>La propiedad adquirida con un crédito hipotecario puede proporcionar seguridad financiera a largo plazo. </li>
+        <li>Control y privacidad: <br>Al ser dueño de la vivienda, se tiene control y privacidad sobre el propio espacio.  </li>
+        <li>Facilidades de pago: <br> Se puede elegir la forma de amortización que mejor se adapte a las necesidades. </li>
      
       </ul>
     </div>
@@ -89,23 +87,23 @@ session_start();
         <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/A2.png" alt=""></center>
       <h3>Requisitos</h3>
       <ul>
-     <strong><li>Crédito Hipotecario para remodelación de vivienda</li></strong>
-        <li>Documento de Identificación</li>
-        <li>Prueba de Ingresos</li>
-        <li>Información Financiera</li>
-        <li>Documentación de la Propiedad</li>
-        <li>Documentación Adicional</li>
-        <li>Cotización de la remodelación</li>
-        <li>Formulario de solicitud</li>
-   <strong><p>Crédito hipotecario para construcción de vivienda</p></strong>
-        <li>Documento de Identificación</li>
-        <li>Prueba de Ingresos</li>
-        <li>·Extractos Bancarios</li>
-        <li>·Certificado de Libertad y Tradición</li>
-        <li>·Escritura de la Propiedad</li>
-        <li>·Planos y Permisos de Construcción</li>
-        <li>·Cotizaciones de Contratistas</li>
-        <li>·Formulario de Solicitud</li>
+     <strong>Crédito Hipotecario para remodelación de vivienda.</strong>
+        <li>Documento de Identificación.</li>
+        <li>Prueba de Ingresos.</li>
+        <li>Información Financiera.</li>
+        <li>Documentación de la Propiedad.</li>
+        <li>Documentación Adicional.</li>
+        <li>Cotización de la remodelación.</li>
+        <li>Formulario de solicitud.</li>
+   <strong>Crédito hipotecario para construcción de vivienda.</strong>
+        <li>Documento de Identificación.</li>
+        <li>Prueba de Ingresos.</li>
+        <li>Extractos Bancarios.</li>
+        <li>Certificado de Libertad y Tradición.</li>
+        <li>Escritura de la Propiedad.</li>
+        <li>Planos y Permisos de Construcción.</li>
+        <li>Cotizaciones de Contratistas.</li>
+        <li>Formulario de Solicitud.</li>
 
       </ul>
     </div>

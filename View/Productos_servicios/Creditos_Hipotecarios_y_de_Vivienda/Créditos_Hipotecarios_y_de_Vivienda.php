@@ -24,7 +24,7 @@ session_start();
 
 <div class="panel">
   <div class="panel-texto">
-    <h1>Créditos Hipotecarios y de Vivienda</h1>
+    <h1>Créditos Hipotecarios Y De Vivienda</h1>
   </div>
  <div class="swiper mySwiper">
   <div class="swiper-wrapper">
@@ -66,7 +66,7 @@ session_start();
       <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/C6.png" alt="Tarjeta de crédito">
       <div class="card-content">
         <h3>Crédito de Vivienda</h3>
-<p>Un Credito de VIvienda es un credito otorgado por bancos, copertivas u otras entidades financieras para la adquisicion, construccion o mejora de una vivienda. </p>      </div>
+<p>Un Credito de vivienda es un credito otorgado por bancos, copertivas u otras entidades financieras para la adquisicion, construccion o mejora de una vivienda. </p>      </div>
       <div class="card-button">
         <a href="./Crédito_de_Vivienda.php">Saber más <span>→</span></a>
       </div>

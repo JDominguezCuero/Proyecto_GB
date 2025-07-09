@@ -202,7 +202,7 @@
     <a href="<?= BASE_URL ?>/View/Productos_servicios/Creditos_descuento_nomina/Creditos_descuento_nomina.php" class="option-card"><span class="icon">💼</span><h2>Créditos Con Descuento Por Nómina</h2></a>
     <a href="<?= BASE_URL ?>/View/Productos_servicios/Creditos_Hipotecarios_y_de_Vivienda/Créditos_Hipotecarios_y_de_Vivienda.php" class="option-card"><span class="icon">🏡</span><h2>Créditos Hipotecarios Y De Vivienda</h2></a>
     <a href="<?= BASE_URL ?>/View/Productos_servicios/Créditos_Vehiculares/Creditos_vehiculares.php" class="option-card"><span class="icon">🚗 </span><h2>Creditos Vehiculares</h2></a>
-    <a href="<?= BASE_URL ?>/View/Productos_servicios/Compra_Cartera/Compra_cartera.php" class="option-card"><span class="icon">💳</span><h2>Compra De Cartera</h2></a>
+    <a href="<?= BASE_URL ?>/View/Productos_servicios/Compra_Cartera/Compra_cartera.php" class="option-card"><span class="icon">💳</span><h2>Credito De Compra De Cartera</h2></a>
     <a href="<?= BASE_URL ?>/View/Productos_servicios/Cuentas_Ahorros/Cuenta_de_Ahorros.php" class="option-card"><span class="icon">💰</span><h2>Cuentas De Ahorro</h2></a>
     <a href="<?= BASE_URL ?>/View/Productos_servicios/Créditos_educativos/Créditos_educativos.php" class="option-card"><span class="icon">🎓 </span><h2>Creditos Educativos</h2></a>
     <a href="<?= BASE_URL ?>/View/Productos_servicios/Creditos_Comerciales_o_Empresariales/Creditos_Comerciales_o_Empresariales.php" class="option-card"><span class="icon">🏢</span><h2>Creditos Comerciales O Empresariales</h2></a>

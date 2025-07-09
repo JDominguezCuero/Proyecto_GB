@@ -24,7 +24,7 @@ session_start();
     <h1>SOLICITA TU CRÉDITO LIBRE EDUCATIVO HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J23.jpg" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/Y14.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -36,7 +36,7 @@ session_start();
   <div class="info-box">
   
 <center><img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/a1.png" alt=""></center>
-      <h3>crédito libre educativo</h3>
+      <h3>Crédito libre educativo</h3>
       <p>Impulsa tu futuro hoy con el Crédito Libre Educativo. Financia tu carrera, posgrado o programa técnico en Colombia de forma rápida y flexible. ¡Un solo desembolso directo a tu institución y hasta 48 meses para pagar!</p>
     </div>
     <div class="info-box">
@@ -62,12 +62,12 @@ session_start();
       <h3>Requerimientos</h3>
       <ul>
        <li>Cédula de ciudadanía original y fotocopia legible.</li>
-       <li>Comprobante de pago de matrícula (CPM) de la institución educativa con fecha vigente</li>
-       <li>Certificación laboral (si aplica)</li>
-       <li>Extracto bancario</li>
-       <li>Declaración de renta (si aplica)</li>
-       <li>Formulario de solicitud de crédito diligenciado</li>
-       <li>Información del aspirante o estudiante</li>
+       <li>Comprobante de pago de matrícula (CPM) de la institución educativa con fecha vigente.</li>
+       <li>Certificación laboral (si aplica).</li>
+       <li>Extracto bancario.</li>
+       <li>Declaración de renta (si aplica).</li>
+       <li>Formulario de solicitud de crédito diligenciado.</li>
+       <li>Información del aspirante o estudiante.</li>
       </ul>
     </div>
   </section>

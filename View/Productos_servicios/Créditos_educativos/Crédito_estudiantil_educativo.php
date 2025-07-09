@@ -24,7 +24,7 @@ session_start();
     <h1>SOLICITA TU CRÉDITO ESTUDIANTIL O EDUCATIVO HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
-    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/J23.jpg" alt="Imagen crédito" floatr="right">
+    <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/Y12.png" alt="Imagen crédito" floatr="right">
   </div>
 </div>
 
@@ -62,12 +62,12 @@ session_start();
       <h3>Requerimientos</h3>
       <ul>
        <li>Cédula de ciudadanía original y fotocopia legible.</li>
-       <li>Comprobante de pago de matrícula (CPM) de la institución educativa con fecha vigente</li>
-       <li>Certificación laboral (si aplica)</li>
-       <li>Extracto bancario</li>
-       <li>Declaración de renta (si aplica)</li>
+       <li>Comprobante de pago de matrícula (CPM) de la institución educativa con fecha vigente.</li>
+       <li>Certificación laboral (si aplica).</li>
+       <li>Extracto bancario.</li>
+       <li>Declaración de renta (si aplica).</li>
        <li>Formulario de solicitud de crédito diligenciado.</li>
-       <li>Información del aspirante o estudiante</li>
+       <li>Información del aspirante o estudiante.</li>
           
 
       </ul>

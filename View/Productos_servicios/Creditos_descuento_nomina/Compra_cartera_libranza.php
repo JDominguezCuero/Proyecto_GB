@@ -21,7 +21,7 @@ session_start();
 
 <div class="porque">
   <div class="texto-encabezado">
-    <h1>SOLICITA TU COMPRA DE CARTERA DE LIBRANZA HOY <br> CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
+    <h1>SOLICITA TU COMPRA DE CARTERA DE LIBRANZA HOY <br>CON NOSOTROS TU AMIGO Y BANCO DE CONFIANZA</h1>
   </div>
   <div class="imagen-encabezado">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/Creditos/j1.png" alt="Imagen crédito" floatr="right">
