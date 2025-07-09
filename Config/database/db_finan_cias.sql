@@ -1007,13 +1007,70 @@ COMMIT;
 --
 -- Volcado de datos para la tabla `personal`
 --
-INSERT INTO personal ( `Nombre_Personal`, `Apellido_Personal`, `ID_Rol`, `ID_Genero`, `ID_TD`, `N_Documento_Personal`, `Celular_Personal`, `Correo_Personal`, `Contraseña_Personal`, `Activo_Personal`, `Fecha_Creacion_Personal`, `Foto_Perfil_Personal`) VALUES
-('Zharick Valentina', 'Barrera García', 4, 2, 3, '00000000018', '3130000012', 'barreragarciavalentina646@gmail.com', '$2y$10$rkKHkUEXmUeH6CAyexrT0O9lvMfM.5BaSMD1eGjVmMQvRU3JRIqvy', 1, '2025-06-20 17:02:48', NULL),
-('Alisson Yulieth', 'Palacios Arrieta', 4, 2, 3, '00000000019', '3130000013', 'alissonpalaciosa@gmail.com', '$2y$10$oxYMXGtxsEU4qV2TwG6STu3twIhkN5qPYfbdH3Qtun0wzSKMZzN6y', 1, '2025-06-20 17:02:48', NULL),
-('Angoli Angelica', 'Martinez Sandoval', 4, 2, 3, '00000000020', '3130000014', 'Sandovalanyoli44@gmail.com', '$2y$10$8OhNUmQj6Lra9CefCZ9kXOlb9U6R4.nACWAnbh1IRKU/pdALRTlLi', 1, '2025-06-20 17:02:48', NULL),
-('Geraldin', 'Ulloa Martinez', 4, 2, 3, '00000000021', '3130000015', 'Alexcrissdbz@gmail.com', '$2y$10$ASyYo4W1m99M7YbXp34GFOkV7n1ZbJZqGrj65gEfnrQw/7NfjRLje', 1, '2025-06-20 17:02:48', NULL),
-('Laura Dayana', 'Hernández Cuellar', 4, 2, 3, '00000000022', '3130000016', 'lauradayanahernandezcuellar@gmail.com', '$2y$10$MhiC2aMQAJIl5tShY23Q/ON1CdZbZLsc74vYfbB7BqBNu8XW5crlq', 1, '2025-06-20 17:02:48', NULL),
-('Lesly Nathalia', 'Suárez Rendón', 4, 2, 3, '00000000023', '3130000017', 'suarezrendonnathalia2807@gmail.com', '$2y$10$RzeLnsLgHd6vAO5QoazpiuOfVuPbi4lmMFG6D3t5DWkD8BYfdIgKq', 1, '2025-06-20 17:02:48', NULL);
+
+INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `ID_Rol`, `ID_Genero`, `ID_TD`, `N_Documento_Personal`, `Celular_Personal`, `Correo_Personal`, `Contraseña_Personal`, `Activo_Personal`, `Fecha_Creacion_Personal`, `Foto_Perfil_Personal`) VALUES
+(1, 'Gerente', 'Primero', 1, 1, 1, '0000000000', '3130000001', 'jsdmngzc@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:00:44', NULL),
+(2, 'SubGerente', 'Segundo', 2, 2, 2, '0000000002', '3130000002', 'SubGerente@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
+(3, 'Asesor', 'tercero', 3, 3, 3, '0000000003', '3130000003', 'jose@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
+(4, 'Cajero', 'Cuarto', 4, 1, 1, '0000000004', '3130000004', 'Cajero@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
+(5, 'ADMIN', 'SUPER', 5, 1, 1, '0000000001', '3206339397', 'admin1$#$@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-07-06 13:03:05', 'N/A'),
+(19, 'Juan', 'Santos', 5, 1, 1, '00545000000', '3130000001', 'jdsp.1011@gmail.com', '$2y$10$9xnt8x9onA7z.ae62o8HQu5Oh944G0AAOkOrPOARY6lCQCFCv2UhK', 1, '2025-06-20 17:00:44', NULL),
+(56, 'Zharick Valentina', 'Barrera García', 4, 2, 1, '1039680619', '3143610286', 'barreragarciavalentina646@gmail.com', '$2y$10$rkKHkUEXmUeH6CAyexrT0O9lvMfM.5BaSMD1eGjVmMQvRU3JRIqvy', 1, '2025-06-20 17:02:48', NULL),
+(57, 'Naftali Estefani', 'Moreno Murcia', 3, 2, 1, '1007201990', '3207238688', 'morenonaftali@gmail.com', '$2b$12$OT4gxskOUKYf3yMqnVp6m.OpFXvijZk0yvdPnVTWNhYdSt5B/utT2', 1, '2025-06-20 17:02:48', NULL),
+(58, 'Alisson Yulieth', 'Palacios Arrieta', 4, 2, 1, '1056772579', '3216842389', 'alissonpalaciosa@gmail.com', '$2y$10$oxYMXGtxsEU4qV2TwG6STu3twIhkN5qPYfbdH3Qtun0wzSKMZzN6y', 1, '2025-06-20 17:02:48', NULL),
+(59, 'Siara Vanesa', 'Madero Ramirez', 3, 2, 1, '1056784532', '3223157570', 'saramadero96@gmail.com', '$2b$12$9y0nSvm6qXgVq76h.wm/De7uA8/.BDyyZSxZqtbu03wVHoamyvisK', 1, '2025-06-20 17:02:48', NULL),
+(60, 'Luisa Fernanda', 'Cuesta Rivera', 3, 2, 1, '1056770991', '3143702502', 'luisacuesta180@gmail.com', '$2b$12$owvT2WEdWEasBn4yl9W/9uQZ7EVgmLkAocO2.mmYALNaxTqSai1eu', 1, '2025-06-20 17:02:48', NULL),
+(61, 'Nubia Lorena', 'Montoya Palomo', 3, 2, 1, '1056785288', '3105945332', 'montoyapalomo1997@gmail.com', '$2b$12$tKjvxULmvVdAwcjt/cDF/.uu2PtVS8LQuztTtCWUtzLXzCxmy7UXu', 1, '2025-06-20 17:02:48', NULL),
+(62, 'Heilyn Stefany', 'Hernández Pérez', 3, 2, 1, '1056773867', '3218796494', 'heihernandez111@gmail.com', '$2b$12$g17nRKC3qS4d41BtpgBlduRE1QINn2hw3WeG0tenrgmmhS2xtemdG', 1, '2025-06-20 17:02:48', NULL),
+(63, 'Dina Mayerli', 'Muñoz Erazo', 3, 2, 1, '1118473918', '3173792234', 'izajhoss@gmail.com', '$2b$12$qovAPfsjRb6NLc0vTavSveYK9cL6TGZY84qzHrD1ju05jKYeaBR.y', 1, '2025-06-20 17:02:48', NULL),
+(64, 'Lilian Yohana', 'Ocampo Henao', 3, 2, 1, '1056777856', '3134729782', 'yoanaocampohenao@gmail.com', '$2b$12$SrigfQ8Rl/Vy7qAHA6c87OdqdmYspxUxP/8QsdOPW0DwO6zLPNq9C', 1, '2025-06-20 17:02:48', NULL),
+(65, 'Lesly Nathalia', 'Suárez Rendón', 4, 2, 1, '1193561026', '3146940364', 'suarezrendonnathalia2807@gmail.com', '$2y$10$RzeLnsLgHd6vAO5QoazpiuOfVuPbi4lmMFG6D3t5DWkD8BYfdIgKq', 1, '2025-06-20 17:02:48', NULL),
+(66, 'Ana Yulieth', 'Palacio Cuellar', 3, 2, 1, '1099262144', '3207132939', 'Anayuliethpalacio04@gmail.com', '$2b$12$zkEFusdEqpT1ALwOLIXqr.XaZrQW6sAom3a4OpWGeBNdSWpgkfuym', 1, '2025-06-20 17:02:48', NULL),
+(67, 'Angie Lorena', 'Murcia', 3, 2, 1, '1007474249', '3127132616', 'lorenamurcia199905@gmail.com', '$2b$12$UZlp83s.6WlBmNm3bd7FXOvmHt6BiKBBGpLOu6t7TIuhAaWiwThSO', 1, '2025-06-20 17:02:48', NULL),
+(68, 'Angela Maria', 'Valencia Tabarez', 3, 2, 1, '1036220463', '3112705628', 'Angelavalenciatabarez09@gmail.com', '$2b$12$mEKEOWj.eDJFHC4z2j5V/OBjX/IIlEQ/20b6Q9rJG1AUIJRbqOI2u', 1, '2025-06-20 17:02:48', NULL),
+(69, 'Miguel Ángel', 'Hernández Cárdenas', 3, 1, 1, '1073680139', '3017743293', 'hernandezcardenas288@gmail.com', '$2b$12$l1vmEuAWcmzuKW4WJWmL.OZ770kvHsxn.YF5QHVUKhCKupgnqV/Ei', 1, '2025-06-20 17:02:48', NULL),
+(70, 'Laura Dayana', 'Hernández Cuellar', 4, 2, 1, '1056771905', '3114895895', 'lauradayanahernandezcuellar@gmail.com', '$2y$10$MhiC2aMQAJIl5tShY23Q/ON1CdZbZLsc74vYfbB7BqBNu8XW5crlq', 1, '2025-06-20 17:02:48', NULL),
+(71, 'Nicoll Daniela', 'Flores Pacheco', 3, 2, 1, '1056770987', '3112754273', 'florezdaniela313@gmail.com', '$2b$12$8YVwt2sD4jEGRXnYUcvpAuCPu35Gg9PLV5hWp0gLMuo2SlbTkPfgS', 1, '2025-06-20 17:02:48', NULL),
+(72, 'Geraldin', 'Ulloa Martinez', 4, 2, 1, '1007568476', '3127552509', 'Alexcrissdbz@gmail.com', '$2y$10$ASyYo4W1m99M7YbXp34GFOkV7n1ZbJZqGrj65gEfnrQw/7NfjRLje', 1, '2025-06-20 17:02:48', NULL),
+(73, 'Angoli Angelica', 'Martinez Sandoval', 4, 2, 1, '1056774261', '3025113277', 'Sandovalanyoli44@gmail.com', '$2y$10$8OhNUmQj6Lra9CefCZ9kXOlb9U6R4.nACWAnbh1IRKU/pdALRTlLi', 1, '2025-06-20 17:02:48', NULL);
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `personal`
+--
+ALTER TABLE `personal`
+  ADD PRIMARY KEY (`ID_Personal`),
+  ADD UNIQUE KEY `N_Documento_Personal` (`N_Documento_Personal`),
+  ADD UNIQUE KEY `Correo_Personal` (`Correo_Personal`),
+  ADD KEY `fk_personal_rol` (`ID_Rol`),
+  ADD KEY `fk_personal_genero` (`ID_Genero`),
+  ADD KEY `fk_personal_tipo_documento` (`ID_TD`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `personal`
+--
+ALTER TABLE `personal`
+  MODIFY `ID_Personal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `personal`
+--
+ALTER TABLE `personal`
+  ADD CONSTRAINT `fk_personal_genero` FOREIGN KEY (`ID_Genero`) REFERENCES `genero` (`ID_Genero`),
+  ADD CONSTRAINT `fk_personal_rol` FOREIGN KEY (`ID_Rol`) REFERENCES `rol` (`ID_Rol`),
+  ADD CONSTRAINT `fk_personal_tipo_documento` FOREIGN KEY (`ID_TD`) REFERENCES `tipo_documento` (`ID_TD`);
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
