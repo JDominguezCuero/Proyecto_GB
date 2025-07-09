@@ -24,7 +24,7 @@ try {
                         $_SESSION['rol'] = 'cliente';
                         $_SESSION['cliente_id'] = $cliente['ID_Cliente'];
 
-                        header("Location: ../../public/index_controller.php?login=success&rol=cliente");
+                        header("Location: /Proyecto_GB/View/cliente/index.php?login=success");
                         exit;
                     } else {
                         $mensjError = "El usuario no se encuentra activo, por favor contactese con el administrador";
