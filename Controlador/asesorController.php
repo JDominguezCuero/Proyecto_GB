@@ -353,14 +353,19 @@ try {
                     throw new Exception("Error al actualizar la cuota.");
                 }
 
+                $idReAsesoramiento = $_GET['idReAsesoramiento'] ?? null;
+                $idCliente = $_GET['ID_Cliente'] ?? null;
+
                 $datosBitacora = [
+                    'ID_Cliente' => $idCliente,
+                    'ID_Personal' => $idPersonal,
+                    'ID_RegistroAsesoramiento' => $idReAsesoramiento,
                     'Tipo_Evento' => 'Pago finalizado por el cliente',
                     'Descripcion_Evento' => 'El cliente ha completado satisfactoriamente el proceso de pago y formalización en el sistema.'
                 ];
 
                 registrarEventoBitacora($conexion, $datosBitacora);
 
-                $idReAsesoramiento = $_GET['idReAsesoramiento'] ?? null;
 
                 $datosAsesoramiento = [
                     'Fecha_Hora_Fin' => date('Y-m-d H:i:s'),
@@ -535,6 +540,7 @@ try {
             $idCredito = $data['idCredito'] ?? null;
             $idPersonal = $data['idPersonal'] ?? null;
             $montoDesembolsar = $data['montoDesembolsar'] ?? null;
+            $estadoDesembolso = 'Desembolsado';
 
             if (!$idCliente || !$idCredito || !$idPersonal || !is_numeric($montoDesembolsar) || $montoDesembolsar <= 0) {
                 header('Content-Type: application/json');
@@ -545,24 +551,12 @@ try {
             $conexion->beginTransaction();
 
             try {
-                // 1. Actualizar el estado del crédito a 'Desembolsado' (asumiendo un ID_Estado para esto)
-                // Necesitarás una función en tu modelo: actualizarEstadoCredito($conexion, $idCredito, $nuevoEstadoId)
-                $exitoActualizacionCredito = actualizarEstadoCredito($conexion, (int)$idCredito, 8); // Suponiendo 8 es el ID para 'Desembolsado'
+                $exitoActualizacionCredito = actualizarEstadoCredito($conexion, (int)$idCredito, $estadoDesembolso);
 
                 if (!$exitoActualizacionCredito) {
                     throw new Exception("Error al actualizar el estado del crédito.");
                 }
-
-                // 2. Registrar el desembolso en una tabla de movimientos/desembolsos (si existe)
-                // Esto es opcional, pero buena práctica para tener un registro de los desembolsos.
-                // Necesitarás una función: registrarDesembolso($conexion, $idCredito, $montoDesembolsar, $idPersonal, ...)
-                $exitoRegistroDesembolso = registrarDesembolso($conexion, (int)$idCredito, $montoDesembolsar, (int)$idPersonal, 'Desembolso inicial del crédito');
-
-                if (!$exitoRegistroDesembolso) {
-                    throw new Exception("Error al registrar el desembolso.");
-                }
-
-                // 3. Registrar en la bitácora
+                
                 $datosBitacora = [
                     'ID_Cliente' => $idCliente,
                     'ID_Personal' => $idPersonal,

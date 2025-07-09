@@ -430,15 +430,12 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
         <div class="filter-section">
             <label for="filterDocumento">Filtrar por Documento (Cliente/Personal):</label>
             <input type="text" id="filterDocumento" placeholder="Ingrese documento...">
-            <label for="filterEventType">Tipo de Evento:</label>
-            <select id="filterEventType">
-                <option value="">Todos</option>
-                                <option value="Login">Login</option>
-                <option value="Registro Cliente">Registro Cliente</option>
-                <option value="Registro Asesor">Registro Asesor</option>
-                <option value="Abono Cuota">Abono Cuota</option>
-                <option value="Creacion Credito">Creación Crédito</option>
-                            </select>
+            <label for="filterRol">Filtrar por Tipo de Personal:</label>
+            <select id="filterRol">
+                <option value="">Ambos</option>
+                <option value="3">Asesor</option>
+                <option value="4">Cajero</option>
+            </select>
             <button onclick="applyFilters()">Aplicar Filtros</button>
             <button id="btnExportar" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Exportar Bitácora</button>
         </div>
@@ -579,18 +576,20 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
 
         function applyFilters() {
             const documentoFilter = document.getElementById('filterDocumento').value.toLowerCase();
-            const eventTypeFilter = document.getElementById('filterEventType').value;
+            const rolFilter = document.getElementById('filterRol').value;
 
             const filteredRecords = allBitacoraRecords.filter(record => {
-                // Asegurarse de que los campos de documento existan antes de llamar a toLowerCase()
-                const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toLowerCase().includes(documentoFilter) : false;
-                const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toLowerCase().includes(documentoFilter) : false;
-                
+                const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toString().toLowerCase().includes(documentoFilter) : false;
+                const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toString().toLowerCase().includes(documentoFilter) : false;
+
                 const matchesDocumento = (clientDocMatch || personalDocMatch || documentoFilter === '');
 
-                const matchesEventType = (eventTypeFilter === '' || record.Tipo_Evento === eventTypeFilter);
+                let matchesRol = true;
+                if (rolFilter !== '') {
+                    matchesRol = record.ID_Rol == parseInt(rolFilter);
+                }
 
-                return matchesDocumento && matchesEventType;
+                return matchesDocumento && matchesRol;
             });
 
             renderBitacora(filteredRecords);
@@ -892,70 +891,56 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             const eventTypeFilter = document.getElementById('filterEventType').value;
 
             const filteredRecords = allBitacoraRecords.filter(record => {
-                const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toLowerCase().includes(documentoFilter) : false;
-                const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toLowerCase().includes(documentoFilter) : false;
-                const matchesDocumento = (clientDocMatch || personalDocMatch || documentoFilter === '');
-                const matchesEventType = (eventTypeFilter === '' || record.Tipo_Evento === eventTypeFilter);
+            const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toString().includes(documentoFilter) : false;
+            const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toString().includes(documentoFilter) : false;
+            const matchesDocumento = (clientDocMatch || personalDocMatch || documentoFilter === '');
+            const matchesEventType = (eventTypeFilter === '' || record.Tipo_Evento === eventTypeFilter);
 
-                let matchesPersonalType = true;
-                if (tipoPersonalFiltro !== 'ambos') {
-                    let esAsesor = false;
-                    let esCajero = false;
-
-                    if (record.Tipo_Evento && record.Tipo_Evento.includes('Asesor')) {
-                        esAsesor = true;
-                    }
-                    if (record.Tipo_Evento && record.Tipo_Evento.includes('Cajero')) {
-                        esCajero = true;
-                    }
-                    
-                    const tipoPersonalDeterminado = esAsesor ? 'asesor' : (esCajero ? 'cajero' : 'No Definido');
-
-                    if (tipoPersonalFiltro === 'asesor' && tipoPersonalDeterminado !== 'asesor') {
-                        matchesPersonalType = false;
-                    }
-                    if (tipoPersonalFiltro === 'cajero' && tipoPersonalDeterminado !== 'cajero') {
-                        matchesPersonalType = false;
-                    }
+            let matchesPersonalType = true;
+            if (tipoPersonalFiltro !== 'ambos') {
+                if (tipoPersonalFiltro === 'asesor' && record.ID_Rol != 3) {
+                    matchesPersonalType = false;
+                } else if (tipoPersonalFiltro === 'cajero' && record.ID_Rol != 4) {
+                    matchesPersonalType = false;
                 }
+            }
 
-                return matchesDocumento && matchesEventType && matchesPersonalType;
-            });
+            return matchesDocumento && matchesEventType && matchesPersonalType;
+        });
 
-            return filteredRecords.map(record => {
-                // Prepara el nombre completo del personal
-                const personalFullName = (record.Nombre_Personal && record.Apellido_Personal) ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'No Definido';
+        return filteredRecords.map(record => {
+            // Prepara el nombre completo del personal
+            const personalFullName = (record.Nombre_Personal && record.Apellido_Personal) ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'No Definido';
                 
-                // Determina el tipo de personal para la exportación
-                let tipoPersonalEjecuta = 'No Definido';
-                if (record.Tipo_Evento && record.Tipo_Evento.includes('Asesor')) {
-                    tipoPersonalEjecuta = 'Asesor';
-                } else if (record.Tipo_Evento && record.Tipo_Evento.includes('Cajero')) {
-                    tipoPersonalEjecuta = 'Cajero';
-                } else if (record.ID_Personal) {
-                    tipoPersonalEjecuta = 'Personal General';
-                }
+            // Determina el tipo de personal para la exportación
+           let tipoPersonalEjecuta = 'No Definido';
+            if (record.ID_Rol == 3) {
+                tipoPersonalEjecuta = 'Asesor';
+            } else if (record.ID_Rol == 4) {
+                tipoPersonalEjecuta = 'Cajero';
+            } else if (record.ID_Personal) {
+                tipoPersonalEjecuta = 'Personal General';
+            }
 
-                // Lógica para determinar si es Cliente o Usuario y asignar los campos correctos
-                let nombreRelacionado = 'N/A';
-                let documentoRelacionado = 'N/A';
-                let tipoEntidad = 'N/A';
-                let idEntidad = 'N/A';
-                let numeroTurno = 'N/A';
+            // Lógica para determinar si es Cliente o Usuario y asignar los campos correctos
+            let nombreRelacionado = 'N/A';
+            let documentoRelacionado = 'N/A';
+            let tipoEntidad = 'N/A';
+            let idEntidad = 'N/A';
+            let numeroTurno = 'N/A';
 
-                if (record.ID_Cliente) {
-                    nombreRelacionado = (record.Nombre_Cliente && record.Apellido_Cliente) ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'No Definido';
-                    documentoRelacionado = record.N_Documento_Cliente ?? 'No Definido';
-                    tipoEntidad = 'Cliente';
-                    idEntidad = record.ID_Cliente ?? 'No Definido';
-                } else if (record.Nombre_Completo_Solicitante || record.N_Documento_Solicitante) {
-                    nombreRelacionado = record.Nombre_Completo_Solicitante ?? 'No Definido';
-                    documentoRelacionado = record.N_Documento_Solicitante ?? 'No Definido';
-                    tipoEntidad = 'Usuario (No Cliente)';
-                    idEntidad = record.ID_Turno ?? 'N/A';
-                    numeroTurno = record.Numero_Turno ?? 'No Definido';
-                }
-
+            if (record.ID_Cliente) {
+                nombreRelacionado = (record.Nombre_Cliente && record.Apellido_Cliente) ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'No Definido';
+                documentoRelacionado = record.N_Documento_Cliente ?? 'No Definido';
+                tipoEntidad = 'Cliente';
+                idEntidad = record.ID_Cliente ?? 'No Definido';
+            } else if (record.Nombre_Completo_Solicitante || record.N_Documento_Solicitante) {
+                nombreRelacionado = record.Nombre_Completo_Solicitante ?? 'No Definido';
+                documentoRelacionado = record.N_Documento_Solicitante ?? 'No Definido';
+                tipoEntidad = 'Usuario (No Cliente)';
+                idEntidad = record.ID_Turno ?? 'N/A';
+                numeroTurno = record.Numero_Turno ?? 'No Definido';
+            }
 
                 return {
                     'ID Bitácora': record.ID_Bitacora ?? 'No definido',

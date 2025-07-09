@@ -140,9 +140,11 @@ tr.con-mora {
     </div>
     <button onclick="consultarCliente()">Consultar</button>
 
-    <div class="info" id="clienteInfo">
+    <div class="info" id="clienteInfo" style="display: none;">
       <input type="hidden" id="id_registroHidden" value="">
       <input type="hidden" id="idCreditoHidden" value="">
+      <input type="hidden" id="idClienteHidden"> <input type="hidden" id="id_registroHidden" value="">
+
 
       <h3>Información del Cliente</h3>
       <p><strong>Nombre:</strong> <span id="nombreCliente"></span></p>
@@ -152,19 +154,116 @@ tr.con-mora {
       <p><strong>Tasa Anual:</strong> <span id="tasaAnual"></span>%</p>
       <p><strong>Periodicidad:</strong> <span id="periodicidad"></span></p>
       <p><strong>Estado Crédito:</strong> <span id="estadoCredito"></span></p>
-      <p><strong>Estado Desembolso:</strong> <span id="estadoDesembolso"></span></p> <div id="tasaPeriodica"></div>
+      <p><strong>Estado Desembolso:</strong> <span id="estadoDesembolso"></span></p>
+      <div id="tasaPeriodica"></div>
       <div id="valorCuota"></div>
-      <div id="tabla-amortizacion" style="margin-top: 20px;"></div>
+
+      <div id="tabla-amortizacion" style="margin-top: 20px;">
+          </div>
 
       <div class="acciones">
-          <button id="aprobarDesembolsoBtn" class="btn-desembolso" style="display:none;" onclick="aprobarDesembolso()">Aprobar Desembolso</button>
+          <button id="aprobarDesembolsoBtn" class="btn-desembolso" style="display:none;">Aprobar Desembolso</button>
           <button id="abonarCuotaBtn" onclick="abonarCuota()">Abonar Cuota Seleccionada</button>
-          <div id="loadingMessage">Procesando abono... Por favor espere.</div>
+          <div id="loadingMessage" style="display:none;">Procesando abono... Por favor espere.</div>
       </div>
-  </div>
-
-
+    </div>
 </div>
+
+<div id="desembolsoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Detalle del Crédito para Desembolso</h2>
+        <p><strong>Cliente:</strong> <span id="modalNombreCliente"></span></p>
+        <p><strong>Producto:</strong> <span id="modalProductoCredito"></span></p>
+        <p><strong>Monto Total del Crédito:</strong> $<span id="modalMontoCredito"></span></p>
+        <p><strong>Número de Cuotas:</strong> <span id="modalNumCuotas"></span></p>
+        <p><strong>Tasa Anual:</strong> <span id="modalTasaAnual"></span>%</p>
+        <p><strong>Periodicidad:</strong> <span id="modalPeriodicidad"></span></p>
+        <p><strong>Estado del Crédito:</strong> <span id="modalEstadoCredito"></span></p>
+        <p><strong>Estado del Desembolso Actual:</strong> <span id="modalEstadoDesembolso"></span></p>
+        <p>¿Confirma que desea aprobar este desembolso?</p>
+        <button id="confirmarDesembolsoBtn">Confirmar Desembolso</button>
+    </div>
+</div>
+
+<style>
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+        max-width: 500px;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #confirmarDesembolsoBtn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    #confirmarDesembolsoBtn:hover {
+        background-color: #45a049;
+    }
+
+    /* Estilos para la tabla */
+    #tabla-amortizacion table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    #tabla-amortizacion th, #tabla-amortizacion td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    #tabla-amortizacion th {
+        background-color: #f2f2f2;
+    }
+
+    .cancelada {
+        background-color: #e6ffe6; /* Fondo verde claro para cuotas pagadas */
+    }
+
+    .con-mora {
+        background-color: #ffe6e6; /* Fondo rojo claro para cuotas con mora */
+    }
+</style>
 
 <?php include '../public/layout/frontendBackend.php'; ?>
 <?php include '../public/layout/layoutfooter.php'; ?>
@@ -174,31 +273,54 @@ tr.con-mora {
 const ID_PERSONAL = <?php echo json_encode($idPersonal); ?>;
 let idRegistroAsesor = null; // Para guardar el ID de la sesión de asesoramiento
 
-function consultarCliente(esRefresco = false) { // Modificado para aceptar parámetro esRefresco
+// NUEVO: Referencias a elementos del DOM para el modal
+const aprobarDesembolsoBtn = document.getElementById("aprobarDesembolsoBtn");
+const desembolsoModal = document.getElementById("desembolsoModal");
+const closeModalBtn = document.querySelector(".close-button");
+const confirmarDesembolsoBtn = document.getElementById("confirmarDesembolsoBtn");
+
+// NUEVO: Elementos dentro del modal para mostrar los detalles del crédito
+const modalNombreCliente = document.getElementById("modalNombreCliente");
+const modalProductoCredito = document.getElementById("modalProductoCredito");
+const modalMontoCredito = document.getElementById("modalMontoCredito");
+const modalNumCuotas = document.getElementById("modalNumCuotas");
+const modalTasaAnual = document.getElementById("modalTasaAnual");
+const modalPeriodicidad = document.getElementById("modalPeriodicidad");
+const modalEstadoCredito = document.getElementById("modalEstadoCredito");
+const modalEstadoDesembolso = document.getElementById("modalEstadoDesembolso");
+
+// NUEVO: La tabla de amortización y el botón de abonar estarán deshabilitados inicialmente
+const tablaAmortizacionContainer = document.getElementById("tabla-amortizacion");
+const abonarCuotaBtn = document.getElementById("abonarCuotaBtn");
+
+
+function consultarCliente(esRefresco = false) {
     const documento = document.getElementById("documento").value;
-    
+
     if (!documento) {
         alert("Ingrese un documento válido");
         return;
     }
 
-    // NUEVO: Mostrar mensaje de carga general
     document.getElementById("loadingMessage").textContent = "Cargando información del cliente...";
     document.getElementById("loadingMessage").style.display = "block";
-    document.getElementById("abonarCuotaBtn").disabled = true;
-    document.getElementById("aprobarDesembolsoBtn").disabled = true; // Deshabilitar el botón de desembolso
+    
+    // Deshabilitar botones y ocultar tabla al iniciar la consulta
+    abonarCuotaBtn.disabled = true;
+    aprobarDesembolsoBtn.disabled = true;
+    tablaAmortizacionContainer.style.display = "none"; 
 
-    // CORREGIDO: Pasar la acción por URL
+
     const url = `<?= BASE_URL ?>/Controlador/asesorController.php?accion=Simulador_Cajero`;
 
-    fetch(url, { // Usar la URL con la acción
-        method: "POST", // Sigue siendo POST porque envías más datos en el body
+    fetch(url, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             documento: documento,
-            esRefresco: esRefresco, // Pasa el flag de refresco
-            idRegistroAsesor: idRegistroAsesor, // Pasa el ID existente si es un refresco
-            idPersonal: ID_PERSONAL // Pasa el ID_PERSONAL
+            esRefresco: esRefresco,
+            idRegistroAsesor: idRegistroAsesor,
+            idPersonal: ID_PERSONAL
         })
     })
     .then(res => {
@@ -208,14 +330,15 @@ function consultarCliente(esRefresco = false) { // Modificado para aceptar pará
         return res.json();
     })
     .then(data => {
-        // Ocultar mensaje de carga y habilitar botones al finalizar
         document.getElementById("loadingMessage").style.display = "none";
-        document.getElementById("abonarCuotaBtn").disabled = false;
-        // El botón de desembolso se habilitará/deshabilitará lógicamente más abajo
+        document.getElementById("clienteInfo").style.display = "block"; // Asegura que la info del cliente siempre se muestre si hay data
 
         if (!data.exito) {
             alert(data.mensaje || "Cliente no encontrado");
-            document.getElementById("clienteInfo").style.display = "none";
+            document.getElementById("clienteInfo").style.display = "none";            
+            tablaAmortizacionContainer.style.display = "none"; 
+            abonarCuotaBtn.disabled = true;
+            aprobarDesembolsoBtn.style.display = "none";
             return;
         }
 
@@ -223,25 +346,21 @@ function consultarCliente(esRefresco = false) { // Modificado para aceptar pará
         const credito = data.credito;
         const cuotas = data.cuotas;
 
-        // NUEVO: Almacena el idRegistroAsesoramiento solo si no es un refresco
         if (!esRefresco) {
             idRegistroAsesor = data.idRegistroAsesor;
             document.getElementById("id_registroHidden").value = idRegistroAsesor;
         }
 
-        // NUEVO: Guarda el ID del crédito
         document.getElementById("idCreditoHidden").value = credito.ID_Credito;
-
+        document.getElementById("idClienteHidden").value = cliente.ID_Cliente;
         document.getElementById("nombreCliente").textContent = cliente.Nombre_Cliente + ' ' + cliente.Apellido_Cliente;
         document.getElementById("productoCliente").textContent = credito.NombreProducto;
         document.getElementById("montoCredito").textContent = parseInt(credito.Monto_Total_Credito).toLocaleString('es-CO');
         document.getElementById("numCuotas").textContent = cuotas.length;
         document.getElementById("tasaAnual").textContent = credito.Tasa_Interes_Anual;
         document.getElementById("periodicidad").textContent = credito.Periodicidad;
-        // NUEVO: Mostrar el estado del crédito
-        document.getElementById("estadoCredito").textContent = cuotas.Estado_Cuota;
-        document.getElementById("estadoDesembolso").textContent = credito.Desembolso || 'N/A'; 
-
+        document.getElementById("estadoCredito").textContent = credito.Estado_Credito;
+        document.getElementById("estadoDesembolso").textContent = credito.Desembolso || 'N/A';
 
         const tasaNominal = parseFloat(credito.Tasa_Interes_Anual) / 100;
         let tasaPeriodica = tasaNominal / 12;
@@ -255,7 +374,7 @@ function consultarCliente(esRefresco = false) { // Modificado para aceptar pará
             cuotaValor = parseFloat(cuotas[0].Monto_Total_Cuota);
         } else {
             console.warn("No se encontraron cuotas para este crédito.");
-            alert("No se encontraron cuotas de amortización para este crédito.");
+            // No alertar aquí, ya que el estado de desembolso se encargará de la lógica.
         }
 
         document.getElementById("tasaPeriodica").innerHTML = `📈 Tasa periódica (${credito.Periodicidad}): <strong>${(tasaPeriodica * 100).toFixed(4)}%</strong>`;
@@ -272,7 +391,8 @@ function consultarCliente(esRefresco = false) { // Modificado para aceptar pará
                         <th>Capital</th>
                         <th>Intereses</th>
                         <th>Monto Pagado</th> <th>Fecha Pago</th> <th>Días Mora</th> <th>Recargo Mora</th> <th>Estado</th> <th>Saldo</th>
-                        <th>Acciones</th> </tr>
+                        <th>Acciones</th> 
+                    </tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -309,12 +429,9 @@ function consultarCliente(esRefresco = false) { // Modificado para aceptar pará
                     <td>$${montoPagadoDisplay}</td> <td>${fechaPagoDisplay}</td> <td>${cuota.Dias_Mora_Al_Pagar}</td> <td>$${montoRecargoMoraDisplay}</td> <td>${cuota.Estado_Cuota}</td> <td>$${saldo > 0 ? saldo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0'}</td>
                     <td>`;
             
-            // Lógica para botones de acción en la tabla de cuotas
             if (esPagada) {
-                // NUEVO: Botón para generar comprobante si la cuota está pagada
-                tablaHTML += `<button class="btn-comprobante" onclick="generarComprobante(${cuota.ID_CuotaCredito})">Comprobante</button>`;
+                tablaHTML += `<i class="fas fa-file-invoice-dollar" title="Generar Comprobante" style="cursor: pointer; color: #2a6ebd;" onclick="generarComprobante(${cuota.ID_CuotaCredito})"></i>`;
             } else {
-                // Radio button para seleccionar cuotas a abonar
                 tablaHTML += `<input type="radio" name="cuotaSeleccionada" value="${cuota.ID_CuotaCredito}">`;
             }
             tablaHTML += `</td>
@@ -322,32 +439,30 @@ function consultarCliente(esRefresco = false) { // Modificado para aceptar pará
         });
 
         tablaHTML += `</tbody></table>`;
-        document.getElementById("tabla-amortizacion").innerHTML = `
-        <div style="overflow-x: auto;">
-            ${tablaHTML}
-        </div>
-        `;
-        document.getElementById("clienteInfo").style.display = "block";
+        tablaAmortizacionContainer.innerHTML = `<div style="overflow-x: auto;">${tablaHTML}</div>`;
+        
 
-        // NUEVO: Lógica para mostrar/ocultar el botón de Aprobar Desembolso
-        const aprobarDesembolsoBtn = document.getElementById('aprobarDesembolsoBtn');
-          if (credito.Desembolso === 'No desembolsado') {
+        // Lógica para mostrar/ocultar el botón de Aprobar Desembolso y habilitar/deshabilitar la tabla
+        if (credito.Desembolso === 'No desembolsado') {
             aprobarDesembolsoBtn.style.display = "block";
             aprobarDesembolsoBtn.disabled = false;
+            tablaAmortizacionContainer.style.display = "none"; // Ocultar tabla
+            abonarCuotaBtn.disabled = true; 
         } else {
             aprobarDesembolsoBtn.style.display = "none";
+            aprobarDesembolsoBtn.disabled = true;
+            tablaAmortizacionContainer.style.display = "block"; // Mostrar tabla
+            abonarCuotaBtn.disabled = false; // Habilitar botón de abonar
         }
-
-
     })
     .catch(err => {
         console.error("Error:", err);
         alert("Error al consultar cliente: " + err.message);
         document.getElementById("clienteInfo").style.display = "none";
-        // Ocultar mensaje de carga y habilitar botones en caso de error
         document.getElementById("loadingMessage").style.display = "none";
-        document.getElementById("abonarCuotaBtn").disabled = false;
-        document.getElementById("aprobarDesembolsoBtn").style.display = "none"; // Asegurarse de que esté oculto en error
+        abonarCuotaBtn.disabled = true;
+        aprobarDesembolsoBtn.style.display = "none";
+        tablaAmortizacionContainer.style.display = "none";
     });
 }
 
@@ -371,29 +486,26 @@ function abonarCuota() {
 
     const montoPagadoTransaccion = montoCuota;
     const idAsesoramientoActual = document.getElementById('id_registroHidden').value;
+    const ID_Cliente = document.getElementById('idClienteHidden').value;
 
     console.log("ID de Cuota enviado:", cuotaId);
     console.log("ID de Asesoramiento enviado:", idAsesoramientoActual);
     console.log("ID Personal enviado:", ID_PERSONAL);
 
-    const abonarBtn = document.getElementById("abonarCuotaBtn");
-    const loadingMsg = document.getElementById("loadingMessage");
+    abonarCuotaBtn.disabled = true;
+    document.getElementById("loadingMessage").textContent = "Procesando abono... Por favor espere.";
+    document.getElementById("loadingMessage").style.display = "block";
 
-    abonarBtn.disabled = true;
-    loadingMsg.textContent = "Procesando abono... Por favor espere.";
-    loadingMsg.style.display = "block";
+    const url = `<?= BASE_URL ?>/Controlador/asesorController.php?accion=Abonar_Cuota&idReAsesoramiento=${idAsesoramientoActual}&ID_Cliente=${ID_Cliente}`;
 
-    // CORREGIDO: Pasar la acción por URL
-    const url = `<?= BASE_URL ?>/Controlador/asesorController.php?accion=Abonar_Cuota&idReAsesoramiento=${idAsesoramientoActual}`;
-
-    fetch(url, { // Usar la URL con la acción
-        method: "POST", // Sigue siendo POST
+    fetch(url, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             idCuotaCredito: cuotaId,
-            idPersonal: ID_PERSONAL, // Usar la constante global
+            idPersonal: ID_PERSONAL,
             montoPagadoTransaccion: montoPagadoTransaccion,
-            observaciones: "Abono de cuota desde el sistema de Gestión de Cajero"
+            observaciones: "Abono de cuota desde módulo de gestión de cajero"
         })
     })
     .then(res => {
@@ -405,38 +517,81 @@ function abonarCuota() {
     .then(data => {
         if (data.exito) {
             alert(data.mensaje || "Abono realizado con éxito.");
-            // Recargar la información del cliente para ver los cambios en las cuotas y saldo
-            consultarCliente(true); // Pasar true para indicar que es un refresco
+            consultarCliente(true);
         } else {
             alert("Error al abonar la cuota: " + (data.mensaje || "Error desconocido."));
         }
-        abonarBtn.disabled = false;
-        loadingMsg.style.display = "none";
+        abonarCuotaBtn.disabled = false;
+        document.getElementById("loadingMessage").style.display = "none";
     })
     .catch(err => {
         console.error("Error en el abono:", err);
         alert("Ocurrió un error al intentar abonar la cuota: " + err.message);
-        abonarBtn.disabled = false;
-        loadingMsg.style.display = "none";
+        abonarCuotaBtn.disabled = false;
+        document.getElementById("loadingMessage").style.display = "none";
     });
 }
 
-// NUEVA FUNCIÓN: Generar Comprobante
 function generarComprobante(idCuota) {
     if (!ID_PERSONAL) {
         alert("Error: ID de Personal no disponible. Inicie sesión.");
         return;
     }
-    // Ya estaba correcto, la acción y los parámetros van por URL para GET
     window.open(`<?= BASE_URL ?>/Controlador/asesorController.php?accion=Generar_Comprobante_Pago&idCuota=${idCuota}&idPersonal=${ID_PERSONAL}`, '_blank');
 }
 
-// NUEVA FUNCIÓN: Aprobar Desembolso
-async function aprobarDesembolso() {
+// NUEVA FUNCIÓN: Mostrar el modal con los detalles del crédito
+function mostrarModalDesembolso() {
     const idCredito = document.getElementById('idCreditoHidden').value;
+    const nombreCliente = document.getElementById("nombreCliente").textContent;
+    const productoCliente = document.getElementById("productoCliente").textContent;
+    const montoCredito = document.getElementById("montoCredito").textContent;
+    const numCuotas = document.getElementById("numCuotas").textContent;
+    const tasaAnual = document.getElementById("tasaAnual").textContent;
+    const periodicidad = document.getElementById("periodicidad").textContent;
+    const estadoCredito = document.getElementById("estadoCredito").textContent;
+    const estadoDesembolso = document.getElementById("estadoDesembolso").textContent;
+
+    if (!idCredito) {
+        alert("No hay un crédito cargado para desembolsar.");
+        return;
+    }
+
+    modalNombreCliente.textContent = nombreCliente;
+    modalProductoCredito.textContent = productoCliente;
+    modalMontoCredito.textContent = montoCredito;
+    modalNumCuotas.textContent = numCuotas;
+    modalTasaAnual.textContent = tasaAnual;
+    modalPeriodicidad.textContent = periodicidad;
+    modalEstadoCredito.textContent = estadoCredito;
+    modalEstadoDesembolso.textContent = estadoDesembolso;
+
+    desembolsoModal.style.display = "block";
+}
+
+// NUEVA FUNCIÓN: Cerrar el modal
+closeModalBtn.onclick = function() {
+    desembolsoModal.style.display = "none";
+}
+
+// Cerrar el modal haciendo clic fuera de él
+window.onclick = function(event) {
+    if (event.target == desembolsoModal) {
+        desembolsoModal.style.display = "none";
+    }
+}
+
+// Event listener para el botón "Aprobar Desembolso" para mostrar el modal
+aprobarDesembolsoBtn.addEventListener('click', mostrarModalDesembolso);
+
+
+// MODIFICADA: Función para aprobar el desembolso (ahora llamada desde el modal)
+async function confirmarAprobarDesembolso() {
+    const idCredito = document.getElementById('idCreditoHidden').value;
+    const idCliente = document.getElementById('idClienteHidden').value;
     const montoTotalCredito = parseFloat(document.getElementById('montoCredito').textContent.replace(/[^0-9,-]+/g,"").replace(",", ".")); // Limpia y convierte
 
-    if (!idCredito || isNaN(montoTotalCredito) || montoTotalCredito <= 0) {
+    if (!idCredito || !idCliente || isNaN(montoTotalCredito) || montoTotalCredito <= 0) {
         alert("No se pudo obtener el ID del crédito o el monto para el desembolso.");
         return;
     }
@@ -446,25 +601,24 @@ async function aprobarDesembolso() {
         return;
     }
 
-    if (!confirm(`¿Está seguro de que desea aprobar el desembolso del crédito ${idCredito} por $${montoTotalCredito.toLocaleString('es-CO')}?`)) {
-        return;
-    }
+    // Ya no se necesita el confirm porque el modal actúa como confirmación visual.
+    // if (!confirm(`¿Está seguro de que desea aprobar el desembolso del crédito ${idCredito} por $${montoTotalCredito.toLocaleString('es-CO')}?`)) {
+    //     return;
+    // }
 
-    const aprobarDesembolsoBtn = document.getElementById("aprobarDesembolsoBtn");
-    const loadingMsg = document.getElementById("loadingMessage");
+    confirmarDesembolsoBtn.disabled = true; // Deshabilitar el botón de confirmar en el modal
+    document.getElementById("loadingMessage").textContent = "Aprobando desembolso... Por favor espere.";
+    document.getElementById("loadingMessage").style.display = "block";
+    desembolsoModal.style.display = "none"; // Ocultar el modal mientras se procesa
 
-    aprobarDesembolsoBtn.disabled = true;
-    loadingMsg.textContent = "Aprobando desembolso... Por favor espere.";
-    loadingMsg.style.display = "block";
-
-    // CORREGIDO: Pasar la acción por URL
     const url = `<?= BASE_URL ?>/Controlador/asesorController.php?accion=Aprobar_Desembolso`;
 
     try {
-        const response = await fetch(url, { // Usar la URL con la acción
-            method: "POST", // Sigue siendo POST
+        const response = await fetch(url, {
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+                idCliente: idCliente,
                 idCredito: idCredito,
                 montoDesembolsar: montoTotalCredito,
                 idPersonal: ID_PERSONAL,
@@ -476,8 +630,7 @@ async function aprobarDesembolso() {
 
         if (data.exito) {
             alert(data.mensaje || "Desembolso aprobado con éxito!");
-            // Recargar la información del cliente para ver el cambio de estado del crédito
-            consultarCliente(true); // Pasar true para indicar que es un refresco
+            consultarCliente(true);
         } else {
             alert("Error al aprobar desembolso: " + (data.mensaje || "Error desconocido."));
         }
@@ -485,10 +638,19 @@ async function aprobarDesembolso() {
         console.error("Error en la aprobación de desembolso:", error);
         alert("Ocurrió un error al intentar aprobar el desembolso: " + error.message);
     } finally {
-        aprobarDesembolsoBtn.disabled = false;
-        loadingMsg.style.display = "none";
+        confirmarDesembolsoBtn.disabled = false; // Habilitar el botón de confirmar
+        document.getElementById("loadingMessage").style.display = "none";
     }
 }
+
+// Event listener para el botón de confirmar dentro del modal
+confirmarDesembolsoBtn.addEventListener('click', confirmarAprobarDesembolso);
+
+// Al cargar la página, la tabla de amortización estará oculta y el botón de abonar deshabilitado
+document.addEventListener('DOMContentLoaded', () => {
+    tablaAmortizacionContainer.style.display = "none";
+    abonarCuotaBtn.disabled = true;
+});
 </script>
 
 

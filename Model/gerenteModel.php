@@ -194,6 +194,7 @@ function obtenerRegistrosBitacora(PDO $conexion): array {
         c.Apellido_Cliente,
         b.ID_Personal,
         p.Nombre_Personal,
+        p.ID_Rol,
         p.Apellido_Personal,
         p.N_Documento_Personal,
         rl.Rol,

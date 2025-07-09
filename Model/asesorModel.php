@@ -255,9 +255,10 @@ function obtenerClientePorDocumento(PDO $conexion, string $nDocumento) {
 }
 
 function obtenerCreditoActivoPorCliente(PDO $conexion, int $idCliente) {
-    $sql = "SELECT c.*, p.Nombre_Producto AS NombreProducto
+    $sql = "SELECT c.*, p.Nombre_Producto AS NombreProducto, e.Estado AS Estado_Credito
             FROM Credito c
             JOIN Producto p ON c.ID_Producto = p.ID_Producto
+            JOIN estado e ON c.ID_Estado = e.ID_Estado
             WHERE c.ID_Cliente = :idCliente AND c.ID_Estado = 4 LIMIT 1";
     $stmt = $conexion->prepare($sql);
     $stmt->bindParam(':idCliente', $idCliente, PDO::PARAM_INT);
@@ -564,10 +565,10 @@ function actualizarEstadoCredito($conexion, $idCredito, $nuevoEstadoId) {
         // Asume que tienes una tabla 'Credito' con una columna 'ID_Estado_Credito'
         $stmt = $conexion->prepare("
             UPDATE Credito
-            SET ID_Estado_Credito = :nuevoEstadoId, Fecha_Actualizacion = NOW()
+            SET Desembolso = :nuevoEstadoId
             WHERE ID_Credito = :idCredito
         ");
-        $stmt->bindParam(':nuevoEstadoId', $nuevoEstadoId, PDO::PARAM_INT);
+        $stmt->bindParam(':nuevoEstadoId', $nuevoEstadoId, PDO::PARAM_STR);
         $stmt->bindParam(':idCredito', $idCredito, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->rowCount() > 0; // Devuelve true si se actualizó al menos una fila
