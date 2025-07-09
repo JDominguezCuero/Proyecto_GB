@@ -73,6 +73,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         /* Asegura que el box-sizing sea consistente */
@@ -287,7 +288,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                 </select>
 
                 <?php 
-                if (isset($_SESSION['rol']) && $_SESSION['rol'] == 1){
+                if (isset($_SESSION['rol']) && ($_SESSION['rol'] == 3 || $_SESSION['rol'] == 5)){
                     echo '<label for="idRol">Rol *</label>
                           <select id="idRol" name="idRol" required onchange="toggleProductAssociation()">
                             <option value="" disabled selected>Seleccione una opción</option>

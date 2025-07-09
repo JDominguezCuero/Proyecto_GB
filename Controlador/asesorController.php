@@ -2,8 +2,12 @@
 // personal/controller.php
 session_start();
 
+require_once(__DIR__ . '/../vendor/autoload.php');
 require_once __DIR__ . '/../../Proyecto_GB/Config/config.php';
 require_once __DIR__ . '/../../Proyecto_GB/Model/asesorModel.php';
+
+use Dompdf\Options;
+use Dompdf\Dompdf;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -18,26 +22,26 @@ if ($accionesPublicas) {
         if (
             isset($_SERVER['HTTP_ACCEPT']) &&
             strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
-            ) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
-            } else {
-                $mensajeError = "Usuario no logueado.";
-                header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
-            }
-            exit;
+        ) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
+        } else {
+            $mensajeError = "Usuario no logueado.";
+            header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
         }
+        exit;
     }
-    
+}
+   
 $accion = $_GET['accion'] ?? 'listar';
 $error = "";
 
 try {
     switch ($accion) {
-        case 'listar':
-            $personal = obtenerTodoElPersonal($conexion);
-            header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
-        break;
+        // case 'listar':
+        //     $personal = obtenerTodoElPersonal($conexion);
+        //     header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
+        // break;
 
         case 'Credito_Cliente':
             $idPersonal = $_SESSION['idPersonal'];
@@ -78,8 +82,8 @@ try {
                         'ID_Turno' => $idTurno,
                         'Fecha_Hora_Inicio' => date('Y-m-d H:i:s'),
                         'Fecha_Hora_Fin' => null, // o la misma fecha si es inmediato
-                        'Observaciones' => null,
-                        'Resultado' => 'Pendiente'
+                        'Observaciones' => 'El asesor inició la atención del usuario mediante el turno asignado desde el sistema.',
+                        'Resultado' => 'Usuario en proceso de vinculación'
                     ];
 
                     $idRegistroAsesoramiento = registrarAsesoramiento($conexion, $datosAsesoramiento);
@@ -91,7 +95,7 @@ try {
                             'ID_Personal' => $idPersonal,
                             'ID_RegistroAsesoramiento' => $idRegistroAsesoramiento,
                             'Tipo_Evento' => 'Solicitud de crédito',
-                            'Descripcion_Evento' => 'Se registró asesoramiento para solicitud de crédito del cliente ID ' . $turnoAtender['ID_Cliente']
+                            'Descripcion_Evento' => 'Se registró asesoramiento para solicitud de crédito'
                         ];
 
                         registrarEventoBitacora($conexion, $datosBitacora);
@@ -128,26 +132,38 @@ try {
         break;
 
         case 'Simulador_Cajero':
-            // Asegúrate de que el método sea POST
+            $idPersonal = $_SESSION['idPersonal'] ?? null;
+
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 header('Content-Type: application/json');
                 echo json_encode(['exito' => false, 'mensaje' => 'Método no permitido.']);
                 exit;
             }
 
-            // Obtener el cuerpo de la solicitud JSON
             $input = file_get_contents('php://input');
             $data = json_decode($input, true);
 
             $nDocumento = $data['documento'] ?? null;
+            $esRefresco = $data['esRefresco'] ?? false;
+            $idRegistroAsesoramientoExistente = $data['idRegistroAsesor'] ?? null;
+
+            if (isset($data['idPersonal'])) {
+                $idPersonal = $data['idPersonal'];
+            }
 
             if (!$nDocumento) {
                 header('Content-Type: application/json');
                 echo json_encode(['exito' => false, 'mensaje' => 'Documento no proporcionado.']);
                 exit;
             }
+            if (!$idPersonal) {
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'ID de Personal no disponible. Por favor, inicie sesión o contacte a soporte.']);
+                exit;
+            }
 
-           $cliente = obtenerClientePorDocumento($conexion, $nDocumento);
+            // 1. Obtener información del cliente
+            $cliente = obtenerClientePorDocumento($conexion, $nDocumento);
 
             if (!$cliente) {
                 header('Content-Type: application/json');
@@ -155,6 +171,7 @@ try {
                 exit;
             }
 
+            // 2. Obtener el crédito activo del cliente
             $credito = obtenerCreditoActivoPorCliente($conexion, $cliente['ID_Cliente']);
 
             if (!$credito) {
@@ -163,11 +180,12 @@ try {
                 exit;
             }
 
-            // 1. Obtener las cuotas inicialmente (pueden tener mora desactualizada)
+            // 3. Obtener las cuotas inicialmente (pueden tener mora desactualizada)
             $cuotas = obtenerCuotasPorCredito($conexion, $credito['ID_Credito']);
 
-            // 2. Recorrer las cuotas para actualizar la mora de las que estén vencidas y no pagadas
+            // 4. Recorrer las cuotas para actualizar la mora de las que estén vencidas y no pagadas
             foreach ($cuotas as $cuota) {
+                // ID_Estado_Cuota 7 = 'Pagado' (o el ID que uses para cuotas pagadas)
                 if ($cuota['ID_Estado_Cuota'] != 7 && strtotime($cuota['Fecha_Vencimiento']) < strtotime(date('Y-m-d'))) {
                     try {
                         // Llamar al Stored Procedure para actualizar la mora de esta cuota
@@ -175,26 +193,57 @@ try {
                         $stmt->bindParam(':idCuota', $cuota['ID_CuotaCredito'], PDO::PARAM_INT);
                         $stmt->execute();
                         // Es CRUCIAL cerrar el cursor después de cada CALL para poder hacer más operaciones de DB
-                        $stmt->closeCursor(); 
+                        $stmt->closeCursor();
                     } catch (PDOException $e) {
                         // Si hay un error al actualizar la mora de una cuota, lo registramos
-                        // pero no detenemos la consulta del cliente completo.
                         error_log("Error al actualizar mora para cuota " . $cuota['ID_CuotaCredito'] . ": " . $e->getMessage());
                     }
                 }
             }
 
-            // 3. Volver a obtener las cuotas para reflejar los cambios realizados por el SP.
+            // 5. Volver a obtener las cuotas para reflejar los cambios realizados por el SP.
             // Esto asegura que los datos enviados al frontend estén completamente actualizados.
             $cuotas = obtenerCuotasPorCredito($conexion, $credito['ID_Credito']);
 
-            // 4. Si todo es exitoso, envía los datos en formato JSON
+            // Inicializa el ID de asesoramiento con el valor existente si es un refresco.
+            $idRegistroAsesoramiento = $idRegistroAsesoramientoExistente;
+
+            // 6. Registrar Asesoramiento para el cajero (SOLO SI NO ES UN REFRESH)
+            // La bitácora también se registra aquí, solo en la consulta inicial.
+            if (!$esRefresco) {
+                $datosAsesoramiento = [
+                    'ID_Personal' => $idPersonal,
+                    'ID_Cliente' => $cliente['ID_Cliente'],
+                    'ID_Turno' => $idTurno ?? NULL, // Asegúrate de que $idTurno esté definido en tu contexto si es necesario
+                    'Fecha_Hora_Inicio' => date('Y-m-d H:i:s'),
+                    'Fecha_Hora_Fin' => NULL,
+                    'Observaciones' => 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.',
+                    'Resultado' => 'Usuario en proceso de pago mediante el sistema de caja.'
+                ];
+
+                $idRegistroAsesoramiento = registrarAsesoramiento($conexion, $datosAsesoramiento);
+
+                // 7. Registrar bitácora (SOLO SI ES UNA CONSULTA INICIAL Y SE REGISTRA ASESORAMIENTO)
+                if ($idRegistroAsesoramiento) {
+                    $datosBitacora = [
+                        'ID_Cliente' => $cliente['ID_Cliente'],
+                        'ID_Personal' => $idPersonal,
+                        'ID_RegistroAsesoramiento' => $idRegistroAsesoramiento,
+                        'Tipo_Evento' => 'Inicio de atención en módulo de cajero',
+                        'Descripcion_Evento' => 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.'
+                    ];
+                    registrarEventoBitacora($conexion, $datosBitacora);
+                }
+            }
+
+            // 8. Si todo es exitoso, envía los datos en formato JSON
             header('Content-Type: application/json');
             echo json_encode([
                 'exito' => true,
                 'cliente' => $cliente,
                 'credito' => $credito,
-                'cuotas' => $cuotas
+                'cuotas' => $cuotas,
+                'idRegistroAsesor' => $idRegistroAsesoramiento
             ]);
             exit;
         break;
@@ -225,7 +274,9 @@ try {
 
             try {
                 // 1. Obtener la información actual de la cuota (antes de cualquier actualización de mora)
-                $cuotaOriginal = obtenerCuotaPorId($conexion, $idCuotaCredito);
+                $cuotaOriginal = obtenerCuotaPorId($conexion, (int)$idCuotaCredito);
+
+                error_log("DEBUG: Valor de \$cuotaOriginal para ID {$idCuotaCredito}: " . var_export($cuotaOriginal, true));
 
                 if (!$cuotaOriginal) {
                     throw new Exception("Cuota no encontrada.");
@@ -302,7 +353,29 @@ try {
                     throw new Exception("Error al actualizar la cuota.");
                 }
 
-                $conexion->commit(); // Confirmar la transacción si todo fue exitoso
+                $idReAsesoramiento = $_GET['idReAsesoramiento'] ?? null;
+                $idCliente = $_GET['ID_Cliente'] ?? null;
+
+                $datosBitacora = [
+                    'ID_Cliente' => $idCliente,
+                    'ID_Personal' => $idPersonal,
+                    'ID_RegistroAsesoramiento' => $idReAsesoramiento,
+                    'Tipo_Evento' => 'Pago finalizado por el cliente',
+                    'Descripcion_Evento' => 'El cliente ha completado satisfactoriamente el proceso de pago y formalización en el sistema.'
+                ];
+
+                registrarEventoBitacora($conexion, $datosBitacora);
+
+
+                $datosAsesoramiento = [
+                    'Fecha_Hora_Fin' => date('Y-m-d H:i:s'),
+                    'Observaciones' => 'El cajero finalizó el proceso de atención tras la confirmación del pago.',
+                    'Resultado' => 'Cliente validado y pago efectuado exitosamente'
+                ];
+
+                $idRegistroAsesoramiento = actualizarRegistroAsesoramiento($conexion, (int)$idReAsesoramiento, $datosAsesoramiento);
+
+                $conexion->commit();
                 header('Content-Type: application/json');
                 echo json_encode(['exito' => true, 'mensaje' => 'Abono registrado y cuota actualizada con éxito.']);
                 exit;
@@ -315,6 +388,195 @@ try {
             }
         break;
 
+        case 'Generar_Comprobante_Pago':
+            $idCuota = $_GET['idCuota'] ?? null;
+
+            if (!$idCuota) {
+                exit('ID de cuota no proporcionado.');
+            }
+
+            $datosComprobante = obtenerDatosComprobantePago($conexion, (int)$idCuota);
+
+            if (!$datosComprobante) {
+                exit('Datos del comprobante no encontrados.');
+            }
+           
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true);
+            $dompdf = new Dompdf($options);
+            $qrTexto = "Cuota: {$datosComprobante['Numero_Cuota']} - Cliente: {$datosComprobante['Nombre_Cliente']} {$datosComprobante['Apellido_Cliente']} - Documento: {$datosComprobante['N_Documento_Cliente']} - Monto: $" . number_format($datosComprobante['Monto_Pagado_Transaccion'], 2, ',', '.') . " - Fecha: {$datosComprobante['Fecha_Hora_Pago']}";
+
+            $logoPath = __DIR__ . '../../View/public/assets/Img/logos/logo2.png';
+            $logoBase64 = base64_encode(file_get_contents($logoPath));
+            $logoSrc = 'data:image/png;base64,' . $logoBase64;
+
+            $proxCuota = obtenerProximaCuota($conexion, $datosComprobante['ID_CuotaCredito'], $datosComprobante['Numero_Cuota']);
+
+           $html = '
+                <style>
+                    body { font-family: Arial, sans-serif; font-size: 12px; color: #333; }
+                    h1 { text-align: center; color: #2a2a2a; margin-bottom: 20px; }
+                    h3 { margin-top: 25px; color: #1a1a1a; }
+                    .info, .resumen, .footer { margin-bottom: 15px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                    th, td { border: 1px solid #999; padding: 8px; text-align: left; }
+                    th { background-color: #f0f0f0; }
+                    .highlight { font-weight: bold; color: #1a73e8; }
+                    .footer { text-align: center; font-size: 11px; margin-top: 30px; }
+                    .logo-footer, .qr { margin-top: 30px; text-align: center; }
+                    .logo-footer img { width: 150px; opacity: 0.9; }
+                    .qr img { width: 100px; }
+                    .firma { margin-top: 40px; text-align: right; font-style: italic; font-size: 12px; }
+                    .referencia { text-align: right; font-size: 11px; color: #666; }
+                </style>
+
+                <h1>Comprobante de Pago</h1>
+
+                <div class="referencia">
+                    <strong>Referencia:</strong> CP-' . str_pad($datosComprobante['ID_CuotaCredito'], 6, '0', STR_PAD_LEFT) . '
+                </div>
+
+                <div class="info">
+                    <table>
+                        <tr><th>Cliente</th><td>' . $datosComprobante['Nombre_Cliente'] . ' ' . $datosComprobante['Apellido_Cliente'] . '</td></tr>
+                        <tr><th>Documento</th><td>' . $datosComprobante['N_Documento_Cliente'] . '</td></tr>
+                        <tr><th>Atendido por</th><td>' . $datosComprobante['Nombre_Personal'] . ' ' . $datosComprobante['Apellido_Personal'] . '</td></tr>
+                        <tr><th>Fecha y hora del pago</th><td>' . $datosComprobante['Fecha_Hora_Pago'] . '</td></tr>
+                    </table>
+                </div>
+
+                <div class="resumen">
+                    <h3>Detalles del Pago</h3>
+                    <table>
+                        <tr>
+                            <th>Número de Cuota</th>
+                            <th>Valor Cuota</th>
+                            <th>Capital</th>
+                            <th>Intereses</th>
+                            <th>Mora</th>
+                            <th>Monto Pagado</th>
+                            <th>Estado</th>
+                        </tr>
+                        <tr>
+                            <td>' . $datosComprobante['Numero_Cuota'] . '</td>
+                            <td>$' . number_format($datosComprobante['Monto_Total_Cuota'], 2, ',', '.') . '</td>
+                            <td>$' . number_format($datosComprobante['Monto_Capital'], 2, ',', '.') . '</td>
+                            <td>$' . number_format($datosComprobante['Monto_Interes'], 2, ',', '.') . '</td>
+                            <td>$' . number_format($datosComprobante['Monto_Recargo_Mora'], 2, ',', '.') . '</td>
+                            <td class="highlight">$' . number_format($datosComprobante['Monto_Pagado_Transaccion'], 2, ',', '.') . '</td>
+                            <td>' . $datosComprobante['Estado_Cuota_Nombre'] . '</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="info">
+                    <h3>Información del Crédito</h3>
+                    <table>
+                        <tr><th>Monto Total del Crédito</th><td>$' . number_format($datosComprobante['Monto_Total_Credito'], 2, ',', '.') . '</td></tr>
+                    </table>
+                </div>
+
+                <div class="info">
+                    <h3>Próxima Cuota (Estimación)</h3>
+                    <table>
+                        <tr>
+                            <th>Número</th>
+                            <th>Fecha Vencimiento</th>
+                            <th>Valor Cuota</th>
+                        </tr>
+                        <tr>
+                            <td>' . ($datosComprobante['Numero_Cuota'] + 1) . '</td>
+                            <td>' . ($proxCuota['Fecha_Vencimiento'] ?? 'N/A') . '</td>
+                            <td>' . number_format($proxCuota['Monto_Total_Cuota'] ?? 0, 2, ',', '.') . '</td>
+                        </tr>
+                    </table>
+                    <small>* Esta información es estimada y puede variar según el plan de amortización.</small>
+                </div>
+
+                <div class="info">
+                    <h3>Observaciones</h3>
+                    <p>' . ($datosComprobante['Observaciones_Pago'] ?: 'Ninguna') . '</p>
+                </div>
+
+                <div class="firma">
+                    ___________________________________________<br>
+                    ' . $datosComprobante['Nombre_Personal'] . ' ' . $datosComprobante['Apellido_Personal'] . '<br>
+                    Cajero - Banco Finan-CIAS
+                </div>
+
+                <div class="qr">
+                    <p><strong>Escanea para validar:</strong></p>
+                </div>
+
+                <div class="footer">
+                    Gracias por su pago. Este documento ha sido generado automáticamente por el sistema Finan-CIAS.
+                </div>
+
+                <div class="logo-footer">
+                </div>
+                ';
+
+
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            $dompdf->stream("Comprobante_Pago_Cuota_{$idCuota}.pdf", ["Attachment" => false]);
+            exit;
+        break; 
+
+        case 'Aprobar_Desembolso':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Método no permitido.']);
+                exit;
+            }
+
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+
+            $idCliente = $data['idCliente'] ?? null;
+            $idCredito = $data['idCredito'] ?? null;
+            $idPersonal = $data['idPersonal'] ?? null;
+            $montoDesembolsar = $data['montoDesembolsar'] ?? null;
+            $estadoDesembolso = 'Desembolsado';
+
+            if (!$idCliente || !$idCredito || !$idPersonal || !is_numeric($montoDesembolsar) || $montoDesembolsar <= 0) {
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => 'Datos de desembolso incompletos o inválidos.']);
+                exit;
+            }
+
+            $conexion->beginTransaction();
+
+            try {
+                $exitoActualizacionCredito = actualizarEstadoCredito($conexion, (int)$idCredito, $estadoDesembolso);
+
+                if (!$exitoActualizacionCredito) {
+                    throw new Exception("Error al actualizar el estado del crédito.");
+                }
+                
+                $datosBitacora = [
+                    'ID_Cliente' => $idCliente,
+                    'ID_Personal' => $idPersonal,
+                    'Tipo_Evento' => 'Crédito Desembolsado',
+                    'Descripcion_Evento' => "Se ha aprobado y desembolsado el crédito por $" . number_format($montoDesembolsar, 2, ',', '.') . " al cliente."
+                ];
+                registrarEventoBitacora($conexion, $datosBitacora);
+
+                $conexion->commit();
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => true, 'mensaje' => 'Desembolso aprobado y registrado con éxito.']);
+                exit;
+
+            } catch (Exception $e) {
+                $conexion->rollBack();
+                header('Content-Type: application/json');
+                echo json_encode(['exito' => false, 'mensaje' => $e->getMessage()]);
+                exit;
+            }
+        break;
 
          case 'agregarAsesor':
             try {
@@ -539,14 +801,13 @@ try {
                     $datosCreditoParaDB = [
                         'ID_Cliente' => $idCliente,
                         'Monto_Total_Credito' => $montoPrestamo,
+                        'Desembolso' => 'No desembolsado',
                         'Monto_Pendiente_Credito' => $montoPrestamo, // Al inicio, el monto total
                         'Fecha_Apertura_Credito' => date('Y-m-d H:i:s'), // Fecha actual de apertura
                         'Fecha_Vencimiento_Credito' => $fechaVencimientoCredito,
                         'ID_Producto' => $idProducto,
                         'ID_Estado' => $idEstadoCreditoActivo,
-                        // Estos campos no estaban en tu JSON de 'Credito', pero son parte de la simulación.
-                        // Si tu tabla Credito los guarda, asegúrate de que los tipos de datos coincidan (ej. % vs decimal).
-                        'Tasa_Interes_Anual' => $tasaInteresAnual * 100, // Multiplicar por 100 si tu DB guarda el %
+                        'Tasa_Interes_Anual' => $tasaInteresAnual, // Multiplicar por 100 si tu DB guarda el %
                         'Tasa_Interes_Periodica' => $tasaInteresPeriodica * 100, // Multiplicar por 100 si tu DB guarda el %
                         'Numero_Cuotas' => $numeroCuotas,
                         'Valor_Cuota_Calculado' => $valorCuota,
@@ -617,22 +878,66 @@ try {
 
                     // --- 4. Actualizar el estado del turno a 3 ---
                     $idTurnoActual = $_GET['idTurno'] ?? null;
+                    $idReAsesoramiento = $_GET['idReAsesoramiento'] ?? null;
 
                     if ($idTurnoActual !== null && $idTurnoActual !== '') {
                         $nuevoEstadoTurno = 3; 
 
                         $datosParaActualizarTurno = [
+                            'ID_Cliente' => $idCliente,
                             'ID_Estado_Turno' => $nuevoEstadoTurno,
                             'Fecha_Hora_Finalizacion' => date('Y-m-d H:i:s')
                         ];
 
                         $resultadoUpdateTurno = actualizarTurno($conexion, (int)$idTurnoActual, $datosParaActualizarTurno);
 
+                        if ($idReAsesoramiento !== null && $idReAsesoramiento !== '') {
+
+                            $datosAsesoramiento = [
+                                'ID_Cliente' => $idCliente,
+                                'Fecha_Hora_Fin' => date('Y-m-d H:i:s'),
+                                'Observaciones' => 'Registro del usuario finalizado por el asesor desde el módulo de turnos.',
+                                'Resultado' => 'Proceso de vinculación al sistema finalizado correctamente'
+                            ];
+
+                            $resultadoActualizacionAsesoramiento = actualizarRegistroAsesoramiento($conexion, (int)$idReAsesoramiento, $datosAsesoramiento);
+
+                            if (!$resultadoActualizacionAsesoramiento) {
+                                error_log("Error al actualizar el registro de asesoramiento ID: " . $idReAsesoramiento);
+                            }
+
+                            if ($resultadoUpdateTurno && $resultadoActualizacionAsesoramiento) {
+                                $datosBitacora = [
+                                    'ID_Cliente' => $idCliente,
+                                    'ID_Personal' => $_SESSION['idPersonal'],
+                                    'ID_RegistroAsesoramiento' => (int)$idReAsesoramiento,
+                                    'Tipo_Evento' => 'Formalización de cliente',
+                                    'Descripcion_Evento' => 'El usuario ha finalizado el proceso de aprobación y se vinculó oficialmente como cliente.'
+                                ];
+                                registrarEventoBitacora($conexion, $datosBitacora);
+                            }
+                        } else {
+                            error_log("Advertencia: Se intentó actualizar un turno (ID: " . $idTurnoActual . "), pero el ID_RegistroAsesoramiento no fue proporcionado para su actualización.");
+                        }
+
                         if (!$resultadoUpdateTurno) {
                             error_log("Advertencia: No se pudo actualizar el estado del turno ID: " . $idTurnoActual . ". El proceso de crédito continuó.");
                         }
+
                     } else {
-                        error_log("Advertencia: ID de turno no disponible para actualizar su estado.");
+                        // Registrar Asesoramiento Cuando sea por registro directo y no por turno
+                        $datosAsesoramiento = [
+                            'ID_Personal' => $idPersonal,
+                            'ID_Cliente' => $idCliente,
+                            'Fecha_Hora_Inicio' => date('Y-m-d H:i:s'),
+                            'Fecha_Hora_Fin' => date('Y-m-d H:i:s'),
+                            'Observaciones' => 'Ingreso del usuario gestionado directamente por el asesor, sin turno asignado desde el sistema.',
+                            'Resultado' => 'Proceso de vinculación al sistema finalizado correctamente'
+                        ];
+
+                        $idRegistroAsesoramiento = registrarAsesoramiento($conexion, $datosAsesoramiento);
+
+                        error_log("Información: Nuevo registro de asesoramiento creado directamente, sin turno asociado.");
                     }
 
                     // Confirmar la transacción si todo fue exitoso
@@ -666,8 +971,27 @@ try {
             }
         break;
 
+       case 'verPerfilPersonal':
+            $idPersonal = $_SESSION['idPersonal'];
+
+            try {
+                $personalData = obtenerPerfilPersonalCompleto($conexion, $idPersonal);
+
+                if ($personalData) {
+                    include __DIR__ . '/../View/asesor/perfilAsesor.php'; 
+                } else {
+                    header('Location: ' . BASE_URL . '/View/public/inicio.php?login=error&error==Perfil de personal no encontrado o inaccesible.');
+                    exit();
+                }
+            } catch (Exception $e) {
+                error_log("Error al cargar perfil personal: " . $e->getMessage());
+                header('Location: ' . BASE_URL . '/View/public/inicio.php?login=error&error=Error interno al cargar su perfil.');
+                exit();
+            }
+        break;
+
         default:
-            header("Location: controller.php?accion=listar");
+            header("Location: /Proyecto_GB/View/public/inicio.php?login=success");
             exit;
         break;
     }

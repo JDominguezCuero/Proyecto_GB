@@ -433,10 +433,12 @@ document.getElementById('btnFinalizarProceso').addEventListener('click', functio
 
     const urlParams = new URLSearchParams(window.location.search);
     const idTurno = urlParams.get('idTurno'); 
+    const idAsesoramientoActual = document.getElementById('id_registroHidden').value;
 
     console.error('Id Turno:', idTurno);
+    console.error('Id Asesoramiento Actual:', idAsesoramientoActual);
 
-    const fetchUrl = `/Proyecto_GB/Controlador/asesorController.php?accion=consolidadoCliente&idTurno=${idTurno}`;
+    const fetchUrl = `/Proyecto_GB/Controlador/asesorController.php?accion=consolidadoCliente&idTurno=${idTurno}&idReAsesoramiento=${idAsesoramientoActual}`;
 
     // Aquí es donde enviarías finalDataToSave a tu backend vía AJAX (fetch).
     fetch(fetchUrl, {
