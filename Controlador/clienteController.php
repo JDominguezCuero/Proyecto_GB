@@ -10,9 +10,7 @@ class ClienteController {
 
     // Acción por defecto: Redirige al perfil del cliente
     public function index() {
-        // Redirige al perfil del cliente, usando un ID por defecto si no hay uno en la sesión o URL.
-        // Para un sistema real, el ID_Cliente vendría de la sesión del usuario logueado.
-        $id_cliente_default = $_SESSION['ID_Cliente_Logueado'] ?? 1; // Usamos 1 para pruebas.
+        $id_cliente_default = $_SESSION['ID_Cliente_Logueado'] ?? 1;
         header("Location: index.php?controller=cliente&action=mostrarPerfilCliente&id=" . $id_cliente_default);
         exit();
     }

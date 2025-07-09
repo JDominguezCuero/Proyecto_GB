@@ -37,6 +37,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -281,6 +282,143 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                 grid-template-columns: 1fr; /* Una columna en pantallas muy pequeñas */
             }
         }
+
+        /* Estilos para el modal de Exportar (similar al de detalles pero separado) */
+        #modalExportar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #modalExportar.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #modalExportar .modal-content-export { /* Usar una clase diferente para evitar conflictos de estilos */
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            display: flex; /* Añadido para flexbox en el contenido */
+            flex-direction: column; /* Apila elementos verticalmente */
+            align-items: center; /* Centra elementos horizontalmente */
+        }
+        #modalExportar.show .modal-content-export {
+            transform: translateY(0);
+        }
+        #modalExportar .modal-header {
+            width: 100%; /* El header ocupa todo el ancho */
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: center; /* Centrar el título */
+        }
+        #modalExportar .modal-header h3 {
+            flex-grow: 1; /* Permite que el título ocupe el espacio disponible */
+            text-align: center; /* Centra el texto del título */
+            color: #8B5CF6; /* Un color distinto para el modal de exportar */
+            margin: 0; /* Elimina márgenes por defecto del h3 */
+        }
+        /* Ajuste para el botón de cierre en el header */
+        #modalExportar .modal-header #cerrarModalExportarTop {
+            position: absolute; /* Posiciona el botón de cierre en la esquina */
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+            padding: 0; /* Elimina padding para que sea más pequeño */
+            width: auto; /* Elimina el 100% de width */
+            margin: 0; /* Elimina el margin-bottom */
+        }
+        #modalExportar .modal-header #cerrarModalExportarTop:hover {
+            color: #333;
+        }
+        /* Ajustes para el contenido del body del modal de exportación */
+        #modalExportar .mt-2.px-4.py-3 {
+            width: 100%;
+            padding: 15px 25px; /* Ajuste de padding */
+            margin-top: 0; /* Eliminar margen superior si Tailwind lo pone */
+        }
+        #modalExportar .text-sm.text-gray-500.mb-4.text-center {
+            margin-bottom: 20px; /* Más espacio debajo de la descripción */
+            line-height: 1.5;
+        }
+        #modalExportar .mb-4.text-left {
+            width: 100%; /* Asegura que el contenedor del select ocupe todo el ancho */
+            margin-bottom: 20px; /* Más espacio debajo del select */
+        }
+        #modalExportar .mb-4.text-left label {
+            text-align: left; /* Alinea la etiqueta a la izquierda */
+            width: 100%; /* La etiqueta ocupa todo el ancho */
+        }
+        #modalExportar .mb-4.text-left select {
+            width: 100%;
+            padding: 12px 15px; /* Más padding para el select */
+            border: 1px solid #d1d5db; /* Color de borde más suave */
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        #modalExportar .items-center.px-4.py-3.flex.flex-col {
+            width: 100%;
+            padding-top: 0; /* Eliminar padding superior si Tailwind lo pone */
+            align-items: stretch; /* Estira los botones para que ocupen todo el ancho */
+        }
+        #modalExportar button {
+            background-color: #8B5CF6; /* Botones de exportar de color púrpura */
+            color: white;
+            padding: 12px 20px; /* Más padding para los botones */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em; /* Ajuste de tamaño de fuente */
+            transition: background-color 0.3s ease;
+            width: 100%; /* Asegura que los botones ocupen todo el ancho disponible */
+            margin-bottom: 15px; /* Más espacio entre botones */
+        }
+        #modalExportar button:last-child {
+            margin-bottom: 0; /* Eliminar margen inferior del último botón */
+        }
+        #modalExportar button:hover {
+            background-color: #7C3AED;
+        }
+        #modalExportar #exportarExcel {
+            background-color: #22C55E; /* Verde para Excel */
+        }
+        #modalExportar #exportarExcel:hover {
+            background-color: #16A34A;
+        }
+        #modalExportar #exportarPdf {
+            background-color: #EF4444; /* Rojo para PDF */
+        }
+        #modalExportar #exportarPdf:hover {
+            background-color: #DC2626;
+        }
+        #modalExportar #cerrarModalExportar {
+            background-color: #6B7280; /* Gris para Cancelar */
+        }
+        #modalExportar #cerrarModalExportar:hover {
+            background-color: #4B5563;
+        }
+
     </style>
 </head>
 <body>
@@ -292,23 +430,18 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
         <div class="filter-section">
             <label for="filterDocumento">Filtrar por Documento (Cliente/Personal):</label>
             <input type="text" id="filterDocumento" placeholder="Ingrese documento...">
-            <label for="filterEventType">Tipo de Evento:</label>
-            <select id="filterEventType">
-                <option value="">Todos</option>
-                <!-- Opciones de tipo de evento se pueden cargar dinámicamente o ser estáticas -->
-                <option value="Login">Login</option>
-                <option value="Registro Cliente">Registro Cliente</option>
-                <option value="Registro Asesor">Registro Asesor</option>
-                <option value="Abono Cuota">Abono Cuota</option>
-                <option value="Creacion Credito">Creación Crédito</option>
-                <!-- Agrega más tipos de evento según tu DB -->
+            <label for="filterRol">Filtrar por Tipo de Personal:</label>
+            <select id="filterRol">
+                <option value="">Ambos</option>
+                <option value="3">Asesor</option>
+                <option value="4">Cajero</option>
             </select>
             <button onclick="applyFilters()">Aplicar Filtros</button>
+            <button id="btnExportar" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Exportar Bitácora</button>
         </div>
 
         <div id="bitacoraEventsContainer">
-            <!-- Los registros de la bitácora se cargarán aquí -->
-            <p class="no-records">Cargando registros de bitácora...</p>
+                                <p class="no-records">Cargando registros de bitácora...</p>
         </div>
     </div>
 
@@ -316,21 +449,55 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
     <?php include '../public/layout/layoutfooter.php'; ?>
     <?php include __DIR__ . '../../../View/public/layout/mensajesModal.php'; ?>
 
-    <!-- Modal para Detalles del Evento -->
-    <div id="eventDetailsModal" class="modal-overlay">
+        <div id="eventDetailsModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalEventTitle">Detalles del Evento</h3>
                 <button type="button" class="modal-close-btn" onclick="closeEventDetailsModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalEventBody">
-                <!-- Los detalles del evento se cargarán aquí -->
-            </div>
+                                </div>
             <div class="modal-footer">
                 <button type="button" onclick="closeEventDetailsModal()">Cerrar</button>
             </div>
         </div>
     </div>
+
+    <div id="modalExportar" class="modal-overlay">
+        <div class="modal-content-export">
+            <div class="modal-header">
+                <h3>Opciones de Exportación</h3>
+                <button type="button" class="modal-close-btn" id="cerrarModalExportarTop">&times;</button>
+            </div>
+            <div class="mt-2 px-4 py-3">
+                <p class="text-sm text-gray-500 mb-4 text-center">Selecciona los filtros y el formato de exportación.</p>
+
+                <div class="mb-4 text-left">
+                    <label for="filtroPersonal" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Personal que Ejecutó el Evento:</label>
+                    <select id="filtroPersonal" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="ambos">Asesor y Cajero</option>
+                        <option value="asesor">Solo Asesores</option>
+                        <option value="cajero">Solo Cajeros</option>
+                    </select>
+                </div>
+            </div>
+            <div class="items-center px-4 py-3 flex flex-col">
+                <button id="exportarExcel" class="bg-green-500 hover:bg-green-600">
+                    Exportar a Excel
+                </button>
+                <button id="exportarPdf" class="bg-red-500 hover:bg-red-600">
+                    Generar PDF
+                </button>
+                <button id="cerrarModalExportar" class="bg-gray-500 hover:bg-gray-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <script>
         let allBitacoraRecords = []; // Almacenará todos los registros para el filtrado local
@@ -381,17 +548,24 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                 // Usar N_Documento_Personal para el documento del personal si está disponible
                 const personalDoc = record.N_Documento_Personal ? ` (Doc: ${record.N_Documento_Personal})` : '';
 
-                const fechaHora = new Date(record.Fecha_Hora).toLocaleString('es-CO');
+                const fechaHora = record.Fecha_Hora ? new Date(record.Fecha_Hora).toLocaleString('es-CO') : 'No definido';
+
+                let nombreIdentificado = '';
+                if (record.ID_Cliente) {
+                    nombreIdentificado = `<strong>Cliente:</strong> ${clientName} ${clientDoc}`;
+                } else {
+                    nombreIdentificado = `<strong>Usuario:</strong> ${record.Nombre_Completo_Solicitante ?? 'Sin Nombre'} ${record.N_Documento_Solicitante ?? ''}`;
+                }
 
                 card.innerHTML = `
                     <div class="event-header">
-                        <span class="event-type">${record.Tipo_Evento}</span>
-                        <span class="event-id">ID: ${record.ID_Bitacora}</span>
+                        <span class="event-type">${record.Tipo_Evento ?? 'No Definido'}</span>
+                        <span class="event-id">ID: ${record.ID_Bitacora ?? 'No Definido'}</span>
                     </div>
-                    <p class="event-description">${record.Descripcion_Evento}</p>
+                    <p class="event-description">${record.Descripcion_Evento ?? 'No Definido'}</p>
                     <div class="event-details">
                         <p><strong>Fecha y Hora:</strong> ${fechaHora}</p>
-                        <p><strong>Cliente:</strong> ${clientName}${clientDoc}</p>
+                        <p>${nombreIdentificado}</p>
                         <p><strong>Personal:</strong> ${personalName}${personalDoc}</p>
                         ${record.ID_RegistroAsesoramiento ? `<p><strong>ID Asesoramiento:</strong> ${record.ID_RegistroAsesoramiento}</p>` : ''}
                     </div>
@@ -402,18 +576,20 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
 
         function applyFilters() {
             const documentoFilter = document.getElementById('filterDocumento').value.toLowerCase();
-            const eventTypeFilter = document.getElementById('filterEventType').value;
+            const rolFilter = document.getElementById('filterRol').value;
 
             const filteredRecords = allBitacoraRecords.filter(record => {
-                // Asegurarse de que los campos de documento existan antes de llamar a toLowerCase()
-                const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toLowerCase().includes(documentoFilter) : false;
-                const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toLowerCase().includes(documentoFilter) : false;
-                
+                const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toString().toLowerCase().includes(documentoFilter) : false;
+                const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toString().toLowerCase().includes(documentoFilter) : false;
+
                 const matchesDocumento = (clientDocMatch || personalDocMatch || documentoFilter === '');
 
-                const matchesEventType = (eventTypeFilter === '' || record.Tipo_Evento === eventTypeFilter);
+                let matchesRol = true;
+                if (rolFilter !== '') {
+                    matchesRol = record.ID_Rol == parseInt(rolFilter);
+                }
 
-                return matchesDocumento && matchesEventType;
+                return matchesDocumento && matchesRol;
             });
 
             renderBitacora(filteredRecords);
@@ -425,27 +601,27 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             const modalTitle = document.getElementById('modalEventTitle');
             const modalBody = document.getElementById('modalEventBody');
 
-            modalTitle.textContent = `Detalles de Evento: ${record.Tipo_Evento} (ID: ${record.ID_Bitacora})`;
+            modalTitle.textContent = `Detalles de Evento: ${record.Tipo_Evento ?? 'No Definido'} (ID: ${record.ID_Bitacora ?? 'No Definido'})`;
             
-            const clientName = record.Nombre_Cliente ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'N/A';
-            const clientDoc = record.N_Documento_Cliente ? `${record.N_Documento_Cliente}` : 'N/A';
-            const personalName = record.Nombre_Personal ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'N/A';
-            const personalDoc = record.N_Documento_Personal ? `${record.N_Documento_Personal}` : 'N/A';
-            const fechaHora = new Date(record.Fecha_Hora).toLocaleString('es-CO');
+            const clientName = record.Nombre_Cliente ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'No Definido';
+            const clientDoc = record.N_Documento_Cliente ? `${record.N_Documento_Cliente}` : 'No Definido';
+            const personalName = record.Nombre_Personal ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'No Definido';
+            const personalDoc = record.N_Documento_Personal ? `${record.N_Documento_Personal}` : 'No Definido';
+            const fechaHora = record.Fecha_Hora ? new Date(record.Fecha_Hora).toLocaleString('es-CO') : 'No Definido';
 
             modalBody.innerHTML = `
                 <div class="modal-details-grid">
                     <div class="modal-detail-item">
                         <strong>ID del Evento:</strong>
-                        <p>${record.ID_Bitacora}</p>
+                        <p>${record.ID_Bitacora ?? 'No Definido'}</p>
                     </div>
                     <div class="modal-detail-item">
                         <strong>Tipo de Evento:</strong>
-                        <p>${record.Tipo_Evento}</p>
+                        <p>${record.Tipo_Evento ?? 'No Definido'}</p>
                     </div>
                     <div class="modal-full-width-item">
                         <strong>Descripción Detallada:</strong>
-                        <p>${record.Descripcion_Evento}</p>
+                        <p>${record.Descripcion_Evento ?? 'No Definido'}</p>
                     </div>
                     <div class="modal-detail-item">
                         <strong>Fecha y Hora:</strong>
@@ -458,6 +634,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                     </div>` : ''}
                 </div>
 
+                ${record.ID_Cliente ? `
                 <div class="modal-full-width-item mt-6">
                     <strong>Información del Cliente:</strong>
                     <div class="modal-details-grid">
@@ -469,16 +646,34 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                             <strong>Documento Cliente:</strong>
                             <p>${clientDoc}</p>
                         </div>
-                        ${record.ID_Cliente ? `
                         <div class="modal-detail-item">
                             <strong>ID Cliente:</strong>
                             <p>${record.ID_Cliente}</p>
-                        </div>` : ''}
+                        </div>
                     </div>
                 </div>
+                ` : `
+                <div class="modal-full-width-item mt-6">
+                    <strong>Información del Usuario:</strong>
+                    <div class="modal-details-grid">
+                        <div class="modal-detail-item">
+                            <strong>Número de Turno:</strong>
+                            <p>${record.Numero_Turno}</p>
+                        </div>
+                        <div class="modal-detail-item">
+                            <strong>Nombre Completo:</strong>
+                            <p>${record.Nombre_Completo_Solicitante}</p>
+                        </div>
+                        <div class="modal-detail-item">
+                            <strong>Cédula:</strong>
+                            <p>${record.N_Documento_Solicitante}</p>
+                        </div>
+                    </div>
+                </div>
+            `}
 
                 <div class="modal-full-width-item mt-6">
-                    <strong>Información del Personal (Asesor):</strong>
+                    <strong>Información del Personal: ${record.Rol}</strong>
                     <div class="modal-details-grid">
                         <div class="modal-detail-item">
                             <strong>Nombre Personal:</strong>
@@ -506,7 +701,265 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
 
         // Cargar los registros de la bitácora al cargar la página
         document.addEventListener('DOMContentLoaded', loadBitacoraRecords);
-    </script>
 
+        // --- Lógica para el Nuevo Modal de Exportación ---
+        const btnExportar = document.getElementById('btnExportar');
+        const modalExportar = document.getElementById('modalExportar');
+        const cerrarModalExportar = document.getElementById('cerrarModalExportar');
+        const cerrarModalExportarTop = document.getElementById('cerrarModalExportarTop'); // Botón de cerrar en el header
+        const filtroPersonal = document.getElementById('filtroPersonal');
+        const exportarExcelBtn = document.getElementById('exportarExcel');
+        const exportarPdfBtn = document.getElementById('exportarPdf');
+
+        // Función para abrir el modal de exportación
+        btnExportar.addEventListener('click', () => {
+            modalExportar.classList.add('show');
+        });
+
+        // Funciones para cerrar el modal de exportación
+        cerrarModalExportar.addEventListener('click', () => {
+            modalExportar.classList.remove('show');
+        });
+        cerrarModalExportarTop.addEventListener('click', () => { // Listener para el botón de cerrar en el header
+            modalExportar.classList.remove('show');
+        });
+
+        // Cerrar modal al hacer clic fuera de él
+        modalExportar.addEventListener('click', (e) => {
+            if (e.target === modalExportar) {
+                modalExportar.classList.remove('show');
+            }
+        });
+
+         exportarExcelBtn.addEventListener('click', () => {
+            const dataToExport = getFilteredExportData();
+            if (dataToExport.length === 0) {
+                showModal('Advertencia', 'No hay registros para exportar a Excel con los filtros actuales.', 'warning');
+                return;
+            }
+
+            // Crear una hoja de cálculo a partir de los datos JSON
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+
+            // **Aplicar estilos al encabezado**
+            // Obtener el rango de la hoja para determinar las columnas presentes
+            const range = XLSX.utils.decode_range(ws['!ref']); // Ej. A1:M4
+
+            // Iterar sobre cada celda en la primera fila (fila del encabezado)
+            for (let C = range.s.c; C <= range.e.c; ++C) { // C es el índice de la columna
+                const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C }); // r:0 es la primera fila (encabezado)
+                const cell = ws[cellAddress];
+
+                if (cell) { // Asegurarse de que la celda exista
+                    if (!cell.s) {
+                        cell.s = {}; // Inicializar el objeto de estilo si no existe
+                    }
+                    
+                    // Aplicar negrita
+                    if (!cell.s.font) {
+                        cell.s.font = {};
+                    }
+                    cell.s.font.bold = true;
+
+                    // Aplicar color de fondo (verde oscuro)
+                    if (!cell.s.fill) {
+                        cell.s.fill = {};
+                    }
+                    cell.s.fill.fgColor = { rgb: "FF2E7D32" }; // FF es para transparencia (opaco), 2E7D32 es el color
+
+                    // Aplicar color de texto (blanco)
+                    if (!cell.s.font) {
+                        cell.s.font = {};
+                    }
+                    cell.s.font.color = { rgb: "FFFFFFFF" }; // FF es para transparencia (opaco), FFFFFF es blanco
+                }
+            }
+
+            // Crear un libro de trabajo
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Bitácora de Actividad");
+
+            // Guardar el archivo
+            const date = new Date();
+            const dateString = date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+            const timeString = date.getHours().toString().padStart(2, '0') + date.getMinutes().toString().padStart(2, '0') + date.getSeconds().toString().padStart(2, '0');
+            const fileName = `Bitacora_Actividad_${dateString}_${timeString}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+
+            modalExportar.classList.remove('show');
+            showModal('✅ Éxito', 'Bitácora exportada a Excel correctamente.', 'success');
+        });
+
+        // Lógica para el botón de Generar PDF
+        exportarPdfBtn.addEventListener('click', () => {
+            const dataToExport = getFilteredExportData(); // Obtener los datos ya filtrados
+
+            if (dataToExport.length === 0) {
+                showModal('Advertencia', 'No hay registros para generar PDF con los filtros actuales.', 'warning');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape'); // 'landscape' para orientación horizontal
+
+            // **Agregar el Logo del Banco**
+            // Usando la ruta que proporcionaste. Asegúrate que `BASE_URL` se resuelva correctamente.
+            const logoUrl = '<?= BASE_URL ?>/View/public/assets/Img/logos/logo2.png';
+            const logoWidth = 40; // Ancho del logo en mm
+            const logoHeight = 40; // Alto del logo en mm
+            const logoX = 14;     // Posición X del logo (margen izquierdo)
+            const logoY = 10;     // Posición Y del logo (parte superior)
+
+            doc.addImage(logoUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+            // **Parte informativa al inicio (aparece solo una vez al principio del PDF)**
+            // Ajusta las coordenadas Y y X para que no se solapen con el logo y el texto quede mejor distribuido.
+            const textStartX = logoX + logoWidth + 10; // Inicio del texto a la derecha del logo
+            const initialY = logoY + 5; // Posición Y inicial para el texto, alineado con la parte superior del logo
+
+            doc.setFontSize(18);
+            doc.setTextColor(46, 125, 50); // Color verde oscuro
+            doc.text("Reporte de Bitácora de Actividad del Sistema", textStartX, initialY);
+
+            doc.setFontSize(10);
+            doc.setTextColor(68, 68, 68); // Color gris oscuro
+            doc.text("Este documento presenta un registro detallado de los eventos y acciones ocurridas en el sistema.", textStartX, initialY + 10);
+            doc.text(`Fecha de Generación: ${new Date().toLocaleString('es-CO')}`, textStartX, initialY + 15);
+            doc.text(`Total de Registros: ${dataToExport.length}`, textStartX, initialY + 20);
+            doc.text("A continuación, se detalla cada registro con su información relevante.", textStartX, initialY + 25);
+
+
+            // Preparar encabezados y cuerpo de la tabla
+            const headers = Object.keys(dataToExport[0]); // Obtener encabezados de la primera fila
+            const body = dataToExport.map(row => Object.values(row)); // Obtener solo los valores
+
+            doc.autoTable({
+                head: [headers],
+                body: body,
+                startY: Math.max(initialY + 35, logoY + logoHeight + 5), // Asegura que la tabla empiece después del logo y el texto descriptivo
+                theme: 'grid', // 'striped', 'grid', 'plain'
+                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, // Ajusta tamaño de fuente y padding
+                headStyles: { fillColor: [46, 125, 50], textColor: 255, fontStyle: 'bold' }, // Color verde oscuro para encabezados
+                columnStyles: {
+                    // **ESTOS SON LOS columnStyles ORIGINALES QUE TENÍAS O SIMILARES, ANTES DE MIS CAMBIOS RECIENTES**
+                    'Descripción': { cellWidth: 70 },
+                    'Fecha y Hora': { cellWidth: 35 },
+                    'Nombre Cliente': { cellWidth: 35 },
+                    'Documento Cliente': { cellWidth: 30 },
+                    'Nombre Personal': { cellWidth: 35 },
+                    'Documento Personal': { cellWidth: 30 },
+                    'Tipo de Personal Ejecuta': { cellWidth: 30 },
+                    'ID Asesoramiento': { cellWidth: 25 },
+                    // Si tenías otras columnas con nombres específicos, asegúrate de que estén aquí
+                    // y que los 'cellWidth' sean adecuados.
+                    // Si agregaste las columnas de 'Tipo Entidad Relacionada', 'Nombre Entidad Relacionada', etc.
+                    // y quieres que jsPDF las maneje automáticamente, puedes eliminar este 'columnStyles'
+                    // o agregar manualmente las nuevas columnas con sus anchos.
+                },
+                didDrawPage: function (data) {
+                    // Pie de página (aparece en cada página)
+                    let str = "Página " + doc.internal.getNumberOfPages();
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text(str, doc.internal.pageSize.width - data.settings.margin.right, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            // Pequeño texto al final del PDF (aparece solo una vez, después de toda la tabla)
+            const finalY = doc.autoTable.previous.finalY;
+            doc.setFontSize(9);
+            doc.setTextColor(68, 68, 68);
+            doc.text("Este reporte es generado automáticamente y refleja la actividad del sistema hasta la fecha y hora de emisión.", 14, finalY + 15);
+            doc.text("Para cualquier consulta, por favor contacte al administrador del sistema. Gracias por su atención.", 14, finalY + 20);
+
+            // Generar un nombre de archivo con fecha y hora
+            const date = new Date();
+            const dateString = date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+            const timeString = date.getHours().toString().padStart(2, '0') + date.getMinutes().toString().padStart(2, '0') + date.getSeconds().toString().padStart(2, '0');
+            const fileName = `Bitacora_Actividad_${dateString}_${timeString}.pdf`;
+
+            doc.save(fileName);
+            modalExportar.classList.remove('show');
+            showModal('✅ Éxito', 'Bitácora generada en PDF correctamente.', 'success');
+        });
+
+        // Función para preparar los datos filtrados para la exportación
+        function getFilteredExportData() {
+            const tipoPersonalFiltro = filtroPersonal.value;
+            
+            const documentoFilter = document.getElementById('filterDocumento').value.toLowerCase();
+            const eventTypeFilter = document.getElementById('filterEventType').value;
+
+            const filteredRecords = allBitacoraRecords.filter(record => {
+            const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toString().includes(documentoFilter) : false;
+            const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toString().includes(documentoFilter) : false;
+            const matchesDocumento = (clientDocMatch || personalDocMatch || documentoFilter === '');
+            const matchesEventType = (eventTypeFilter === '' || record.Tipo_Evento === eventTypeFilter);
+
+            let matchesPersonalType = true;
+            if (tipoPersonalFiltro !== 'ambos') {
+                if (tipoPersonalFiltro === 'asesor' && record.ID_Rol != 3) {
+                    matchesPersonalType = false;
+                } else if (tipoPersonalFiltro === 'cajero' && record.ID_Rol != 4) {
+                    matchesPersonalType = false;
+                }
+            }
+
+            return matchesDocumento && matchesEventType && matchesPersonalType;
+        });
+
+        return filteredRecords.map(record => {
+            // Prepara el nombre completo del personal
+            const personalFullName = (record.Nombre_Personal && record.Apellido_Personal) ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'No Definido';
+                
+            // Determina el tipo de personal para la exportación
+           let tipoPersonalEjecuta = 'No Definido';
+            if (record.ID_Rol == 3) {
+                tipoPersonalEjecuta = 'Asesor';
+            } else if (record.ID_Rol == 4) {
+                tipoPersonalEjecuta = 'Cajero';
+            } else if (record.ID_Personal) {
+                tipoPersonalEjecuta = 'Personal General';
+            }
+
+            // Lógica para determinar si es Cliente o Usuario y asignar los campos correctos
+            let nombreRelacionado = 'N/A';
+            let documentoRelacionado = 'N/A';
+            let tipoEntidad = 'N/A';
+            let idEntidad = 'N/A';
+            let numeroTurno = 'N/A';
+
+            if (record.ID_Cliente) {
+                nombreRelacionado = (record.Nombre_Cliente && record.Apellido_Cliente) ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'No Definido';
+                documentoRelacionado = record.N_Documento_Cliente ?? 'No Definido';
+                tipoEntidad = 'Cliente';
+                idEntidad = record.ID_Cliente ?? 'No Definido';
+            } else if (record.Nombre_Completo_Solicitante || record.N_Documento_Solicitante) {
+                nombreRelacionado = record.Nombre_Completo_Solicitante ?? 'No Definido';
+                documentoRelacionado = record.N_Documento_Solicitante ?? 'No Definido';
+                tipoEntidad = 'Usuario (No Cliente)';
+                idEntidad = record.ID_Turno ?? 'N/A';
+                numeroTurno = record.Numero_Turno ?? 'No Definido';
+            }
+
+                return {
+                    'ID Bitácora': record.ID_Bitacora ?? 'No definido',
+                    'Tipo de Evento': record.Tipo_Evento ?? 'No definido',
+                    'Descripción': record.Descripcion_Evento ?? 'No definido',
+                    'Fecha y Hora': record.Fecha_Hora ? new Date(record.Fecha_Hora).toLocaleString('es-CO') : 'No definido',
+                    'Tipo Entidad Relacionada': tipoEntidad, // Nuevo campo
+                    'Nombre Entidad Relacionada': nombreRelacionado, // Nuevo campo
+                    'Documento Entidad Relacionada': documentoRelacionado, // Nuevo campo
+                    'ID Entidad': idEntidad, // Nuevo campo
+                    'Número de Turno': numeroTurno, // Nuevo campo para usuarios no clientes
+                    'ID Personal': record.ID_Personal ?? 'No definido',
+                    'Nombre Personal': personalFullName,
+                    'Documento Personal': record.N_Documento_Personal ?? 'No definido',
+                    'Tipo de Personal Ejecuta': tipoPersonalEjecuta,
+                    'ID Asesoramiento': record.ID_RegistroAsesoramiento ?? 'No definido'
+                };
+            });
+        }
+    </script>
 </body>
 </html>
