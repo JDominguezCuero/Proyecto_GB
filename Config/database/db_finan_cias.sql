@@ -12,6 +12,7 @@ CREATE DATABASE db_finan_cias2;
 
 USE db_finan_cias2;
 
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -174,9 +175,7 @@ INSERT INTO `asesor_producto` (`ID_Asesor_Producto`, `ID_Personal`, `ID_Producto
 (56, 17, 39, NULL, '2025-07-05 18:12:35', 'Activo'),
 (57, 17, 20, NULL, '2025-07-05 18:12:35', 'Activo'),
 (58, 17, 1, NULL, '2025-07-05 18:12:35', 'Activo'),
-(59, 23, 2, '', '2025-07-07 02:07:30', 'Activo'),
-(60, 23, 3, '', '2025-07-07 02:07:30', 'Activo'),
-(61, 23, 4, '', '2025-07-07 02:07:30', 'Activo');
+(62, 3, 7, NULL, '2025-07-09 12:34:33', 'Activo');
 
 -- --------------------------------------------------------
 
@@ -199,9 +198,30 @@ CREATE TABLE `bitacora` (
 --
 
 INSERT INTO `bitacora` (`ID_Bitacora`, `ID_Cliente`, `ID_Personal`, `ID_RegistroAsesoramiento`, `Tipo_Evento`, `Descripcion_Evento`, `Fecha_Hora`) VALUES
-(1, 1, 1, 1, 'Asesoramiento Inicial', 'Se brindó asesoramiento financiero sobre manejo de presupuesto mensual.', '2025-07-04 15:32:00'),
-(2, NULL, 6, 2, 'Solicitud de crédito', 'Se registró asesoramiento para solicitud de crédito del cliente ID ', '2025-07-06 21:11:13'),
-(3, NULL, 3, 3, 'Solicitud de crédito', 'Se registró asesoramiento para solicitud de crédito del cliente ID ', '2025-07-07 01:17:36');
+(111, NULL, 3, 92, 'Solicitud de crédito', 'Se registró asesoramiento para solicitud de crédito', '2025-07-09 03:27:58'),
+(112, 31, 3, 92, 'Formalización de cliente', 'El usuario ha finalizado el proceso de aprobación y se vinculó oficialmente como cliente.', '2025-07-09 03:28:41'),
+(113, 31, 4, 93, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 03:32:31'),
+(114, 31, 4, NULL, 'Crédito Desembolsado', 'Se ha aprobado y desembolsado el crédito por $1.000.000,00 al cliente.', '2025-07-09 03:32:59'),
+(115, NULL, 4, 93, 'Pago finalizado por el cliente', 'El cliente ha completado satisfactoriamente el proceso de pago y formalización en el sistema.', '2025-07-09 03:33:24'),
+(116, 31, 5, 94, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 03:47:12'),
+(117, 31, 5, 95, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 03:50:17'),
+(118, 31, 5, 96, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 03:54:15'),
+(119, 31, 5, 96, 'Pago finalizado por el cliente', 'El cliente ha completado satisfactoriamente el proceso de pago y formalización en el sistema.', '2025-07-09 03:54:18'),
+(120, NULL, 3, 97, 'Solicitud de crédito', 'Se registró asesoramiento para solicitud de crédito', '2025-07-09 04:05:40'),
+(121, 31, 5, 98, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 12:14:05'),
+(122, 31, 5, 99, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 12:16:46'),
+(123, 31, 5, NULL, 'Crédito Desembolsado', 'Se ha aprobado y desembolsado el crédito por $1.000.000,00 al cliente.', '2025-07-09 12:17:00'),
+(124, NULL, 3, 100, 'Solicitud de crédito', 'Se registró asesoramiento para solicitud de crédito', '2025-07-09 12:29:44'),
+(125, 32, 4, 101, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 12:37:59'),
+(126, 32, 4, NULL, 'Crédito Desembolsado', 'Se ha aprobado y desembolsado el crédito por $3.243.243,00 al cliente.', '2025-07-09 12:38:53'),
+(127, 32, 4, 101, 'Pago finalizado por el cliente', 'El cliente ha completado satisfactoriamente el proceso de pago y formalización en el sistema.', '2025-07-09 12:39:18'),
+(128, 32, 4, 101, 'Pago finalizado por el cliente', 'El cliente ha completado satisfactoriamente el proceso de pago y formalización en el sistema.', '2025-07-09 12:39:46'),
+(129, 32, 4, 101, 'Pago finalizado por el cliente', 'El cliente ha completado satisfactoriamente el proceso de pago y formalización en el sistema.', '2025-07-09 12:39:51'),
+(130, 32, 4, 102, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 12:40:06'),
+(131, 32, 4, 103, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 12:40:43'),
+(132, 32, 5, 104, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 12:52:42'),
+(133, 32, 5, 105, 'Inicio de atención en módulo de cajero', 'El usuario fue atendido por el cajero a través del módulo de Gestión de Cajero para gestionar un pago.', '2025-07-09 12:53:24'),
+(134, 32, 5, NULL, 'Crédito Desembolsado', 'Se ha aprobado y desembolsado el crédito por $3.243.243,00 al cliente.', '2025-07-09 12:54:00');
 
 -- --------------------------------------------------------
 
@@ -232,16 +252,8 @@ CREATE TABLE `cliente` (
 --
 
 INSERT INTO `cliente` (`ID_Cliente`, `Nombre_Cliente`, `Apellido_Cliente`, `ID_Genero`, `ID_TD`, `N_Documento_Cliente`, `Celular_Cliente`, `Correo_Cliente`, `Direccion_Cliente`, `Ciudad_Cliente`, `Fecha_Nacimiento_Cliente`, `ID_Personal_Creador`, `Fecha_Creacion_Cliente`, `Estado_Cliente`, `Contraseña`) VALUES
-(1, 'SIN', 'CLIENTE', 3, 1, '0000000000', '000000000', 'SIN@gmail.com', 'DESCONOCIDAD', 'DESCONOCIDAD', '2000-01-01', NULL, '2025-06-29 15:27:36', 0, '741852963QAZWSXEDCRFVTGBYHNUJMIKOLPÑ'),
-(2, 'Cliente', 'prueba', 1, 3, '0000000005', '313000008', 'Cliente@gmail.com', 'el SENA', 'Puerto Boyaca', '2000-01-01', NULL, '2025-06-20 17:04:54', 1, '12345'),
-(3, 'Cliente2', 'Aprobado', 1, 1, '0000000006', '313000009', 'ClienteAprobado@gmail.com', 'SENA', 'PUERTO BOYACA', '2000-01-01', 1, '2025-06-29 16:25:07', 1, '12345'),
-(12, 'Prueba', 'turno', 1, 1, '2324234', '3206339397', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-18', 1, '2025-07-06 10:44:55', 1, '$2y$10$jcnGdr82SLX9BZDhwNXmd.H/D0lLHIwbjJW8Wnxj3SHnwM2zEwAEK'),
-(14, 'Prueba', 'turno', 1, 1, '213312233', '3223', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-21', 1, '2025-07-06 11:00:23', 1, '$2y$10$UBd7fos1UY9HzXdi5JB.ruK5BHlh4cBMustMqIIXU/2hKqmiGTJIi'),
-(15, 'Jose', 'Dominguez Cuero', 1, 1, '23223', '322332', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-30', 1, '2025-07-06 11:07:45', 1, '$2y$10$HSx9Pf8.CdZS8Z92RfZEhOZZb00hBBOnShs0/hUrOQmxmZ3oKKdjK'),
-(16, 'Prueba', 'turno', 1, 1, '23242342', '233232', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-30', 1, '2025-07-06 11:08:37', 1, '$2y$10$Qzw1RH2fFLAh3eWwHy595.m..BdkPC2.NQO2IAOojn/kiZP.3Alei'),
-(18, 'Prueba', 'turno', 2, 1, '2323323223', '3206339397', 'jose@gmail.com', 'Cra 11 # 39-4', 'dsdsd', '2025-07-23', 1, '2025-07-06 11:11:56', 1, '$2y$10$460pCjxt4Oz1CjEW37uBO.cyX9VHSqEjuw3af025KHoec6BM8.Dy6'),
-(21, 'asd', 'dsdsd', 1, 1, '223223', '22332', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-14', 1, '2025-07-06 11:23:57', 1, '$2y$10$HmGekjSAz65VRtA3mcBQpeLHpaYYI7rszB9Sb2KAXLA3DZt4z/Ps6'),
-(22, 'Jose', 'Dominguez Cuero', 1, 1, '1037665857', '3206339397', 'jose@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-07', 3, '2025-07-07 01:18:56', 1, '$2y$10$hQZIwvXx8JQxIUBPqQ8Td.zRhi56aCDGkDoQwB35Hju1FnD3rUeDO');
+(31, 'Juan', 'Carlos Sanabria', 1, 1, '233324432', '3206339397', 'jose@gmail.com', '', 'Puerto Boyaca', '2025-07-16', 5, '2025-07-09 03:28:41', 1, '$2y$10$W8JFqEXBjb/.p9JJg2CUDO7d5usJZ3yTeZyUxQlfXxr6WQbrwN3WW'),
+(32, 'Jose', 'Camila Ríos Martínez', 2, 1, '103766585722', '12312312', 'sds3dsd@gmail.com', 'Cra 11 # 39-4', 'Puerto Boyaca', '2025-07-01', 3, '2025-07-09 12:36:04', 1, '$2y$10$NbbMSIjk5ckm6jlSBfJZ5um3w2lSbV.ElR/QOq82/HrXdXTAIw.fK');
 
 -- --------------------------------------------------------
 
@@ -253,6 +265,7 @@ CREATE TABLE `credito` (
   `ID_Credito` int(11) NOT NULL,
   `ID_Cliente` int(11) NOT NULL,
   `Monto_Total_Credito` decimal(15,2) NOT NULL,
+  `Desembolso` varchar(255) DEFAULT NULL,
   `Monto_Pendiente_Credito` decimal(15,2) NOT NULL,
   `Fecha_Apertura_Credito` datetime NOT NULL DEFAULT current_timestamp(),
   `Fecha_Vencimiento_Credito` date NOT NULL,
@@ -269,14 +282,9 @@ CREATE TABLE `credito` (
 -- Volcado de datos para la tabla `credito`
 --
 
-INSERT INTO `credito` (`ID_Credito`, `ID_Cliente`, `Monto_Total_Credito`, `Monto_Pendiente_Credito`, `Fecha_Apertura_Credito`, `Fecha_Vencimiento_Credito`, `ID_Producto`, `ID_Estado`, `Tasa_Interes_Anual`, `Tasa_Interes_Periodica`, `Numero_Cuotas`, `Valor_Cuota_Calculado`, `Periodicidad`) VALUES
-(1, 12, 23232.00, 23232.00, '2025-07-06 17:44:55', '2025-09-06', 37, 4, 3.00, 0.25000, 2, 11659.58, 'Mensual'),
-(2, 14, 32233.00, 32233.00, '2025-07-06 18:00:23', '2025-09-06', 37, 4, 2.00, 0.16667, 2, 16156.80, 'Mensual'),
-(3, 15, 222332.00, 222332.00, '2025-07-06 18:07:45', '2025-09-06', 1, 4, 3.00, 0.25000, 2, 111583.05, 'Mensual'),
-(4, 16, 232323.00, 232323.00, '2025-07-06 18:08:37', '2025-09-06', 37, 4, 3.00, 0.25000, 2, 116597.29, 'Mensual'),
-(5, 18, 323.00, 323.00, '2025-07-06 18:11:56', '2025-08-06', 37, 4, 2.00, 0.16667, 1, 323.54, 'Mensual'),
-(8, 21, 232332.00, 232332.00, '2025-07-06 18:23:57', '2025-08-06', 17, 4, 3.00, 0.25000, 1, 232912.83, 'Mensual'),
-(9, 22, 1000000.00, 1000000.00, '2025-07-07 08:18:56', '2026-07-07', 11, 4, 26.00, 2.16667, 12, 95530.14, 'Mensual');
+INSERT INTO `credito` (`ID_Credito`, `ID_Cliente`, `Monto_Total_Credito`, `Desembolso`, `Monto_Pendiente_Credito`, `Fecha_Apertura_Credito`, `Fecha_Vencimiento_Credito`, `ID_Producto`, `ID_Estado`, `Tasa_Interes_Anual`, `Tasa_Interes_Periodica`, `Numero_Cuotas`, `Valor_Cuota_Calculado`, `Periodicidad`) VALUES
+(16, 31, 1000000.00, 'Desembolsado', 1000000.00, '2025-07-09 10:28:41', '2026-01-09', 14, 4, 0.43, 3.58333, 6, 188182.23, 'Mensual'),
+(17, 32, 3243243.00, 'Desembolsado', 3243243.00, '2025-07-09 19:36:04', '2026-07-09', 7, 4, 0.04, 0.33333, 12, 276161.83, 'Mensual');
 
 -- --------------------------------------------------------
 
@@ -304,28 +312,24 @@ CREATE TABLE `cuotacredito` (
 --
 
 INSERT INTO `cuotacredito` (`ID_CuotaCredito`, `ID_Credito`, `Numero_Cuota`, `Monto_Capital`, `Monto_Interes`, `Monto_Total_Cuota`, `Fecha_Vencimiento`, `Fecha_Pago`, `Monto_Pagado`, `Dias_Mora_Al_Pagar`, `Monto_Recargo_Mora`, `ID_Estado_Cuota`) VALUES
-(1, 1, 1, 11601.50, 58.08, 11659.58, '2025-08-06', '2025-07-07 06:55:29', 11601.50, 0, 0.00, 7),
-(2, 1, 2, 11630.50, 29.08, 11659.58, '2025-09-06', '2025-07-07 06:55:29', 11630.50, 0, 0.00, 7),
-(3, 2, 1, 16103.08, 53.72, 16156.80, '2025-08-06', '2025-07-07 07:52:25', 32312.00, 0, 0.00, 7),
-(4, 2, 2, 16129.92, 26.88, 16156.80, '2025-09-06', NULL, 16156.00, 0, 0.00, 14),
-(5, 3, 1, 111027.22, 555.83, 111583.05, '2025-08-06', NULL, 0.00, 0, 0.00, 14),
-(6, 3, 2, 111304.78, 278.26, 111583.05, '2025-09-06', NULL, 0.00, 0, 0.00, 14),
-(7, 4, 1, 116016.48, 580.81, 116597.29, '2025-08-06', NULL, 0.00, 0, 0.00, 14),
-(8, 4, 2, 116306.52, 290.77, 116597.29, '2025-09-06', NULL, 0.00, 0, 0.00, 14),
-(9, 5, 1, 323.00, 0.54, 323.54, '2025-08-06', NULL, 323.00, 0, 0.00, 14),
-(14, 8, 1, 232332.00, 580.83, 232912.83, '2025-08-06', NULL, 0.00, 0, 0.00, 14),
-(15, 9, 1, 73863.47, 21666.67, 95530.14, '2025-08-07', '2025-07-07 08:20:33', 95530.14, 0, 0.00, 7),
-(16, 9, 2, 75463.85, 20066.29, 95530.14, '2025-07-05', NULL, 0.00, 2, 146.57, 8),
-(17, 9, 3, 77098.90, 18431.24, 95530.14, '2025-10-07', NULL, 0.00, 0, 0.00, 14),
-(18, 9, 4, 78769.37, 16760.77, 95530.14, '2025-11-07', NULL, 0.00, 0, 0.00, 14),
-(19, 9, 5, 80476.04, 15054.10, 95530.14, '2025-12-07', NULL, 0.00, 0, 0.00, 14),
-(20, 9, 6, 82219.69, 13310.45, 95530.14, '2026-01-07', NULL, 0.00, 0, 0.00, 14),
-(21, 9, 7, 84001.12, 11529.02, 95530.14, '2026-02-07', NULL, 0.00, 0, 0.00, 14),
-(22, 9, 8, 85821.14, 9709.00, 95530.14, '2026-03-07', NULL, 0.00, 0, 0.00, 14),
-(23, 9, 9, 87680.60, 7849.54, 95530.14, '2026-04-07', NULL, 0.00, 0, 0.00, 14),
-(24, 9, 10, 89580.35, 5949.79, 95530.14, '2026-05-07', NULL, 0.00, 0, 0.00, 14),
-(25, 9, 11, 91521.25, 4008.89, 95530.14, '2026-06-07', NULL, 0.00, 0, 0.00, 14),
-(26, 9, 12, 93504.21, 2025.92, 95530.14, '2026-07-07', NULL, 0.00, 0, 0.00, 14);
+(49, 16, 1, 152348.90, 35833.33, 188182.23, '2025-08-09', '2025-07-09 10:33:24', 188182.23, 0, 0.00, 7),
+(50, 16, 2, 157808.07, 30374.16, 188182.23, '2025-09-09', '2025-07-09 10:54:18', 188182.23, 0, 0.00, 7),
+(51, 16, 3, 163462.86, 24719.38, 188182.23, '2025-10-09', NULL, 0.00, 0, 0.00, 14),
+(52, 16, 4, 169320.28, 18861.96, 188182.23, '2025-11-09', NULL, 0.00, 0, 0.00, 14),
+(53, 16, 5, 175387.59, 12794.65, 188182.23, '2025-12-09', NULL, 0.00, 0, 0.00, 14),
+(54, 16, 6, 181672.31, 6509.92, 188182.23, '2026-01-09', NULL, 0.00, 0, 0.00, 14),
+(55, 17, 1, 265351.02, 10810.81, 276161.83, '2025-08-09', '2025-07-09 19:39:18', 276161.83, 0, 0.00, 7),
+(56, 17, 2, 266235.52, 9926.31, 276161.83, '2025-09-09', '2025-07-09 19:39:46', 276161.83, 0, 0.00, 7),
+(57, 17, 3, 267122.98, 9038.85, 276161.83, '2025-10-09', '2025-07-09 19:39:51', 276161.83, 0, 0.00, 7),
+(58, 17, 4, 268013.39, 8148.44, 276161.83, '2025-11-09', NULL, 0.00, 0, 0.00, 14),
+(59, 17, 5, 268906.76, 7255.07, 276161.83, '2025-12-09', NULL, 0.00, 0, 0.00, 14),
+(60, 17, 6, 269803.12, 6358.71, 276161.83, '2026-01-09', NULL, 0.00, 0, 0.00, 14),
+(61, 17, 7, 270702.46, 5459.37, 276161.83, '2026-02-09', NULL, 0.00, 0, 0.00, 14),
+(62, 17, 8, 271604.80, 4557.03, 276161.83, '2026-03-09', NULL, 0.00, 0, 0.00, 14),
+(63, 17, 9, 272510.15, 3651.68, 276161.83, '2026-04-09', NULL, 0.00, 0, 0.00, 14),
+(64, 17, 10, 273418.52, 2743.31, 276161.83, '2026-05-09', NULL, 0.00, 0, 0.00, 14),
+(65, 17, 11, 274329.92, 1831.91, 276161.83, '2026-06-09', NULL, 0.00, 0, 0.00, 14),
+(66, 17, 12, 275244.35, 917.48, 276161.83, '2026-07-09', NULL, 0.00, 0, 0.00, 14);
 
 -- --------------------------------------------------------
 
@@ -401,10 +405,11 @@ CREATE TABLE `pagocuota` (
 --
 
 INSERT INTO `pagocuota` (`ID_PagoCuota`, `ID_CuotaCredito`, `ID_Personal`, `Fecha_Hora_Pago`, `Monto_Pagado_Transaccion`, `ID_Estado_Pago`, `Observaciones_Pago`) VALUES
-(1, 1, 1, '2025-07-06 23:46:22', 11659.00, 7, 'Abono de cuota desde simulador cajero'),
-(2, 1, 1, '2025-07-06 23:55:29', 11659.00, 7, 'Abono de cuota desde simulador cajero'),
-(17, 9, 1, '2025-07-07 01:07:37', 323.00, 7, 'Abono de cuota desde simulador cajero'),
-(18, 15, 1, '2025-07-07 01:20:33', 95530.14, 7, 'Abono de cuota desde simulador cajero');
+(36, 49, 4, '2025-07-09 03:33:24', 188182.23, 7, 'Abono de cuota desde módulo de gestión de cajero'),
+(37, 50, 5, '2025-07-09 03:54:18', 188182.23, 7, 'Abono de cuota desde módulo de gestión de cajero'),
+(38, 55, 4, '2025-07-09 12:39:18', 276161.83, 7, 'Abono de cuota desde módulo de gestión de cajero'),
+(39, 56, 4, '2025-07-09 12:39:46', 276161.83, 7, 'Abono de cuota desde módulo de gestión de cajero'),
+(40, 57, 4, '2025-07-09 12:39:51', 276161.83, 7, 'Abono de cuota desde módulo de gestión de cajero');
 
 -- --------------------------------------------------------
 
@@ -456,12 +461,12 @@ CREATE TABLE `personal` (
 --
 
 INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `ID_Rol`, `ID_Genero`, `ID_TD`, `N_Documento_Personal`, `Celular_Personal`, `Correo_Personal`, `Contraseña_Personal`, `Activo_Personal`, `Fecha_Creacion_Personal`, `Foto_Perfil_Personal`) VALUES
-(1, 'Gerente', 'Primero', 1, 1, 1, '0000000000', '3130000001', 'jsdmngzc@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:00:44', NULL),
-(2, 'SubGerente', 'Segundo', 2, 2, 2, '0000000002', '3130000002', 'SubGerente@gmail.com', '12345', 1, '2025-06-20 17:02:48', NULL),
-(3, 'Asesor', 'tercero', 3, 3, 3, '0000000003', '3130000003', 'jose@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
-(4, 'Cajero', 'Cuarto', 4, 1, 1, '0000000004', '3130000004', 'cajero@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
+(1, 'Gerente', 'Admin', 1, 1, 1, '0000000000', '3130000001', 'gerente@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:00:44', NULL),
+(2, 'SubGerente', 'Admin', 2, 2, 2, '0000000002', '3130000002', 'subGerente@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
+(3, 'Asesor', 'Admin', 3, 3, 3, '0000000003', '3130000003', 'asesor@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
+(4, 'Cajero', 'Admin', 4, 1, 1, '0000000004', '3130000004', 'cajero@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
 (5, 'ADMIN', 'SUPER', 5, 1, 1, '0000000001', '3206339397', 'admin1$#$@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-07-06 13:03:05', 'N/A'),
-(6, 'Nubia Lorena', 'Montoya Palomo', 3, 3, 3, '00000000000', '3130000001', 'montoyapalomo1997@gmail.com', '$2y$10$jqggiIAtb4r0rmIy3hCC1us0PDdkoOdYUqyRiWO9A4ZNXyxb1dvl.', 1, '2025-06-20 17:02:48', NULL),
+(6, 'Nubia Lorena', 'Montoya Palomo', 3, 3, 3, '00000000000', '3130000001', 'montoyapalomo1997@gmail.com', 'Montoya1', 1, '2025-06-20 17:02:48', NULL),
 (7, 'Dina Mayerli', 'Muñoz Erazo', 3, 3, 3, '00000000002', '3130000001', 'izajhoss@gmail.com', 'Muñoz2', 1, '2025-06-20 17:02:48', NULL),
 (8, 'Luisa Fernanda', 'Cuesta Rivera', 3, 3, 3, '00000000003', '3130000002', 'luisacuesta180@gmail.com', 'Cuesta3', 1, '2025-06-20 17:02:48', NULL),
 (9, 'Angela Maria', 'Valencia Tabarez', 3, 3, 3, '00000000004', '3130000003', 'Angelavalenciatabarez09@gmail.com', 'Valencia4', 1, '2025-06-20 17:02:48', NULL),
@@ -473,8 +478,12 @@ INSERT INTO `personal` (`ID_Personal`, `Nombre_Personal`, `Apellido_Personal`, `
 (15, 'Nicoll Daniela', 'Flores Pacheco', 3, 3, 3, '00000000010', '3130000009', 'florezdaniela313@gmail.com', 'Flores10', 1, '2025-06-20 17:02:48', NULL),
 (16, 'Angie Lorena', 'Murcia', 3, 3, 3, '00000000011', '3130000010', 'lorenamurcia199905@gmail.com', 'Murcia11', 1, '2025-06-20 17:02:48', NULL),
 (17, 'Heilyn Stefany', 'Hernández Pérez', 3, 3, 3, '00000000012', '3130000011', 'heihernandez111@gmail.com', 'Hernández12', 1, '2025-06-20 17:02:48', NULL),
-(22, 'Prueba', 'Dominguez Cuero', 3, 1, 1, '103766585733', '3206339397', 'jose33@gmail.com', '$2y$10$.K5isTwrtwKz/gLUDMJMwO/nKd706y3W0lTR.W1A4kFeA2.XfprHK', 1, '2025-07-07 02:02:34', NULL),
-(23, 'Envio', 'Nuevo', 3, 2, 1, '1234532233', '3206339397', '111jose@gmail.com', '$2y$10$VuU38WZgO1Kp5E5dwSaKMe62mmtSUsDZNUTaQjWWk.HsXZXWW9TrS', 1, '2025-07-07 02:07:30', NULL);
+(24, 'Zharick Valentina', 'Barrera García', 4, 2, 3, '00000000018', '3130000012', 'barreragarciavalentina646@gmail.com', '$2y$10$rkKHkUEXmUeH6CAyexrT0O9lvMfM.5BaSMD1eGjVmMQvRU3JRIqvy', 1, '2025-06-20 17:02:48', NULL),
+(25, 'Alisson Yulieth', 'Palacios Arrieta', 4, 2, 3, '00000000019', '3130000013', 'alissonpalaciosa@gmail.com', '$2y$10$oxYMXGtxsEU4qV2TwG6STu3twIhkN5qPYfbdH3Qtun0wzSKMZzN6y', 1, '2025-06-20 17:02:48', NULL),
+(26, 'Angoli Angelica', 'Martinez Sandoval', 4, 2, 3, '00000000020', '3130000014', 'Sandovalanyoli44@gmail.com', '$2y$10$8OhNUmQj6Lra9CefCZ9kXOlb9U6R4.nACWAnbh1IRKU/pdALRTlLi', 1, '2025-06-20 17:02:48', NULL),
+(27, 'Geraldin', 'Ulloa Martinez', 4, 2, 3, '00000000021', '3130000015', 'Alexcrissdbz@gmail.com', '$2y$10$ASyYo4W1m99M7YbXp34GFOkV7n1ZbJZqGrj65gEfnrQw/7NfjRLje', 1, '2025-06-20 17:02:48', NULL),
+(28, 'Laura Dayana', 'Hernández Cuellar', 4, 2, 3, '00000000022', '3130000016', 'lauradayanahernandezcuellar@gmail.com', '$2y$10$MhiC2aMQAJIl5tShY23Q/ON1CdZbZLsc74vYfbB7BqBNu8XW5crlq', 1, '2025-06-20 17:02:48', NULL),
+(29, 'Lesly Nathalia', 'Suárez Rendón', 4, 2, 3, '00000000023', '3130000017', 'suarezrendonnathalia2807@gmail.com', '$2y$10$RzeLnsLgHd6vAO5QoazpiuOfVuPbi4lmMFG6D3t5DWkD8BYfdIgKq', 1, '2025-06-20 17:02:48', NULL);
 
 -- --------------------------------------------------------
 
@@ -559,9 +568,20 @@ CREATE TABLE `registroasesoramiento` (
 --
 
 INSERT INTO `registroasesoramiento` (`ID_RegistroAsesoramiento`, `ID_Personal`, `ID_Cliente`, `ID_Turno`, `Fecha_Hora_Inicio`, `Fecha_Hora_Fin`, `Observaciones`, `Resultado`) VALUES
-(1, 1, 1, 1, '2025-07-04 14:00:00', '2025-07-04 14:45:00', 'Cliente interesado en consolidar sus deudas. Se identificaron gastos innecesarios.', ''),
-(2, 6, NULL, 41, '2025-07-07 04:11:13', NULL, NULL, 'Pendiente'),
-(3, 3, NULL, 45, '2025-07-07 08:17:36', NULL, NULL, 'Pendiente');
+(92, 3, 31, 52, '2025-07-09 10:27:58', '2025-07-09 10:28:41', 'Registro del usuario finalizado por el asesor desde el módulo de turnos.', ''),
+(93, 4, 31, NULL, '2025-07-09 10:32:31', '2025-07-09 10:33:24', 'El cajero finalizó el proceso de atención tras la confirmación del pago.', ''),
+(94, 5, 31, NULL, '2025-07-09 10:47:12', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', ''),
+(95, 5, 31, NULL, '2025-07-09 10:50:17', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', ''),
+(96, 5, 31, NULL, '2025-07-09 10:54:15', '2025-07-09 10:54:18', 'El cajero finalizó el proceso de atención tras la confirmación del pago.', ''),
+(97, 3, NULL, 51, '2025-07-09 11:05:40', NULL, 'El asesor inició la atención del usuario mediante el turno asignado desde el sistema.', ''),
+(98, 5, 31, NULL, '2025-07-09 19:14:05', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', ''),
+(99, 5, 31, NULL, '2025-07-09 19:16:46', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', ''),
+(100, 3, NULL, 53, '2025-07-09 19:29:44', NULL, 'El asesor inició la atención del usuario mediante el turno asignado desde el sistema.', ''),
+(101, 4, 32, NULL, '2025-07-09 19:37:59', '2025-07-09 19:39:51', 'El cajero finalizó el proceso de atención tras la confirmación del pago.', ''),
+(102, 4, 32, NULL, '2025-07-09 19:40:06', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', ''),
+(103, 4, 32, NULL, '2025-07-09 19:40:43', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', ''),
+(104, 5, 32, NULL, '2025-07-09 19:52:42', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', ''),
+(105, 5, 32, NULL, '2025-07-09 19:53:24', NULL, 'El cajero inició la atención del usuario a través del módulo de de Gestión de Cajero.', '');
 
 -- --------------------------------------------------------
 
@@ -676,16 +696,9 @@ CREATE TABLE `turno` (
 --
 
 INSERT INTO `turno` (`ID_Turno`, `ID_Cliente`, `Nombre_Completo_Solicitante`, `N_Documento_Solicitante`, `Numero_Turno`, `ID_Producto_Interes`, `Fecha_Hora_Solicitud`, `Fecha_Hora_Finalizacion`, `ID_Estado_Turno`, `Tiempo_Espera_Minutos`, `Motivo_Turno`) VALUES
-(1, 1, 'Laura Camila Ríos Martínez', '1032456789', 'T-000', NULL, '2025-07-04 13:30:00', '2025-07-04 14:00:00', 1, 15, 'Solicitud de asesoría para inversión en CDT'),
-(37, NULL, 'Jose Dominguez Cuero', '3233', 'T037', NULL, '2025-07-06 02:13:29', NULL, 1, NULL, NULL),
-(38, NULL, 'asd', '232', 'T038', 17, '2025-07-06 02:17:02', '2025-07-06 18:23:57', 2, 1547, NULL),
-(39, NULL, 'Prueba turno', '2324234', 'T039', 37, '2025-07-06 02:24:54', NULL, 1, 1517, NULL),
-(40, NULL, 'Jose Dominguez Cuero', '122552522', 'T040', 11, '2025-07-06 03:30:58', NULL, 1, NULL, NULL),
-(41, NULL, 'Jose Dominguez Cuero', '67', 'T041', 38, '2025-07-06 04:27:31', NULL, 2, 1423, NULL),
-(42, NULL, 'sdsd', '3223', 'T042', 15, '2025-07-06 21:21:32', NULL, 2, 408, NULL),
-(43, NULL, 'Prueba Turno PUBLICO', '025245255', 'T043', 1, '2025-07-06 21:22:16', NULL, 2, 398, NULL),
-(44, NULL, 'Jose Dominguez Cuero', '2324234', 'T044', 14, '2025-07-07 04:22:56', NULL, 1, NULL, NULL),
-(45, NULL, 'Jose Dominguez Cuero', '1037665857', 'T045', 11, '2025-07-07 08:17:07', '2025-07-07 08:18:56', 3, 0, NULL);
+(51, NULL, 'Jose Dominguez Cuero', '1037665857', 'T051', 14, '2025-07-09 10:27:06', NULL, 2, 38, NULL),
+(52, 31, 'Juan Carlos Sanabria', '233324432', 'T052', 14, '2025-07-09 10:27:20', '2025-07-09 10:28:41', 3, 0, NULL),
+(53, NULL, 'Jose Dominguez Cuero', '1020304050', 'T053', 14, '2025-07-09 19:26:55', NULL, 2, 2, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -825,31 +838,31 @@ ALTER TABLE `turno`
 -- AUTO_INCREMENT de la tabla `asesor_producto`
 --
 ALTER TABLE `asesor_producto`
-  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `ID_Asesor_Producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT de la tabla `bitacora`
 --
 ALTER TABLE `bitacora`
-  MODIFY `ID_Bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID_Bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=135;
 
 --
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `ID_Cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `ID_Cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `credito`
 --
 ALTER TABLE `credito`
-  MODIFY `ID_Credito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `ID_Credito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `cuotacredito`
 --
 ALTER TABLE `cuotacredito`
-  MODIFY `ID_CuotaCredito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `ID_CuotaCredito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT de la tabla `estado`
@@ -867,7 +880,7 @@ ALTER TABLE `genero`
 -- AUTO_INCREMENT de la tabla `pagocuota`
 --
 ALTER TABLE `pagocuota`
-  MODIFY `ID_PagoCuota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `ID_PagoCuota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `periodo`
@@ -879,7 +892,7 @@ ALTER TABLE `periodo`
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `ID_Personal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `ID_Personal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -891,7 +904,7 @@ ALTER TABLE `producto`
 -- AUTO_INCREMENT de la tabla `registroasesoramiento`
 --
 ALTER TABLE `registroasesoramiento`
-  MODIFY `ID_RegistroAsesoramiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID_RegistroAsesoramiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -915,7 +928,7 @@ ALTER TABLE `tipo_documento`
 -- AUTO_INCREMENT de la tabla `turno`
 --
 ALTER TABLE `turno`
-  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `ID_Turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- Restricciones para tablas volcadas
