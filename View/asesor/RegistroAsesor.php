@@ -288,7 +288,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                 </select>
 
                 <?php 
-                if (isset($_SESSION['rol']) && ($_SESSION['rol'] == 3 || $_SESSION['rol'] == 5)){
+                if (isset($_SESSION['rol']) && ($_SESSION['rol'] == 1 || $_SESSION['rol'] == 5)){
                     echo '<label for="idRol">Rol *</label>
                           <select id="idRol" name="idRol" required onchange="toggleProductAssociation()">
                             <option value="" disabled selected>Seleccione una opción</option>

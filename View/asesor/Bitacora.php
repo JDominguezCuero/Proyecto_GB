@@ -888,7 +888,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             const tipoPersonalFiltro = filtroPersonal.value;
             
             const documentoFilter = document.getElementById('filterDocumento').value.toLowerCase();
-            const eventTypeFilter = document.getElementById('filterEventType').value;
+            const eventTypeFilter = document.getElementById('filterRol').value;
 
             const filteredRecords = allBitacoraRecords.filter(record => {
             const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toString().includes(documentoFilter) : false;
