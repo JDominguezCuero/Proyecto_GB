@@ -1,5 +1,5 @@
 <header class="header">
-
+  
   <div class="logo-nombre">
     <img src="<?= BASE_URL ?>/View/public/assets/Img/logos/logo2.png" alt="Logo Banco" class="logo">
     <div class="titulo">
@@ -10,18 +10,25 @@
 
   <!-- Si NO hay una sesión activa -->
   <?php if (!isset($_SESSION['usuario'])): ?>
-    <div class="dropdown">
-        <button class="btn-admin" onclick="toggleDropdown()">Iniciar Sesión ▾</button>
-        <div id="menuSesion" class="dropdown-content">
-          <a href="../autenticacion/Login_Cliente.php">Cliente</a>
-          <a href="../autenticacion/Login_Administracion.php">Administrativo</a>
-        </div>
-    </div>
-  <?php else: ?>
-    <!-- Si hay sesión activa -->
-    <p class="text-sm text-gray-300"><?php echo htmlspecialchars($_SESSION['nombre'] ?? ''); ?></p>
-    <a href="#" id="cerrarSesionBtn" class="btn-admin">Cerrar Sesión</a>
-  <?php endif; ?>
+            <div class="dropdown">
+                <button class="btn-admin" onclick="toggleDropdown()">Iniciar Sesión ▾</button>
+                <div id="menuSesion" class="dropdown-content">
+                    <a href="../autenticacion/Login_Cliente.php">Cliente</a>
+                    <a href="../autenticacion/Login_Administracion.php">Administrativo</a>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="usuario-dropdown">
+                <button onclick="toggleUsuarioMenu()" class="usuario-btn">
+                    <i class="fas fa-user-circle"></i>
+                    <span><?php echo htmlspecialchars($_SESSION['nombre'] ?? '') . ' ' . htmlspecialchars($_SESSION['apellido'] ?? ''); ?></span>
+                </button>
+                <div id="menuUsuario" class="usuario-menu">
+                    <a href="<?= BASE_URL ?>/Controlador/asesorController.php?accion=verPerfilPersonal">Mi Perfil</a>
+                    <a href="#" id="cerrarSesionBtn">Cerrar Sesión</a>
+                </div>
+            </div>
+        <?php endif; ?>
 
 </header>
 
@@ -66,34 +73,50 @@
 </nav>
 
 <script>
+  // Se ejecuta cuando el DOM está completamente cargado
   document.addEventListener('DOMContentLoaded', function() {
+    // --- Confirmación para cerrar sesión ---
     const cerrarSesionBtn = document.getElementById('cerrarSesionBtn');
+      if (cerrarSesionBtn) {
+        cerrarSesionBtn.addEventListener('click', function(event) {
+          event.preventDefault(); // Evita la navegación predeterminada del enlace
+          const confirmacion = confirm('¿Estás seguro de que deseas cerrar sesión?');
+          if (confirmacion) {
+            window.location.href = '<?= BASE_URL ?>/View/public/inicio.php?logout=true';
+          }
+        });
+      }
+    });
 
-    if (cerrarSesionBtn) {
-      cerrarSesionBtn.addEventListener('click', function(event) {
-        event.preventDefault(); // Evita la navegación predeterminada del enlace
-
-        // Muestra el cuadro de diálogo de confirmación
-        const confirmacion = confirm('¿Estás seguro de que deseas cerrar sesión?');
-
-        if (confirmacion) {
-          // Si el usuario confirma, redirige a inicio.php con un parámetro 'logout'
-          window.location.href = '<?= BASE_URL ?>/View/public/inicio.php?logout=true'; 
-        }
-      });
+    // --- FUNCIONALIDAD PARA EL MENÚ DE INICIO DE SESIÓN (Cliente/Admin) ---
+    function toggleDropdown() {
+      document.getElementById("menuSesion").classList.toggle("show");
     }
-  });
 
-  function toggleDropdown() {
-    document.getElementById("menuSesion").classList.toggle("show");
-  }
+    // --- FUNCIONALIDAD PARA EL MENÚ DE USUARIO (Perfil/Cerrar Sesión) ---
+    function toggleUsuarioMenu() {
+      document.getElementById("menuUsuario").classList.toggle("show");
+    }
 
-  window.onclick = function (event) {
-    if (!event.target.matches('.btn-admin')) {
-      const dropdowns = document.getElementsByClassName("dropdown-content");
+    // --- CERRAR MENÚS AL HACER CLIC FUERA ---
+    window.addEventListener("click", function(event) {
+    // Cerrar menú de inicio de sesión si se hace clic fuera del "dropdown"
+    if (!event.target.closest(".dropdown")) {
+        const dropdowns = document.getElementsByClassName("dropdown-content");
       for (let i = 0; i < dropdowns.length; i++) {
-        dropdowns[i].classList.remove("show");
+        const openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
       }
     }
-  };
+
+        // Cerrar menú de usuario si se hace clic fuera del "usuario-dropdown"
+    if (!event.target.closest(".usuario-dropdown")) {
+        const usuarioMenu = document.getElementById("menuUsuario");
+        if (usuarioMenu && usuarioMenu.classList.contains("show")) {
+            usuarioMenu.classList.remove("show");
+        }
+    }
+  });
 </script>

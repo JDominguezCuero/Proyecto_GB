@@ -55,6 +55,7 @@ try {
                     
                         $_SESSION['idPersonal'] = $resultado['ID_Personal'];
                         $_SESSION['nombre'] = $resultado['Nombre_Personal'];
+                        $_SESSION['apellido'] = $resultado['Apellido_Personal'];
                         $_SESSION['usuario'] = $usuario;
                         $_SESSION['rol'] = $resultado['ID_Rol'];
 

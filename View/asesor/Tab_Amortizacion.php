@@ -22,6 +22,8 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <style>
         /* Estilos base para los modales */
         .modal {
@@ -118,7 +120,7 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
 
     <div class="main-content-area">
         <h1 class="text-3xl font-bold mb-6 text-center">Gestión de Créditos y Clientes</h1>
-
+        
         <div class="flex flex-wrap justify-center gap-4 mb-8">
             <button id="btnGenerarSimulacion" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300">
                 Generar Simulación
@@ -223,6 +225,7 @@ if (isset($_GET['login']) && $_GET['login'] == 'success') {
             <h2 class="text-2xl font-bold mb-4 text-center">Registro de Cliente</h2>
             <form id="formularioCliente" action="#" method="POST" class="formulario-banco">
                 <input type="hidden" name="idTurno" id="idTurnoHidden" value="<?= htmlspecialchars($turnoAtender['ID_Turno'] ?? '') ?>">
+                <input type="hidden" name="idAsesoramientoActual" id="id_registroHidden" value="<?= htmlspecialchars($idRegistroAsesoramiento ?? '') ?>">
 
                 <div class="fila">
                     <div class="columna">

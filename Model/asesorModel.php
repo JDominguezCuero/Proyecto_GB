@@ -389,11 +389,217 @@ function asociarAsesorProducto(PDO $conexion, int $idPersonal, array $idProducto
     return true; // Todas las asociaciones fueron exitosas
 }
 
+/**
+ * Obtiene un registro de personal y sus estadísticas asociadas.
+ * @param PDO $conexion Objeto de conexión PDO.
+ * @param int $idPersonal ID del personal.
+ * @return array|false Array asociativo del personal con sus estadísticas o false si no se encuentra.
+ */
+function obtenerPerfilPersonalCompleto(PDO $conexion, int $idPersonal) {
+    // 1. Consulta principal para los datos del personal
+    // Usamos LEFT JOIN para que siempre traiga el personal, incluso si no tiene registros de asesoramiento.
+    $sqlPersonal = "SELECT 
+                        p.ID_Personal, 
+                        p.Nombre_Personal, 
+                        p.Apellido_Personal, 
+                        p.N_Documento_Personal,
+                        p.Correo_Personal,
+                        p.Celular_Personal,
+                        p.Fecha_Creacion_Personal,
+                        p.Activo_Personal,
+                        p.ID_Rol,
+                        r.Rol AS Nombre_Rol, 
+                        td.Tipo_Documento AS Nombre_Tipo_Documento, 
+                        g.Genero AS Nombre_Genero
+                    FROM personal p
+                    LEFT JOIN rol r ON p.ID_Rol = r.ID_Rol
+                    LEFT JOIN tipo_documento td ON p.ID_TD = td.ID_TD
+                    LEFT JOIN genero g ON p.ID_Genero = g.ID_Genero
+                    WHERE p.ID_Personal = :idPersonal";
+    
+    $stmtPersonal = $conexion->prepare($sqlPersonal);
+    $stmtPersonal->bindParam(':idPersonal', $idPersonal, PDO::PARAM_INT);
+    $stmtPersonal->execute();
+    $personalData = $stmtPersonal->fetch(PDO::FETCH_ASSOC);
+
+    if (!$personalData) {
+        return false; // El personal no fue encontrado
+    }
+
+    // 2. Consulta para estadísticas de registro de asesoramiento
+    // Hacemos GROUP BY para sumar/contar por el ID_Personal.
+    $sqlEstadisticas = "SELECT
+                COUNT(ra.ID_RegistroAsesoramiento) AS total_asesoramientos,
+                COUNT(DISTINCT ra.ID_Cliente) AS clientes_asesorados_unicos,
+                COUNT(DISTINCT ra.ID_Turno) AS turnos_atendidos,
+                SUM(CASE WHEN c.Monto_Total_Credito IS NOT NULL THEN c.Monto_Total_Credito ELSE 0 END) AS monto_total_aprobado_clientes_asesorados
+            FROM registroasesoramiento ra
+            LEFT JOIN credito c ON ra.ID_Cliente = c.ID_Cliente -- ¡Aquí está el cambio clave!
+            WHERE ra.ID_Personal = :idPersonal";
+
+    $stmtEstadisticas = $conexion->prepare($sqlEstadisticas);
+    $stmtEstadisticas->bindParam(':idPersonal', $idPersonal, PDO::PARAM_INT);
+    $stmtEstadisticas->execute();
+    $estadisticas = $stmtEstadisticas->fetch(PDO::FETCH_ASSOC);
+
+    // Si no hay estadísticas, se inicializan a cero para evitar errores
+    if (!$estadisticas) {
+        $estadisticas = [
+            'total_asesoramientos' => 0,
+            'clientes_asesorados_unicos' => 0,
+            'turnos_atendidos' => 0,
+            'monto_total_aprobado_clientes_asesorados' => 0.00
+        ];
+    } else {
+         // Formatear el monto para la vista si es necesario, aquí o en el frontend
+         $estadisticas['monto_total_aprobado_clientes_asesorados'] = number_format((float)$estadisticas['monto_total_aprobado_clientes_asesorados'], 2, '.', ',');
+    }
 
 
+    // 3. Combinar los datos del personal con las estadísticas
+    $personalData['estadisticas'] = $estadisticas;
 
+    return $personalData;
+}
 
+/**
+     * Actualiza un registro de asesoramiento existente.
+     * @param PDO $conexion Objeto de conexión PDO.
+     * @param int $idRegistroAsesoramiento ID del registro a actualizar.
+     * @param array $datosAsesoramiento Array asociativo con los datos a actualizar.
+     * @return bool True si se actualiza correctamente, false en caso contrario.
+     */
+    function actualizarRegistroAsesoramiento(PDO $conexion, int $idRegistroAsesoramiento, array $datosAsesoramiento): bool {
+        $campos = [];
+        $valores = [':idRegistroAsesoramiento' => $idRegistroAsesoramiento];
+    
+        if (isset($datosAsesoramiento['ID_Personal'])) { $campos[] = 'ID_Personal = :idPersonal'; $valores[':idPersonal'] = $datosAsesoramiento['ID_Personal']; }
+        if (isset($datosAsesoramiento['ID_Cliente'])) { $campos[] = 'ID_Cliente = :idCliente'; $valores[':idCliente'] = $datosAsesoramiento['ID_Cliente']; }
+        if (isset($datosAsesoramiento['ID_Turno'])) { $campos[] = 'ID_Turno = :idTurno'; $valores[':idTurno'] = $datosAsesoramiento['ID_Turno']; }
+        if (isset($datosAsesoramiento['Fecha_Hora_Inicio'])) { $campos[] = 'Fecha_Hora_Inicio = :fechaInicio'; $valores[':fechaInicio'] = $datosAsesoramiento['Fecha_Hora_Inicio']; }
+        if (isset($datosAsesoramiento['Fecha_Hora_Fin'])) { $campos[] = 'Fecha_Hora_Fin = :fechaFin'; $valores[':fechaFin'] = $datosAsesoramiento['Fecha_Hora_Fin']; }
+        if (isset($datosAsesoramiento['Observaciones'])) { $campos[] = 'Observaciones = :observaciones'; $valores[':observaciones'] = $datosAsesoramiento['Observaciones']; }
+        if (isset($datosAsesoramiento['Resultado'])) { $campos[] = 'Resultado = :resultado'; $valores[':resultado'] = $datosAsesoramiento['Resultado']; }
+    
+        if (empty($campos)) {
+            return false;
+        }
+    
+        $sql = "UPDATE RegistroAsesoramiento SET " . implode(', ', $campos) . " WHERE ID_RegistroAsesoramiento = :idRegistroAsesoramiento";
+        $stmt = $conexion->prepare($sql);
+        return $stmt->execute($valores);
+    }
 
+function obtenerDatosComprobantePago($conexion, $idCuota) {
+    try {
+        $stmt = $conexion->prepare("
+            SELECT
+                cc.ID_CuotaCredito,
+                cc.Numero_Cuota,
+                cc.Monto_Total_Cuota,
+                cc.Monto_Capital,
+                cc.Monto_Interes,
+                cc.Monto_Recargo_Mora,
+                cc.Fecha_Pago,
+                pc.Monto_Pagado_Transaccion,
+                pc.Fecha_Hora_Pago,
+                pc.Observaciones_Pago,
+                cr.Monto_Total_Credito,
+                cl.Nombre_Cliente,
+                cl.Apellido_Cliente,
+                cl.N_Documento_Cliente,
+                p.Nombre_Personal,
+                p.Apellido_Personal,
+                e.Estado AS Estado_Cuota_Nombre
+            FROM
+                cuotacredito cc
+            JOIN
+                pagocuota pc ON cc.ID_CuotaCredito = pc.ID_CuotaCredito
+            JOIN
+                credito cr ON cc.ID_Credito = cr.ID_Credito
+            JOIN
+                cliente cl ON cr.ID_Cliente = cl.ID_Cliente
+            LEFT JOIN
+                personal p ON pc.ID_Personal = p.ID_Personal
+            LEFT JOIN
+                estado e ON cc.ID_Estado_Cuota = e.ID_Estado
+            WHERE
+                cc.ID_CuotaCredito = :idCuota
+            LIMIT 1
+        ");
+        $stmt->bindParam(':idCuota', $idCuota, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+    } catch (PDOException $e) {
+        error_log("Error al obtener datos del comprobante de pago: " . $e->getMessage());
+        return false;
+    }
+}
+
+function obtenerProximaCuota($conexion, $idCredito, $numeroCuotaActual) {
+    try {
+        $stmt = $conexion->prepare("
+            SELECT Numero_Cuota, Fecha_Vencimiento, Monto_Total_Cuota
+            FROM cuotacredito
+            WHERE ID_Credito = :idCredito AND Numero_Cuota = :numProx
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':idCredito' => $idCredito,
+            ':numProx' => $numeroCuotaActual + 1
+        ]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error al obtener próxima cuota: " . $e->getMessage());
+        return null;
+    }
+}
+
+// Función 2: Actualizar el estado de un crédito
+// Necesaria para el case 'Aprobar_Desembolso' en asesorController.php
+function actualizarEstadoCredito($conexion, $idCredito, $nuevoEstadoId) {
+    try {
+        // Asume que tienes una tabla 'Credito' con una columna 'ID_Estado_Credito'
+        $stmt = $conexion->prepare("
+            UPDATE Credito
+            SET ID_Estado_Credito = :nuevoEstadoId, Fecha_Actualizacion = NOW()
+            WHERE ID_Credito = :idCredito
+        ");
+        $stmt->bindParam(':nuevoEstadoId', $nuevoEstadoId, PDO::PARAM_INT);
+        $stmt->bindParam(':idCredito', $idCredito, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->rowCount() > 0; // Devuelve true si se actualizó al menos una fila
+
+    } catch (PDOException $e) {
+        error_log("Error al actualizar estado del crédito: " . $e->getMessage());
+        return false;
+    }
+}
+
+// Función 3: Registrar un desembolso de crédito
+// Necesaria para el case 'Aprobar_Desembolso' en asesorController.php
+function registrarDesembolso($conexion, $idCredito, $montoDesembolsar, $idPersonal, $observaciones = '') {
+    try {
+        // Asume que tienes una tabla llamada 'Desembolsos' o 'Movimientos_Credito'
+        // que registra los desembolsos. Si no la tienes, necesitarías crearla.
+        $stmt = $conexion->prepare("
+            INSERT INTO Desembolsos (ID_Credito, Monto_Desembolsado, Fecha_Desembolso, ID_Personal, Observaciones)
+            VALUES (:idCredito, :montoDesembolsar, NOW(), :idPersonal, :observaciones)
+        ");
+        $stmt->bindParam(':idCredito', $idCredito, PDO::PARAM_INT);
+        $stmt->bindParam(':montoDesembolsar', $montoDesembolsar, PDO::PARAM_STR); // Usar STR para montos, PDO maneja la conversión
+        $stmt->bindParam(':idPersonal', $idPersonal, PDO::PARAM_INT);
+        $stmt->bindParam(':observaciones', $observaciones, PDO::PARAM_STR);
+        $stmt->execute();
+        return $conexion->lastInsertId(); // Devuelve el ID del nuevo registro de desembolso
+
+    } catch (PDOException $e) {
+        error_log("Error al registrar desembolso: " . $e->getMessage());
+        return false;
+    }
+}
 
 
 
@@ -628,6 +834,7 @@ function registrarCredito(PDO $conexion, array $datosCredito): bool {
     $sql = "INSERT INTO credito (
                 ID_Cliente,
                 Monto_Total_Credito,
+                Desembolso,
                 Monto_Pendiente_Credito,
                 Fecha_Apertura_Credito,
                 Fecha_Vencimiento_Credito,
@@ -641,6 +848,7 @@ function registrarCredito(PDO $conexion, array $datosCredito): bool {
             ) VALUES (
                 :idCliente,
                 :montoTotal,
+                :desembolso,
                 :montoPendiente,
                 :fechaCreacion,
                 :fechaVencimiento,
@@ -652,11 +860,13 @@ function registrarCredito(PDO $conexion, array $datosCredito): bool {
                 :valorCuotaCalculado,
                 :periodicidad
             )";
+    
     $stmt = $conexion->prepare($sql);
 
     return $stmt->execute([
         ':idCliente' => $datosCredito['ID_Cliente'],
         ':montoTotal' => $datosCredito['Monto_Total_Credito'],
+        ':desembolso'=> $datosCredito['Desembolso'],
         ':montoPendiente' => $datosCredito['Monto_Pendiente_Credito'],
         ':fechaCreacion'=> $datosCredito['Fecha_Apertura_Credito'],
         ':fechaVencimiento' => $datosCredito['Fecha_Vencimiento_Credito'],
@@ -919,33 +1129,6 @@ function obtenerRegistroAsesoramientoPorId(PDO $conexion, int $idRegistroAsesora
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-/**
- * Actualiza un registro de asesoramiento existente.
- * @param PDO $conexion Objeto de conexión PDO.
- * @param int $idRegistroAsesoramiento ID del registro a actualizar.
- * @param array $datosAsesoramiento Array asociativo con los datos a actualizar.
- * @return bool True si se actualiza correctamente, false en caso contrario.
- */
-function actualizarRegistroAsesoramiento(PDO $conexion, int $idRegistroAsesoramiento, array $datosAsesoramiento): bool {
-    $campos = [];
-    $valores = [':idRegistroAsesoramiento' => $idRegistroAsesoramiento];
-
-    if (isset($datosAsesoramiento['ID_Personal'])) { $campos[] = 'ID_Personal = :idPersonal'; $valores[':idPersonal'] = $datosAsesoramiento['ID_Personal']; }
-    if (isset($datosAsesoramiento['ID_Cliente'])) { $campos[] = 'ID_Cliente = :idCliente'; $valores[':idCliente'] = $datosAsesoramiento['ID_Cliente']; }
-    if (isset($datosAsesoramiento['ID_Turno'])) { $campos[] = 'ID_Turno = :idTurno'; $valores[':idTurno'] = $datosAsesoramiento['ID_Turno']; }
-    if (isset($datosAsesoramiento['Fecha_Hora_Inicio'])) { $campos[] = 'Fecha_Hora_Inicio = :fechaInicio'; $valores[':fechaInicio'] = $datosAsesoramiento['Fecha_Hora_Inicio']; }
-    if (isset($datosAsesoramiento['Fecha_Hora_Fin'])) { $campos[] = 'Fecha_Hora_Fin = :fechaFin'; $valores[':fechaFin'] = $datosAsesoramiento['Fecha_Hora_Fin']; }
-    if (isset($datosAsesoramiento['Observaciones'])) { $campos[] = 'Observaciones = :observaciones'; $valores[':observaciones'] = $datosAsesoramiento['Observaciones']; }
-    if (isset($datosAsesoramiento['Resultado'])) { $campos[] = 'Resultado = :resultado'; $valores[':resultado'] = $datosAsesoramiento['Resultado']; }
-
-    if (empty($campos)) {
-        return false;
-    }
-
-    $sql = "UPDATE RegistroAsesoramiento SET " . implode(', ', $campos) . " WHERE ID_RegistroAsesoramiento = :idRegistroAsesoramiento";
-    $stmt = $conexion->prepare($sql);
-    return $stmt->execute($valores);
-}
 
 // --- Funciones para la tabla 'asesor_producto' ---
 

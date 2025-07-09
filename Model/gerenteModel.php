@@ -184,21 +184,32 @@ function getTransactionVolumePerMonth(PDO $conexion): array {
 
 function obtenerRegistrosBitacora(PDO $conexion): array {
     $sql = "SELECT 
-                b.ID_Bitacora,
-                b.ID_Cliente,
-                c.Nombre_Cliente,
-                c.Apellido_Cliente,
-                b.ID_Personal,
-                p.Nombre_Personal,
-                p.Apellido_Personal,
-                b.ID_RegistroAsesoramiento,
-                b.Tipo_Evento,
-                b.Descripcion_Evento,
-                b.Fecha_Hora
-            FROM Bitacora b
-            LEFT JOIN Cliente c ON b.ID_Cliente = c.ID_Cliente
-            LEFT JOIN Personal p ON b.ID_Personal = p.ID_Personal
-            ORDER BY b.Fecha_Hora DESC"; // Ordenar por fecha más reciente
+        b.ID_Bitacora,
+        b.ID_Cliente,
+        c.Nombre_Cliente, 
+        t.Nombre_Completo_Solicitante,
+        c.N_Documento_Cliente, 
+        t.N_Documento_Solicitante,
+        t.ID_Turno,
+        c.Apellido_Cliente,
+        b.ID_Personal,
+        p.Nombre_Personal,
+        p.Apellido_Personal,
+        p.N_Documento_Personal,
+        rl.Rol,
+        b.ID_RegistroAsesoramiento,
+        a.ID_Turno,
+        t.Numero_Turno,
+        b.Tipo_Evento,
+        b.Descripcion_Evento,
+        b.Fecha_Hora
+    FROM Bitacora b
+    LEFT JOIN Cliente c ON b.ID_Cliente = c.ID_Cliente
+    LEFT JOIN registroasesoramiento a ON b.ID_RegistroAsesoramiento = a.ID_RegistroAsesoramiento
+    LEFT JOIN Turno t ON a.ID_Turno = t.ID_Turno
+    LEFT JOIN Personal p ON b.ID_Personal = p.ID_Personal
+    LEFT JOIN Rol rl ON p.ID_Rol = rl.ID_Rol
+    ORDER BY b.Fecha_Hora DESC"; // Ordenar por fecha más reciente
     
     $stmt = $conexion->query($sql);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
