@@ -168,10 +168,10 @@ if (isset($_GET['login'])) {
 
     <nav class="nav">
         <ul>
-            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?action=mostrarPerfilCliente">Perfil Cliente</a></li>
-            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?action=mostrarDatosCliente&id=<?= htmlspecialchars($datos_cliente['ID_Cliente'] ?? '') ?>">Actualizar Datos</a></li>
-            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?action=mostrarValidacionProductos&id=<?= htmlspecialchars($datos_cliente['ID_Cliente'] ?? '') ?>">Validación de Productos</a></li>
-            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?action=mostrarCertificaciones">Generar Certificado</a></li>
+            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?accion=mostrarPerfilCliente">Perfil Cliente</a></li>
+            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?accion=mostrarDatosCliente&id=<?= htmlspecialchars($datos_cliente['ID_Cliente'] ?? '') ?>">Actualizar Datos</a></li>
+            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?accion=mostrarValidacionProductos&id=<?= htmlspecialchars($datos_cliente['ID_Cliente'] ?? '') ?>">Validación de Productos</a></li>
+            <li><a href="<?= BASE_URL ?>/Controlador/clienteController.php?accion=mostrarCertificaciones">Generar Certificado</a></li>
         </ul>
     </nav>
 
