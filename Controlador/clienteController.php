@@ -1,130 +1,114 @@
 <?php
-// PROYECTO_GB/Controlador/ClienteController.php
+// cliente/controller.php
 
-class ClienteController {
-    private $clienteModel;
+session_start();
 
-    public function __construct(ClienteModel $clienteModel) {
-        $this->clienteModel = $clienteModel;
-    }
+require_once __DIR__ . '/../../Proyecto_GB/Config/config.php';
+require_once __DIR__ . '/../../Proyecto_GB/Model/ClienteModel.php';
 
-    // Acción por defecto: Redirige al perfil del cliente
-    public function index() {
-        $id_cliente_default = $_SESSION['ID_Cliente_Logueado'] ?? 1;
-        header("Location: index.php?controller=cliente&action=mostrarPerfilCliente&id=" . $id_cliente_default);
-        exit();
-    }
+$accion = $_GET['accion'] ?? 'mostrarPerfilCliente';
+$idCliente = $_SESSION['ID_Cliente_Logueado'] ?? null;
 
-    // Método para mostrar los datos que el cliente puede actualizar
-    public function mostrarDatosCliente() {
-        $id_cliente = $_GET['id'] ?? 1;
-        $datos_cliente = $this->clienteModel->getClienteById($id_cliente);
+$clienteModel = new ClienteModel($conexion);
+$error = "";
 
-        if (!$datos_cliente) {
-            $mensaje_cliente_no_encontrado = "Cliente con ID " . htmlspecialchars($id_cliente) . " no encontrado.";
-        }
+try {
+    switch ($accion) {
 
-        $campos_actualizables = ['Celular_Cliente', 'Correo_Cliente', 'Direccion_Cliente', 'Ciudad_Cliente', 'Contraseña'];
-
-        $seccion = 'actualizar_datos'; 
-        include 'Vista/Cliente.php';
-    }
-
-    // Método para mostrar el perfil básico del cliente
-    public function mostrarPerfilCliente() {
-        $id_cliente = $_GET['id'] ?? 1;
-        
-        $datos_cliente = $this->clienteModel->getClienteById($id_cliente); 
-
-        if (!$datos_cliente) {
-            $mensaje_cliente_no_encontrado = "No se encontraron datos para el perfil del cliente con ID: " . htmlspecialchars($id_cliente);
-        }
-
-        $seccion = 'perfil_cliente'; 
-        include 'Vista/Cliente.php';
-    }
-
-    // Método para mostrar la sección de validación de productos
-    public function mostrarValidacionProductos() {
-        $id_cliente = $_GET['id'] ?? 1;
-        $datos_cliente = $this->clienteModel->getClienteById($id_cliente);
-
-        if (!$datos_cliente) {
-            $mensaje_cliente_no_encontrado = "Cliente con ID " . htmlspecialchars($id_cliente) . " no encontrado para validación de productos.";
-        }
-        
-        $seccion = 'validacion_productos';
-        include 'Vista/Cliente.php';
-    }
-
-    // Método para mostrar la sección de generación de certificaciones
-    public function mostrarCertificaciones() {
-        $datos_cliente = [];
-        $producto_para_certificado = null;
-        $error_message = '';
-
-        // *** CORRECCIÓN CLAVE AQUÍ: Usar 'N_Documento_Cliente' en lugar de 'n_documento' ***
-        if (isset($_GET['N_Documento_Cliente']) && !empty($_GET['N_Documento_Cliente'])) { 
-            $n_documento_cliente = $_GET['N_Documento_Cliente']; // Cambiado a $n_documento_cliente
-
-            // Usar el nombre de la columna real de la base de datos para la búsqueda
-            $datos_cliente_temp = $this->clienteModel->getClienteByNdocumento($n_documento_cliente); 
-
-            if ($datos_cliente_temp) { 
-                $datos_cliente = $datos_cliente_temp; 
-
-                // Obtener un producto. Aquí asumo que siempre buscarás el producto con ID 1
-                // o necesitarás una lógica para determinar qué producto certificar.
-                $producto_para_certificado = $this->clienteModel->getProductoById(1); 
-                if (!$producto_para_certificado) { 
-                    $error_message = "No se encontró el producto para certificar (ID: 1)."; 
-                }
-            } else { 
-                $error_message = "Cliente con N° Documento '" . htmlspecialchars($n_documento_cliente) . "' no encontrado."; 
-            }
-        } else { 
-            // Si no se envió 'N_Documento_Cliente' o se envió vacío, muestra un mensaje para el usuario.
-            if (!isset($_GET['N_Documento_Cliente'])) { 
-                 $error_message = "Por favor, ingrese un número de documento para generar el certificado."; 
-            }
-        }
-
-        $seccion = 'certificaciones';
-        include 'Vista/Cliente.php';
-    }
-
-    public function actualizarCliente() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id_cliente = $_POST['id_cliente'] ?? null;
-
-            if ($id_cliente === null) {
-                header("Location: index.php?controller=cliente&action=mostrarDatosCliente&status=error_id_invalido");
-                exit();
+        case 'mostrarPerfilCliente':
+            if (!$idCliente) {
+                throw new Exception("No se pudo identificar al cliente en sesión.");
             }
 
-            $datos_a_actualizar = [
-                'Celular_Cliente' => $_POST['celular_cliente'] ?? null,
-                'Correo_Cliente' => $_POST['correo_cliente'] ?? null,
-                'Direccion_Cliente' => $_POST['direccion_cliente'] ?? null,
-                'Ciudad_Cliente' => $_POST['ciudad_cliente'] ?? null,
-            ];
+            $datos_cliente = $clienteModel->getClienteById($idCliente);
+            $seccion = 'perfil_cliente';
+            include '../../Proyecto_GB/View/cliente/Cliente.php';
+            break;
 
-            if (!empty($_POST['contrasena'])) {
-                $datos_a_actualizar['Contraseña'] = $_POST['contrasena']; 
+        case 'mostrarDatosCliente':
+            if (!$idCliente) {
+                throw new Exception("No se pudo identificar al cliente.");
             }
-            
-            $actualizado = $this->clienteModel->updateCliente($id_cliente, $datos_a_actualizar);
 
-            if ($actualizado) {
-                header("Location: index.php?controller=cliente&action=mostrarDatosCliente&status=success&id=" . $id_cliente);
+            $datos_cliente = $clienteModel->getClienteById($idCliente);
+            $campos_actualizables = ['Celular_Cliente', 'Correo_Cliente', 'Direccion_Cliente', 'Ciudad_Cliente', 'Contraseña'];
+            $seccion = 'actualizar_datos';
+            include '../../Proyecto_GB/View/cliente/Cliente.php';
+            break;
+
+        case 'mostrarValidacionProductos':
+            if (!$idCliente) {
+                throw new Exception("No se pudo identificar al cliente.");
+            }
+
+            $datos_cliente = $clienteModel->getClienteById($idCliente);
+            $seccion = 'validacion_productos';
+            include '../../Proyecto_GB/View/cliente/Cliente.php';
+            break;
+
+        case 'mostrarCertificaciones':
+            $n_documento_cliente = $_GET['N_Documento_Cliente'] ?? null;
+
+            if (!$n_documento_cliente) {
+                $error_message = "Por favor, ingrese un número de documento para generar el certificado.";
             } else {
-                header("Location: index.php?controller=cliente&action=mostrarDatosCliente&status=error&id=" . $id_cliente);
+                $datos_cliente = $clienteModel->getClienteByNdocumento($n_documento_cliente);
+
+                if ($datos_cliente) {
+                    $producto_para_certificado = $clienteModel->getProductoById(1);
+                    if (!$producto_para_certificado) {
+                        $error_message = "No se encontró el producto para certificar (ID: 1).";
+                    }
+                } else {
+                    $error_message = "Cliente con N° Documento '" . htmlspecialchars($n_documento_cliente) . "' no encontrado.";
+                }
             }
-            exit();
-        } else {
-            header("Location: index.php?controller=cliente&action=mostrarDatosCliente");
-            exit();
-        }
+
+            $seccion = 'certificaciones';
+            include '../../Proyecto_GB/View/cliente/Cliente.php';
+            break;
+
+        case 'actualizarCliente':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $id_cliente = $_POST['id_cliente'] ?? null;
+
+                if (!$id_cliente) {
+                    header("Location: controller.php?accion=mostrarDatosCliente&status=error_id_invalido");
+                    exit;
+                }
+
+                $datos_a_actualizar = [
+                    'Celular_Cliente' => $_POST['celular_cliente'] ?? null,
+                    'Correo_Cliente' => $_POST['correo_cliente'] ?? null,
+                    'Direccion_Cliente' => $_POST['direccion_cliente'] ?? null,
+                    'Ciudad_Cliente' => $_POST['ciudad_cliente'] ?? null,
+                ];
+
+                if (!empty($_POST['contrasena'])) {
+                    $datos_a_actualizar['Contraseña'] = $_POST['contrasena'];
+                }
+
+                $actualizado = $clienteModel->updateCliente($id_cliente, $datos_a_actualizar);
+
+                if ($actualizado) {
+                    header("Location: controller.php?accion=mostrarDatosCliente&status=success");
+                } else {
+                    header("Location: controller.php?accion=mostrarDatosCliente&status=error");
+                }
+                exit;
+            } else {
+                header("Location: controller.php?accion=mostrarDatosCliente");
+                exit;
+            }
+
+        default:
+            header("Location: controller.php?accion=mostrarPerfilCliente");
+            exit;
     }
+
+} catch (Exception $e) {
+    error_log("Error en controller.php (cliente): " . $e->getMessage());
+    $mensajeUsuario = "Ocurrió un error inesperado. Intente más tarde.";
+    header("Location: /Proyecto_GB/View/autenticacion/Login_Cliente.php?login=error&error=" . urlencode($mensajeUsuario));
+    exit;
 }
-?>

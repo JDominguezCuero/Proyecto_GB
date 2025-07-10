@@ -11,8 +11,6 @@ require_once(__DIR__ . '../../Model/gerenteModel.php');
 $accion = $_GET['accion'] ?? '';
 
 if ($accion !== 'listarGestionTotal') {
-    // Configurar el reporte de errores para no mostrar advertencias/notices en la salida directa
-    // Esto es crucial para las respuestas JSON
     error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
     ini_set('display_errors', 'Off'); // Asegúrate de que no se muestren errores en la salida
     header('Content-Type: application/json');

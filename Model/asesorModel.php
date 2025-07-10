@@ -495,6 +495,7 @@ function obtenerDatosComprobantePago($conexion, $idCuota) {
     try {
         $stmt = $conexion->prepare("
             SELECT
+                cc.ID_Credito,
                 cc.ID_CuotaCredito,
                 cc.Numero_Cuota,
                 cc.Monto_Total_Cuota,
@@ -502,6 +503,7 @@ function obtenerDatosComprobantePago($conexion, $idCuota) {
                 cc.Monto_Interes,
                 cc.Monto_Recargo_Mora,
                 cc.Fecha_Pago,
+                cc.Fecha_Vencimiento,
                 pc.Monto_Pagado_Transaccion,
                 pc.Fecha_Hora_Pago,
                 pc.Observaciones_Pago,

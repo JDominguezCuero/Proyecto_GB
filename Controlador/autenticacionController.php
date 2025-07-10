@@ -17,14 +17,17 @@ try {
                 $cliente = loginCliente($conexion, $usuario, $clave);
 
                 if ($cliente) {
-                    if ($cliente['Activo_Cliente'] == 1) {
+                    if ($cliente['Estado_Cliente'] == 'Activo') {
 
                         $_SESSION['usuario'] = $usuario;
                         $_SESSION['nombre'] = $cliente['Nombre_Cliente'];
                         $_SESSION['rol'] = 'cliente';
                         $_SESSION['cliente_id'] = $cliente['ID_Cliente'];
+                        $_SESSION['ID_Cliente_Logueado'] = $cliente['ID_Cliente'];
+                        $id_cliente_default = $cliente['ID_Cliente'];
 
-                        header("Location: /Proyecto_GB/View/cliente/index.php?login=success");
+                        header("Location: /Proyecto_GB/View/cliente/index.php?controller=cliente&action=mostrarPerfilCliente&id=" . $id_cliente_default);
+                        // header("Location: /Proyecto_GB/Controlador/clienteControlador.php?login=success");
                         exit;
                     } else {
                         $mensjError = "El usuario no se encuentra activo, por favor contactese con el administrador";
