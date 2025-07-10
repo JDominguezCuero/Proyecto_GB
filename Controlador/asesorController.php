@@ -745,9 +745,6 @@ try {
                     $datosClienteParaDB = [
                         'Nombre_Cliente' => $datosClienteJSON['nombre'] ?? '',
                         'Apellido_Cliente' => $datosClienteJSON['apellido'] ?? '',
-                        // Aquí debes asegurarte de que 'genero' y 'tipo_documento' sean los IDs correctos para tu DB.
-                        // Si el JS envía el texto (ej. "Cédula de Ciudadanía"), necesitarás funciones como getGeneroId/getTipoDocumentoId.
-                        // Si el JS ya envía el ID numérico, usa $datosClienteJSON['genero'] y $datosClienteJSON['tipoDocumento'].
                         'ID_Genero' => $datosClienteJSON['genero'] ?? '', // <--- Implementa esta función si 'genero' es texto
                         'ID_TD' => $datosClienteJSON['tipo_documento'] ?? '', // <--- Implementa esta función si 'tipo_documento' es texto
                         'N_Documento_Cliente' => $datosClienteJSON['documento'] ?? '',
@@ -758,8 +755,8 @@ try {
                         'Fecha_Nacimiento_Cliente' => $datosClienteJSON['fecha_nacimiento'] ?? '', // Coincide con 'fechaNacimiento' del JS
                         'ID_Personal_Creador' => $_SESSION['idPersonal'] ?? null,
                         'Fecha_Creacion_Cliente' => date('Y-m-d H:i:s'), // Fecha actual de creación
-                        'Estado_Cliente' => 1, // Asume un ID de estado inicial para el cliente (ej. Activo)
-                        'Contraseña' => password_hash($datosClienteJSON['contrasena'] ?? 'default_pass_hash', PASSWORD_DEFAULT), // Siempre hashear
+                        'Estado_Cliente' => 'Activo', // Asume un ID de estado inicial para el cliente (ej. Activo)
+                        'Contraseña' => $datosClienteJSON['contrasena'] ?? 'default_pass_hash' // Siempre hashear
                     ];
 
                     // Validación básica de campos obligatorios para Cliente

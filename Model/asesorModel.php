@@ -809,6 +809,7 @@ function registrarCliente(PDO $conexion, array $datosCliente): bool {
     // Hashear la contraseña antes de guardar
     // Asegúrate de que $datosCliente['Contraseña'] siempre exista aquí.
     $hashedPassword = password_hash($datosCliente['Contraseña'], PASSWORD_DEFAULT);
+    // $datosCliente['Contraseña'] = password_hash($datosPersonal['Contraseña'], PASSWORD_DEFAULT);
 
     return $stmt->execute([
         ':nombre' => $datosCliente['Nombre_Cliente'],
