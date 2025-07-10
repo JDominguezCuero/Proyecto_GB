@@ -10,7 +10,7 @@ $datos_cliente = $datos_cliente ?? [];
 <?php if (!empty($datos_cliente)): ?>
     <div class="perfil-cliente-container">
         <div class="profile-photo-container">
-            <img src="Assets/img/default_profile.png" alt="Foto de Perfil" class="profile-photo">
+            <img src="<?= BASE_URL ?>/View/public/assets/img/default_profile.png" alt="Foto de Perfil" class="profile-photo">
         </div>
 
         <h3>Información General del Cliente</h3>

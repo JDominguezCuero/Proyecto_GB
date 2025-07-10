@@ -20,7 +20,6 @@ if (!isset($_SESSION['usuarioCliente'])) {
     exit;
 }
 
-
 $accion = $_GET['accion'] ?? 'mostrarPerfilCliente';
 $idCliente = $_SESSION['ID_Cliente_Logueado'] ?? null;
 
@@ -28,27 +27,41 @@ try {
     switch ($accion) {
 
         case 'mostrarPerfilCliente':
-            if (!$idCliente) {
-                throw new Exception("No se pudo identificar al cliente en sesión.");
+            try {
+                
+                if (!$idCliente) {
+                    throw new Exception("No se pudo identificar al cliente en sesión.");
+                }
+
+                
+                $datos_cliente = obtenerClientePorId($conexion, $idCliente);
+                $seccion = 'perfil_cliente';
+                $loginStatus = 'success'; // Puedes usar esto como bandera
+
+                include '../../Proyecto_GB/View/cliente/Cliente.php';
+                exit;
+
+            } catch (PDOException $e) {
+                error_log("Error al obtener el id " . $idCliente . ": " . $e->getMessage());
             }
-
-            $datos_cliente = obtenerClientePorId($conexion, $idCliente);
-            $seccion = 'perfil_cliente';
-
-            header("Location: /Proyecto_GB/View/Cliente/Cliente.php?login=success");
 
         break;
 
         case 'mostrarDatosCliente':
-            if (!$idCliente) {
-                throw new Exception("No se pudo identificar al cliente.");
-            }
+            try {
+                if (!$idCliente) {
+                    throw new Exception("No se pudo identificar al cliente.");
+                }
 
-            $datos_cliente = obtenerClientePorId($conexion, $idCliente);
-            $campos_actualizables = ['Celular_Cliente', 'Correo_Cliente', 'Direccion_Cliente', 'Ciudad_Cliente', 'Contraseña'];
-            $seccion = 'actualizar_datos';
-            include '../../Proyecto_GB/View/cliente/Cliente.php';
-            break;
+                $datos_cliente = obtenerClientePorId($conexion, $idCliente);
+                $campos_actualizables = ['Celular_Cliente', 'Correo_Cliente', 'Direccion_Cliente', 'Ciudad_Cliente', 'Contraseña'];
+                $seccion = 'actualizar_datos';
+                include '../../Proyecto_GB/View/cliente/Actualizar_datos.php';
+                
+            } catch (PDOException $e) {
+                error_log("Error: " . $idCliente . ": " . $e->getMessage());
+            }
+        break;
 
         case 'mostrarValidacionProductos':
             if (!$idCliente) {
