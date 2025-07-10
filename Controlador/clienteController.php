@@ -4,13 +4,25 @@
 session_start();
 
 require_once __DIR__ . '/../../Proyecto_GB/Config/config.php';
-require_once __DIR__ . '/../../Proyecto_GB/Model/ClienteModel.php';
+require_once __DIR__ . '/../../Proyecto_GB/Model/clienteModel.php'; // modelo funcional
+
+if (!isset($_SESSION['usuarioCliente'])) {
+    if (
+        isset($_SERVER['HTTP_ACCEPT']) &&
+        strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
+    ) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Sesión expirada o no iniciada.']);
+    } else {
+        $mensajeError = "Usuario no logueado.";
+        header("Location: /Proyecto_GB/View/public/inicio.php?login=error&error=". urlencode($mensajeError)."&reason=nologin");
+    }
+    exit;
+}
+
 
 $accion = $_GET['accion'] ?? 'mostrarPerfilCliente';
 $idCliente = $_SESSION['ID_Cliente_Logueado'] ?? null;
-
-$clienteModel = new ClienteModel($conexion);
-$error = "";
 
 try {
     switch ($accion) {
@@ -20,17 +32,19 @@ try {
                 throw new Exception("No se pudo identificar al cliente en sesión.");
             }
 
-            $datos_cliente = $clienteModel->getClienteById($idCliente);
+            $datos_cliente = obtenerClientePorId($conexion, $idCliente);
             $seccion = 'perfil_cliente';
-            include '../../Proyecto_GB/View/cliente/Cliente.php';
-            break;
+
+            header("Location: /Proyecto_GB/View/Cliente/Cliente.php?login=success");
+
+        break;
 
         case 'mostrarDatosCliente':
             if (!$idCliente) {
                 throw new Exception("No se pudo identificar al cliente.");
             }
 
-            $datos_cliente = $clienteModel->getClienteById($idCliente);
+            $datos_cliente = obtenerClientePorId($conexion, $idCliente);
             $campos_actualizables = ['Celular_Cliente', 'Correo_Cliente', 'Direccion_Cliente', 'Ciudad_Cliente', 'Contraseña'];
             $seccion = 'actualizar_datos';
             include '../../Proyecto_GB/View/cliente/Cliente.php';
@@ -41,7 +55,7 @@ try {
                 throw new Exception("No se pudo identificar al cliente.");
             }
 
-            $datos_cliente = $clienteModel->getClienteById($idCliente);
+            $datos_cliente = obtenerClientePorId($conexion, $idCliente);
             $seccion = 'validacion_productos';
             include '../../Proyecto_GB/View/cliente/Cliente.php';
             break;
@@ -52,10 +66,11 @@ try {
             if (!$n_documento_cliente) {
                 $error_message = "Por favor, ingrese un número de documento para generar el certificado.";
             } else {
-                $datos_cliente = $clienteModel->getClienteByNdocumento($n_documento_cliente);
+                $datos_cliente = obtenerClientePorDocumento($conexion, $n_documento_cliente);
 
                 if ($datos_cliente) {
-                    $producto_para_certificado = $clienteModel->getProductoById(1);
+                    $producto_para_certificado = obtenerProductoPorId($conexion, 1);
+
                     if (!$producto_para_certificado) {
                         $error_message = "No se encontró el producto para certificar (ID: 1).";
                     }
@@ -88,7 +103,7 @@ try {
                     $datos_a_actualizar['Contraseña'] = $_POST['contrasena'];
                 }
 
-                $actualizado = $clienteModel->updateCliente($id_cliente, $datos_a_actualizar);
+                $actualizado = actualizarCliente($conexion, $id_cliente, $datos_a_actualizar);
 
                 if ($actualizado) {
                     header("Location: controller.php?accion=mostrarDatosCliente&status=success");
