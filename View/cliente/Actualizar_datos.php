@@ -1,5 +1,6 @@
 <?php
 // PROYECTO_GB/Vista/Cliente/Actualizar_datos.php
+require_once(__DIR__ . '../../../Config/config.php');
 
 // Asegúrate de que $datos_cliente esté definido y no sea nulo.
 $datos_cliente = $datos_cliente ?? [];

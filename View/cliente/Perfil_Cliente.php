@@ -51,7 +51,7 @@ $datos_cliente = $datos_cliente ?? [];
         </div>
         
         <div class="button-container" style="text-align: center; margin-top: 30px;">
-            <a href="<?= BASE_URL ?>/Controlador/clienteController.php?action=mostrarDatosCliente&id=<?php echo htmlspecialchars($datos_cliente['ID_Cliente'] ?? ''); ?>" class="btn-primary">Actualizar mis Datos</a>
+            <a href="<?= BASE_URL ?>/Controlador/clienteController.php?accion=mostrarDatosCliente&id=<?php echo htmlspecialchars($datos_cliente['ID_Cliente'] ?? ''); ?>" class="btn-primary">Actualizar mis Datos</a>
         </div>
     </div>
 <?php else: ?>

@@ -56,8 +56,8 @@ try {
                 $datos_cliente = obtenerClientePorId($conexion, $idCliente);
                 $campos_actualizables = ['Celular_Cliente', 'Correo_Cliente', 'Direccion_Cliente', 'Ciudad_Cliente', 'Contraseña'];
                 $seccion = 'actualizar_datos';
-                include '../../Proyecto_GB/View/cliente/Actualizar_datos.php';
-                
+                include '../../Proyecto_GB/View/cliente/Cliente.php';
+
             } catch (PDOException $e) {
                 error_log("Error: " . $idCliente . ": " . $e->getMessage());
             }
