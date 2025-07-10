@@ -260,19 +260,19 @@ document.getElementById("formularioAmortizacion").addEventListener("submit", fun
     // CALCULO CON TASA NOMINAL (simple división)
     switch (periodicidad) {
         case "Diaria":
-            tasaPeriodica = tasaAnual / 365;
+            tasaPeriodica = Math.pow(1 + tasaAnual, 1 / 365) - 1;
             break;
         case "Mensual":
-            tasaPeriodica = tasaAnual / 12;
+            tasaPeriodica = Math.pow(1 + tasaAnual, 1 / 12) - 1;
             break;
         case "Bimensual":
-            tasaPeriodica = tasaAnual / 6;
+            tasaPeriodica = Math.pow(1 + tasaAnual, 1 / 6) - 1;
             break;
         case "Trimestral":
-            tasaPeriodica = tasaAnual / 4;
+            tasaPeriodica = Math.pow(1 + tasaAnual, 1 / 4) - 1;
             break;
         case "Semestral":
-            tasaPeriodica = tasaAnual / 2;
+            tasaPeriodica = Math.pow(1 + tasaAnual, 1 / 2) - 1;
             break;
         case "Anual":
             tasaPeriodica = tasaAnual;
