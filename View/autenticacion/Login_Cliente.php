@@ -171,7 +171,7 @@
 </head>
 <body>
   <div class="login-container">
-    <form method="post" action="<?= BASE_URL ?>/Controlador/clienteController.php?accion=loginCliente">
+    <form method="post" action="<?= BASE_URL ?>/Controlador/autenticacionController.php?accion=loginCliente">
       <h2>Inicio de Sesión como cliente</h2>
 
       <label for="usuario">Usuario</label>

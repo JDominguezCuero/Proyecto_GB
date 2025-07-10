@@ -441,7 +441,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
         </div>
 
         <div id="bitacoraEventsContainer">
-                                <p class="no-records">Cargando registros de bitácora...</p>
+            <p class="no-records">Cargando registros de bitácora...</p>
         </div>
     </div>
 
@@ -449,14 +449,14 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
     <?php include '../public/layout/layoutfooter.php'; ?>
     <?php include __DIR__ . '../../../View/public/layout/mensajesModal.php'; ?>
 
-        <div id="eventDetailsModal" class="modal-overlay">
+    <div id="eventDetailsModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalEventTitle">Detalles del Evento</h3>
                 <button type="button" class="modal-close-btn" onclick="closeEventDetailsModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalEventBody">
-                                </div>
+            </div>
             <div class="modal-footer">
                 <button type="button" onclick="closeEventDetailsModal()">Cerrar</button>
             </div>
@@ -501,6 +501,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
 
     <script>
         let allBitacoraRecords = []; // Almacenará todos los registros para el filtrado local
+        let currentFilteredRecords = []; // Almacenará los registros actualmente visibles en la tabla
 
         async function loadBitacoraRecords() {
             const container = document.getElementById('bitacoraEventsContainer');
@@ -513,10 +514,11 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
 
                 if (data.exito && data.registros.length > 0) {
                     allBitacoraRecords = data.registros; // Guardar todos los registros
-                    renderBitacora(allBitacoraRecords); // Renderizar inicialmente todos
+                    applyFilters(); // Aplicar filtros iniciales y renderizar
                 } else {
                     container.innerHTML = '<p class="no-records">No se encontraron registros de bitácora.</p>';
                     allBitacoraRecords = [];
+                    currentFilteredRecords = []; // También vaciar esta
                 }
             } catch (error) {
                 console.error("Error al cargar la bitácora:", error);
@@ -537,15 +539,12 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             recordsToRender.forEach(record => {
                 const card = document.createElement('div');
                 card.className = 'event-card';
-                // Añadir un listener de clic a cada tarjeta
                 card.addEventListener('click', () => openEventDetailsModal(record));
 
                 const clientName = record.Nombre_Cliente ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'N/A';
-                // Usar N_Documento_Cliente para el documento del cliente si está disponible
                 const clientDoc = record.N_Documento_Cliente ? ` (Doc: ${record.N_Documento_Cliente})` : '';
 
                 const personalName = record.Nombre_Personal ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'N/A';
-                // Usar N_Documento_Personal para el documento del personal si está disponible
                 const personalDoc = record.N_Documento_Personal ? ` (Doc: ${record.N_Documento_Personal})` : '';
 
                 const fechaHora = record.Fecha_Hora ? new Date(record.Fecha_Hora).toLocaleString('es-CO') : 'No definido';
@@ -578,7 +577,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             const documentoFilter = document.getElementById('filterDocumento').value.toLowerCase();
             const rolFilter = document.getElementById('filterRol').value;
 
-            const filteredRecords = allBitacoraRecords.filter(record => {
+            currentFilteredRecords = allBitacoraRecords.filter(record => {
                 const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toString().toLowerCase().includes(documentoFilter) : false;
                 const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toString().toLowerCase().includes(documentoFilter) : false;
 
@@ -592,7 +591,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                 return matchesDocumento && matchesRol;
             });
 
-            renderBitacora(filteredRecords);
+            renderBitacora(currentFilteredRecords);
         }
 
         // --- Funciones para la Modal de Detalles del Evento ---
@@ -602,7 +601,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             const modalBody = document.getElementById('modalEventBody');
 
             modalTitle.textContent = `Detalles de Evento: ${record.Tipo_Evento ?? 'No Definido'} (ID: ${record.ID_Bitacora ?? 'No Definido'})`;
-            
+
             const clientName = record.Nombre_Cliente ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'No Definido';
             const clientDoc = record.N_Documento_Cliente ? `${record.N_Documento_Cliente}` : 'No Definido';
             const personalName = record.Nombre_Personal ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'No Definido';
@@ -670,7 +669,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                         </div>
                     </div>
                 </div>
-            `}
+                `}
 
                 <div class="modal-full-width-item mt-6">
                     <strong>Información del Personal: ${record.Rol}</strong>
@@ -731,7 +730,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             }
         });
 
-         exportarExcelBtn.addEventListener('click', () => {
+        exportarExcelBtn.addEventListener('click', () => {
             const dataToExport = getFilteredExportData();
             if (dataToExport.length === 0) {
                 showModal('Advertencia', 'No hay registros para exportar a Excel con los filtros actuales.', 'warning');
@@ -754,7 +753,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                     if (!cell.s) {
                         cell.s = {}; // Inicializar el objeto de estilo si no existe
                     }
-                    
+
                     // Aplicar negrita
                     if (!cell.s.font) {
                         cell.s.font = {};
@@ -841,20 +840,11 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
                 styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, // Ajusta tamaño de fuente y padding
                 headStyles: { fillColor: [46, 125, 50], textColor: 255, fontStyle: 'bold' }, // Color verde oscuro para encabezados
                 columnStyles: {
-                    // **ESTOS SON LOS columnStyles ORIGINALES QUE TENÍAS O SIMILARES, ANTES DE MIS CAMBIOS RECIENTES**
+                    // Si tienes columnas específicas y quieres controlar su ancho:
                     'Descripción': { cellWidth: 70 },
                     'Fecha y Hora': { cellWidth: 35 },
-                    'Nombre Cliente': { cellWidth: 35 },
-                    'Documento Cliente': { cellWidth: 30 },
-                    'Nombre Personal': { cellWidth: 35 },
-                    'Documento Personal': { cellWidth: 30 },
-                    'Tipo de Personal Ejecuta': { cellWidth: 30 },
-                    'ID Asesoramiento': { cellWidth: 25 },
-                    // Si tenías otras columnas con nombres específicos, asegúrate de que estén aquí
-                    // y que los 'cellWidth' sean adecuados.
-                    // Si agregaste las columnas de 'Tipo Entidad Relacionada', 'Nombre Entidad Relacionada', etc.
-                    // y quieres que jsPDF las maneje automáticamente, puedes eliminar este 'columnStyles'
-                    // o agregar manualmente las nuevas columnas con sus anchos.
+                    // Asegúrate de que los nombres de las columnas aquí coincidan exactamente con las claves de tu objeto en dataToExport
+                    // Puedes ajustar o eliminar estas líneas si quieres que jsPDF maneje los anchos automáticamente
                 },
                 didDrawPage: function (data) {
                     // Pie de página (aparece en cada página)
@@ -883,75 +873,65 @@ if (isset($_GET['error']) && $_GET['error'] == 'error' && isset($_GET['msg'])) {
             showModal('✅ Éxito', 'Bitácora generada en PDF correctamente.', 'success');
         });
 
+        // --- Modificación clave aquí ---
         // Función para preparar los datos filtrados para la exportación
         function getFilteredExportData() {
-            const tipoPersonalFiltro = filtroPersonal.value;
-            
-            const documentoFilter = document.getElementById('filterDocumento').value.toLowerCase();
-            const eventTypeFilter = document.getElementById('filterRol').value;
+            const tipoPersonalFiltro = document.getElementById('filtroPersonal').value;
 
-            const filteredRecords = allBitacoraRecords.filter(record => {
-            const clientDocMatch = record.N_Documento_Cliente ? record.N_Documento_Cliente.toString().includes(documentoFilter) : false;
-            const personalDocMatch = record.N_Documento_Personal ? record.N_Documento_Personal.toString().includes(documentoFilter) : false;
-            const matchesDocumento = (clientDocMatch || personalDocMatch || documentoFilter === '');
-            const matchesEventType = (eventTypeFilter === '' || record.Tipo_Evento === eventTypeFilter);
-
-            let matchesPersonalType = true;
-            if (tipoPersonalFiltro !== 'ambos') {
-                if (tipoPersonalFiltro === 'asesor' && record.ID_Rol != 3) {
-                    matchesPersonalType = false;
-                } else if (tipoPersonalFiltro === 'cajero' && record.ID_Rol != 4) {
-                    matchesPersonalType = false;
+            // Filtra los 'currentFilteredRecords' (los que ya están en la vista)
+            const filteredForExport = currentFilteredRecords.filter(record => {
+                let matchesPersonalType = true;
+                if (tipoPersonalFiltro !== 'ambos') {
+                    if (tipoPersonalFiltro === 'asesor' && record.ID_Rol != 3) {
+                        matchesPersonalType = false;
+                    } else if (tipoPersonalFiltro === 'cajero' && record.ID_Rol != 4) {
+                        matchesPersonalType = false;
+                    }
                 }
-            }
+                return matchesPersonalType;
+            });
 
-            return matchesDocumento && matchesEventType && matchesPersonalType;
-        });
+            return filteredForExport.map(record => {
+                const personalFullName = (record.Nombre_Personal && record.Apellido_Personal) ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'No Definido';
 
-        return filteredRecords.map(record => {
-            // Prepara el nombre completo del personal
-            const personalFullName = (record.Nombre_Personal && record.Apellido_Personal) ? `${record.Nombre_Personal} ${record.Apellido_Personal}` : 'No Definido';
-                
-            // Determina el tipo de personal para la exportación
-           let tipoPersonalEjecuta = 'No Definido';
-            if (record.ID_Rol == 3) {
-                tipoPersonalEjecuta = 'Asesor';
-            } else if (record.ID_Rol == 4) {
-                tipoPersonalEjecuta = 'Cajero';
-            } else if (record.ID_Personal) {
-                tipoPersonalEjecuta = 'Personal General';
-            }
+                let tipoPersonalEjecuta = 'No Definido';
+                if (record.ID_Rol == 3) {
+                    tipoPersonalEjecuta = 'Asesor';
+                } else if (record.ID_Rol == 4) {
+                    tipoPersonalEjecuta = 'Cajero';
+                } else if (record.ID_Personal) {
+                    tipoPersonalEjecuta = 'Personal General';
+                }
 
-            // Lógica para determinar si es Cliente o Usuario y asignar los campos correctos
-            let nombreRelacionado = 'N/A';
-            let documentoRelacionado = 'N/A';
-            let tipoEntidad = 'N/A';
-            let idEntidad = 'N/A';
-            let numeroTurno = 'N/A';
+                let nombreRelacionado = 'N/A';
+                let documentoRelacionado = 'N/A';
+                let tipoEntidad = 'N/A';
+                let idEntidad = 'N/A';
+                let numeroTurno = 'N/A';
 
-            if (record.ID_Cliente) {
-                nombreRelacionado = (record.Nombre_Cliente && record.Apellido_Cliente) ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'No Definido';
-                documentoRelacionado = record.N_Documento_Cliente ?? 'No Definido';
-                tipoEntidad = 'Cliente';
-                idEntidad = record.ID_Cliente ?? 'No Definido';
-            } else if (record.Nombre_Completo_Solicitante || record.N_Documento_Solicitante) {
-                nombreRelacionado = record.Nombre_Completo_Solicitante ?? 'No Definido';
-                documentoRelacionado = record.N_Documento_Solicitante ?? 'No Definido';
-                tipoEntidad = 'Usuario (No Cliente)';
-                idEntidad = record.ID_Turno ?? 'N/A';
-                numeroTurno = record.Numero_Turno ?? 'No Definido';
-            }
+                if (record.ID_Cliente) {
+                    nombreRelacionado = (record.Nombre_Cliente && record.Apellido_Cliente) ? `${record.Nombre_Cliente} ${record.Apellido_Cliente}` : 'No Definido';
+                    documentoRelacionado = record.N_Documento_Cliente ?? 'No Definido';
+                    tipoEntidad = 'Cliente';
+                    idEntidad = record.ID_Cliente ?? 'No Definido';
+                } else if (record.Nombre_Completo_Solicitante || record.N_Documento_Solicitante) {
+                    nombreRelacionado = record.Nombre_Completo_Solicitante ?? 'No Definido';
+                    documentoRelacionado = record.N_Documento_Solicitante ?? 'No Definido';
+                    tipoEntidad = 'Usuario (No Cliente)';
+                    idEntidad = record.ID_Turno ?? 'N/A';
+                    numeroTurno = record.Numero_Turno ?? 'No Definido';
+                }
 
                 return {
                     'ID Bitácora': record.ID_Bitacora ?? 'No definido',
                     'Tipo de Evento': record.Tipo_Evento ?? 'No definido',
                     'Descripción': record.Descripcion_Evento ?? 'No definido',
                     'Fecha y Hora': record.Fecha_Hora ? new Date(record.Fecha_Hora).toLocaleString('es-CO') : 'No definido',
-                    'Tipo Entidad Relacionada': tipoEntidad, // Nuevo campo
-                    'Nombre Entidad Relacionada': nombreRelacionado, // Nuevo campo
-                    'Documento Entidad Relacionada': documentoRelacionado, // Nuevo campo
-                    'ID Entidad': idEntidad, // Nuevo campo
-                    'Número de Turno': numeroTurno, // Nuevo campo para usuarios no clientes
+                    'Tipo Entidad Relacionada': tipoEntidad,
+                    'Nombre Entidad Relacionada': nombreRelacionado,
+                    'Documento Entidad Relacionada': documentoRelacionado,
+                    'ID Entidad': idEntidad,
+                    'Número de Turno': numeroTurno,
                     'ID Personal': record.ID_Personal ?? 'No definido',
                     'Nombre Personal': personalFullName,
                     'Documento Personal': record.N_Documento_Personal ?? 'No definido',

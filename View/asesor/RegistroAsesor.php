@@ -40,7 +40,8 @@ $productos = [
     37 => 'Crédito Rotativo',
     38 => 'Tarjeta de crédito',
     39 => 'Crédito de Consumo',
-    40 => 'Crédito Libre Inversión'
+    40 => 'Crédito Libre Inversión',
+    41 => 'Crédito De Vivienda'    
 ];
 
 

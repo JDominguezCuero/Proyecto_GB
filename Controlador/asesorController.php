@@ -411,7 +411,7 @@ try {
             $logoBase64 = base64_encode(file_get_contents($logoPath));
             $logoSrc = 'data:image/png;base64,' . $logoBase64;
 
-            $proxCuota = obtenerProximaCuota($conexion, $datosComprobante['ID_CuotaCredito'], $datosComprobante['Numero_Cuota']);
+            $proxCuota = obtenerProximaCuota($conexion, $datosComprobante['ID_Credito'], $datosComprobante['Numero_Cuota']);
 
            $html = '
                 <style>
@@ -451,6 +451,7 @@ try {
                     <table>
                         <tr>
                             <th>Número de Cuota</th>
+                            <th>Fecha de Vencimiento</th>
                             <th>Valor Cuota</th>
                             <th>Capital</th>
                             <th>Intereses</th>
@@ -460,6 +461,7 @@ try {
                         </tr>
                         <tr>
                             <td>' . $datosComprobante['Numero_Cuota'] . '</td>
+                            <td>' . $datosComprobante['Fecha_Vencimiento'] . '</td>
                             <td>$' . number_format($datosComprobante['Monto_Total_Cuota'], 2, ',', '.') . '</td>
                             <td>$' . number_format($datosComprobante['Monto_Capital'], 2, ',', '.') . '</td>
                             <td>$' . number_format($datosComprobante['Monto_Interes'], 2, ',', '.') . '</td>
@@ -482,7 +484,7 @@ try {
                     <table>
                         <tr>
                             <th>Número</th>
-                            <th>Fecha Vencimiento</th>
+                            <th>Fecha Proximo Pago</th>
                             <th>Valor Cuota</th>
                         </tr>
                         <tr>
