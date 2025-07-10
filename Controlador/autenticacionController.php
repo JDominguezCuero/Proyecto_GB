@@ -27,7 +27,7 @@ try {
                         $_SESSION['ID_Cliente_Logueado'] = $cliente['ID_Cliente'];
                         $id_cliente_default = $cliente['ID_Cliente'];
 
-                        header("Location: /Proyecto_GB/Controlador/clienteController.php?accion=mostrarPerfilCliente&id=" . $id_cliente_default);
+                        header("Location: /Proyecto_GB/Controlador/clienteController.php?login=success&accion=mostrarPerfilCliente&id=" . $id_cliente_default);
                         exit;
                     } else {
                         $mensjError = "El usuario no se encuentra activo, por favor contactese con el administrador";

@@ -20,7 +20,6 @@ if (!isset($_SESSION['usuarioCliente'])) {
     exit;
 }
 
-
 $accion = $_GET['accion'] ?? 'mostrarPerfilCliente';
 $idCliente = $_SESSION['ID_Cliente_Logueado'] ?? null;
 
@@ -28,14 +27,23 @@ try {
     switch ($accion) {
 
         case 'mostrarPerfilCliente':
-            if (!$idCliente) {
-                throw new Exception("No se pudo identificar al cliente en sesión.");
+            try {
+                
+                if (!$idCliente) {
+                    throw new Exception("No se pudo identificar al cliente en sesión.");
+                }
+
+                
+                $datos_cliente = obtenerClientePorId($conexion, $idCliente);
+                $seccion = 'perfil_cliente';
+                $loginStatus = 'success'; // Puedes usar esto como bandera
+
+                include '../../Proyecto_GB/View/cliente/Cliente.php';
+                exit;
+
+            } catch (PDOException $e) {
+                error_log("Error al obtener el id " . $idCliente . ": " . $e->getMessage());
             }
-
-            $datos_cliente = obtenerClientePorId($conexion, $idCliente);
-            $seccion = 'perfil_cliente';
-
-            header("Location: /Proyecto_GB/View/Cliente/Cliente.php?login=success");
 
         break;
 

@@ -4,7 +4,7 @@ require_once(__DIR__ . '../../../Config/config.php');
 // Mostrar mensajes con showModal()
 if (isset($_GET['login'])) {
     if ($_GET['login'] == 'success') {
-        $user = htmlspecialchars($_SESSION['nombreCliente'] ?? 'Cliente');
+        $user = htmlspecialchars($_SESSION['nombreCliente'] ?? 'No definido');
         echo '
         <div id="modalBienvenidaGB" class="modal-bienvenida-gb">
         <div class="modal-contenido-gb">
@@ -137,14 +137,33 @@ if (isset($_GET['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Gestión de Clientes</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/estilos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/View/public/assets/inicio.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <header class="header">
         <div class="logo-nombre">
-            <img src="<?= BASE_URL ?>/View/public/assets/img/logo.jpg" alt="Logo Banco Finan-Cias" class="logo">
-            <h1 class="titulo">Gestión de Clientes</h1>
+            <img src="<?= BASE_URL ?>/View/public/assets/Img/logos/logo2.png" alt="Logo Banco" class="logo">
+            <div class="titulo">
+            <h1>Banco Finan-CIAS</h1>
+            <h6>¡La Banca que te ayuda a crecer!</h6>
+            </div>
         </div>
+
+        <div class="usuario-dropdown">
+            <button onclick="toggleUsuarioMenu()" class="usuario-btn">
+                <i class="fas fa-user-circle"></i>
+                <span><?php echo htmlspecialchars($_SESSION['nombre'] ?? '') . ' ' . htmlspecialchars($_SESSION['apellido'] ?? ''); ?></span>
+            </button>
+            <div id="menuUsuario" class="usuario-menu">
+                <a href="#" id="cerrarSesionBtn">Cerrar Sesión</a>
+            </div>
+        </div>
+
     </header>
 
     <nav class="nav">
@@ -165,22 +184,22 @@ if (isset($_GET['login'])) {
         if (isset($seccion)) {
             switch ($seccion) {
                 case 'perfil_cliente':
-                    include '../../View/cliente/Perfil_Cliente.php';
+                    include '../View/cliente/Perfil_Cliente.php';
                     break;
                 case 'actualizar_datos':
-                    include '../../View/cliente/Actualizar_datos.php';
+                    include '../View/cliente/Actualizar_datos.php';
                     break;
                 case 'validacion_productos':
-                    include '../../View/cliente/Validacion_Productos.php';
+                    include '../View/cliente/Validacion_Productos.php';
                     break;
                 case 'certificaciones':
-                    include '../../View/cliente/Certificaciones.php';
+                    include '../View/cliente/Certificaciones.php';
                     break;
                 default:
-                    include '../../View/cliente/Perfil_Cliente.php';
+                    include '../View/cliente/Perfil_Cliente.php';
             }
         } else {
-            include '../../View/cliente/Perfil_Cliente.php';
+            include '../View/cliente/Perfil_Cliente.php';
         }
         ?>
     </main>
@@ -188,6 +207,55 @@ if (isset($_GET['login'])) {
     <footer>
         <p>&copy; <?= date("Y") ?> Banco Finan-Cias. Todos los derechos reservados.</p>
     </footer>
+
+    <script>
+  // Se ejecuta cuando el DOM está completamente cargado
+  document.addEventListener('DOMContentLoaded', function() {
+    // --- Confirmación para cerrar sesión ---
+    const cerrarSesionBtn = document.getElementById('cerrarSesionBtn');
+      if (cerrarSesionBtn) {
+        cerrarSesionBtn.addEventListener('click', function(event) {
+          event.preventDefault(); // Evita la navegación predeterminada del enlace
+          const confirmacion = confirm('¿Estás seguro de que deseas cerrar sesión?');
+          if (confirmacion) {
+            window.location.href = '<?= BASE_URL ?>/View/public/inicio.php?logout=true';
+          }
+        });
+      }
+    });
+
+    // --- FUNCIONALIDAD PARA EL MENÚ DE INICIO DE SESIÓN (Cliente/Admin) ---
+    function toggleDropdown() {
+      document.getElementById("menuSesion").classList.toggle("show");
+    }
+
+    // --- FUNCIONALIDAD PARA EL MENÚ DE USUARIO (Perfil/Cerrar Sesión) ---
+    function toggleUsuarioMenu() {
+      document.getElementById("menuUsuario").classList.toggle("show");
+    }
+
+    // --- CERRAR MENÚS AL HACER CLIC FUERA ---
+    window.addEventListener("click", function(event) {
+    // Cerrar menú de inicio de sesión si se hace clic fuera del "dropdown"
+    if (!event.target.closest(".dropdown")) {
+        const dropdowns = document.getElementsByClassName("dropdown-content");
+      for (let i = 0; i < dropdowns.length; i++) {
+        const openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+
+        // Cerrar menú de usuario si se hace clic fuera del "usuario-dropdown"
+    if (!event.target.closest(".usuario-dropdown")) {
+        const usuarioMenu = document.getElementById("menuUsuario");
+        if (usuarioMenu && usuarioMenu.classList.contains("show")) {
+            usuarioMenu.classList.remove("show");
+        }
+    }
+  });
+</script>
 
 </body>
 </html>
