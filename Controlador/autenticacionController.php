@@ -8,7 +8,8 @@ $accion = $_GET['accion'] ?? 'listar';
 $error = "";
 
 try {
-    switch ($accion) {        
+    switch ($accion) {   
+
         case 'loginCliente':
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $usuario = $_POST['usuario'] ?? '';
@@ -19,15 +20,14 @@ try {
                 if ($cliente) {
                     if ($cliente['Estado_Cliente'] == 'Activo') {
 
-                        $_SESSION['usuario'] = $usuario;
-                        $_SESSION['nombre'] = $cliente['Nombre_Cliente'];
-                        $_SESSION['rol'] = 'cliente';
+                        $_SESSION['usuarioCliente'] = $usuario;
+                        $_SESSION['nombreCliente'] = $cliente['Nombre_Cliente'];
+                        $_SESSION['rolCliente'] = 'cliente';
                         $_SESSION['cliente_id'] = $cliente['ID_Cliente'];
                         $_SESSION['ID_Cliente_Logueado'] = $cliente['ID_Cliente'];
                         $id_cliente_default = $cliente['ID_Cliente'];
 
-                        header("Location: /Proyecto_GB/View/cliente/index.php?controller=cliente&action=mostrarPerfilCliente&id=" . $id_cliente_default);
-                        // header("Location: /Proyecto_GB/Controlador/clienteControlador.php?login=success");
+                        header("Location: /Proyecto_GB/Controlador/clienteController.php?accion=mostrarPerfilCliente&id=" . $id_cliente_default);
                         exit;
                     } else {
                         $mensjError = "El usuario no se encuentra activo, por favor contactese con el administrador";
