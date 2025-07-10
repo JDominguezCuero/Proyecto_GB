@@ -240,7 +240,7 @@
         <div class="form-group">
             <label for="producto_interes">Producto de Interés:</label>
             <select id="producto_interes" name="producto_interes">
-                <option value="">Ninguno - Pedir asesoría.</option>
+                <option value="41">Ninguno - Pedir asesoría.</option>
                 <option value="1">Compra de cartera de crédito hipotecario</option>
                 <option value="2">Compra de cartera de vehículo</option>
                 <option value="3">Compra de cartera de microcrédito</option>
