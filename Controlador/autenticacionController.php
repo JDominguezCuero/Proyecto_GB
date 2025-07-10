@@ -22,6 +22,7 @@ try {
 
                         $_SESSION['usuarioCliente'] = $usuario;
                         $_SESSION['nombreCliente'] = $cliente['Nombre_Cliente'];
+                        $_SESSION['apellidoCliente'] = $cliente['Apellido_Cliente'];
                         $_SESSION['rolCliente'] = 'cliente';
                         $_SESSION['cliente_id'] = $cliente['ID_Cliente'];
                         $_SESSION['ID_Cliente_Logueado'] = $cliente['ID_Cliente'];

@@ -157,7 +157,7 @@ if (isset($_GET['login'])) {
         <div class="usuario-dropdown">
             <button onclick="toggleUsuarioMenu()" class="usuario-btn">
                 <i class="fas fa-user-circle"></i>
-                <span><?php echo htmlspecialchars($_SESSION['nombre'] ?? '') . ' ' . htmlspecialchars($_SESSION['apellido'] ?? ''); ?></span>
+                <span><?php echo htmlspecialchars($_SESSION['nombreCliente'] ?? '') . ' ' . htmlspecialchars($_SESSION['apellidoCliente'] ?? ''); ?></span>
             </button>
             <div id="menuUsuario" class="usuario-menu">
                 <a href="#" id="cerrarSesionBtn">Cerrar Sesión</a>
